@@ -1,0 +1,9 @@
+Aquí tienes los archivos que has de correr.
+Únicamente falta que pintes a diferentes archivos de texto todos los datos que se crean en CellIni para que pueda chequear que están bien.
+
+Acuérdate de correr el Benchmark de las matrices y pasarme los resultados porfa, que vamos a tener que interpretarlos juntos!
+
+
+A DISFRUTAR!!!
+
+JUGÓN!!!!!!

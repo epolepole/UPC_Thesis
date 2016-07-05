@@ -1,0 +1,85 @@
+
+*************************************************************************
+
+ Time: 2016:06:27 19:26:27
+
+
+
+
+			*****************************************************
+			*                                                   *
+			*                   Testing TIME!                   *
+			*                                                   *
+			*****************************************************
+
+
+Runing 1000 iterations per test
+
+using 8 threads
+
+Matrix size = 64 x 64
+
+Shared memory, accessed with private to shared pointers. Full matrix pointer for B
+
+begin_t = 0.000000
+ clock = 0.000000
+	Clocks per second = 1000000
+
+	Time max = 10000.000000
+	Time min = 0.000000
+	Time average 1= 290.000000
+
+	Time total = 290000.000000
+	Time average 2= 290.000000
+
+Shared memory, accessed with private to shared pointers. Single column pointer for B
+
+begin_t = 290.000000
+ clock = 0.000000
+	Clocks per second = 1000000
+
+	Time max = 10000.000000
+	Time min = 0.000000
+	Time average 1= 150.000000
+
+	Time total = 150000.000000
+	Time average 2= 150.000000
+
+Shared memory, accessed with array
+
+begin_t = 150.000000
+ clock = 0.000000
+	Clocks per second = 1000000
+
+	Time max = 10000.000000
+	Time min = 0.000000
+	Time average 1= 480.000000
+
+	Time total = 480000.000000
+	Time average 2= 480.000000
+
+Local memory
+
+begin_t = 480.000000
+ clock = 0.000000
+	Clocks per second = 1000000
+
+	Time max = 10000.000000
+	Time min = 0.000000
+	Time average 1= 30.000000
+
+	Time total = 30000.000000
+	Time average 2= 30.000000
+
+Dynamic shared allocation, accessed with array
+
+begin_t = 30.000000
+ clock = 0.000000
+	Clocks per second = 1000000
+
+	Time max = 10000.000000
+	Time min = 0.000000
+	Time average 1= 320.000000
+
+	Time total = 320000.000000
+	Time average 2= 320.000000

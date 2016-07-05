@@ -1,0 +1,7 @@
+CellFunctions.c		CORNER DETERMINATION		Check condition if (((Cells + index_Cell)->Boundary) != ((Cells + index_Cell)->BC_ID[j]) )
+
+FilesReading.c		ReadNodes function		Would be nice to implement an error/catch so that if the variable lines is different than NODES (defined in BlockSizeDefiner.h) the program stops
+
+FilesWriting.c		Major changes in both functions once we have the code compiled, we have to make sure that both formats work.
+
+iterate.c		putCellsToWCells		Go over it together
