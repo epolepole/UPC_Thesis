@@ -12,15 +12,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7cb5bf53-186d-4ef3-819c-fd2ffae90c7b" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/code_1.iml" afterPath="$PROJECT_DIR$/.idea/code_1.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/clean.sh" afterPath="$PROJECT_DIR$/clean.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/go.sh" afterPath="$PROJECT_DIR$/go.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/rebuild.sh" afterPath="$PROJECT_DIR$/rebuild.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/run.sh" afterPath="$PROJECT_DIR$/run.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ComputeResiduals.c" afterPath="$PROJECT_DIR$/src/ComputeResiduals.c" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Iterate.c" afterPath="$PROJECT_DIR$/src/Iterate.c" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main.c" afterPath="$PROJECT_DIR$/src/main.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/CellFunctions.c" afterPath="$PROJECT_DIR$/src/CellFunctions.c" />
     </list>
     <ignored path="code_1.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -41,19 +33,17 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="CellFunctions.c" pinned="false" current-in-tab="false">
+      <file leaf-file-name="CellFunctions.c" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/CellFunctions.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="920">
-              <caret line="214" column="0" selection-start-line="214" selection-start-column="0" selection-end-line="214" selection-end-column="0" />
-              <folding>
-                <element signature="e#1#75#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="-6716">
+              <caret line="2" column="18" selection-start-line="2" selection-start-column="18" selection-end-line="2" selection-end-column="18" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Iterate.c" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Iterate.c" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Iterate.c">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="1385">
@@ -79,7 +69,7 @@
       <file leaf-file-name="ComputeResiduals.c" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ComputeResiduals.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="437">
+            <state relative-caret-position="-529">
               <caret line="40" column="29" selection-start-line="40" selection-start-column="29" selection-end-line="40" selection-end-column="29" />
               <folding>
                 <element signature="e#1#19#0" expanded="true" />
@@ -164,17 +154,17 @@
         <option value="$PROJECT_DIR$/src/FilesReading.c" />
         <option value="$PROJECT_DIR$/include/BoundaryConditions.h" />
         <option value="$PROJECT_DIR$/include/Iterate.h" />
-        <option value="$PROJECT_DIR$/src/CellFunctions.c" />
         <option value="$PROJECT_DIR$/include/ShellFunctions.h" />
         <option value="$PROJECT_DIR$/include/ComputeResiduals.h" />
         <option value="$PROJECT_DIR$/src/main.c" />
         <option value="$PROJECT_DIR$/include/CellFunctions.h" />
-        <option value="$PROJECT_DIR$/src/ComputeResiduals.c" />
         <option value="$PROJECT_DIR$/run.sh" />
         <option value="$PROJECT_DIR$/clean.sh" />
         <option value="$PROJECT_DIR$/rebuild.sh" />
         <option value="$PROJECT_DIR$/go.sh" />
         <option value="$PROJECT_DIR$/src/Iterate.c" />
+        <option value="$PROJECT_DIR$/src/ComputeResiduals.c" />
+        <option value="$PROJECT_DIR$/src/CellFunctions.c" />
       </list>
     </option>
   </component>
@@ -541,9 +531,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4945">
           <caret line="215" column="0" selection-start-line="215" selection-start-column="0" selection-end-line="215" selection-end-column="0" />
-          <folding>
-            <element signature="e#1#75#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -578,9 +566,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4945">
           <caret line="215" column="0" selection-start-line="215" selection-start-column="0" selection-end-line="215" selection-end-column="0" />
-          <folding>
-            <element signature="e#1#75#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -780,26 +766,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/CellFunctions.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="920">
-          <caret line="214" column="0" selection-start-line="214" selection-start-column="0" selection-end-line="214" selection-end-column="0" />
-          <folding>
-            <element signature="e#1#75#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ComputeResiduals.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="437">
-          <caret line="40" column="29" selection-start-line="40" selection-start-column="29" selection-end-line="40" selection-end-column="29" />
-          <folding>
-            <element signature="e#1#19#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/run.sh">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="184">
@@ -832,6 +798,16 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/ComputeResiduals.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-529">
+          <caret line="40" column="29" selection-start-line="40" selection-start-column="29" selection-end-line="40" selection-end-column="29" />
+          <folding>
+            <element signature="e#1#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/Iterate.c">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1385">
@@ -840,6 +816,14 @@
             <element signature="e#0#52#0" expanded="true" />
             <element signature="e#652#702#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/CellFunctions.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-6716">
+          <caret line="2" column="18" selection-start-line="2" selection-start-column="18" selection-end-line="2" selection-end-column="18" />
+          <folding />
         </state>
       </provider>
     </entry>

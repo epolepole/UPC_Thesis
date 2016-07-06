@@ -1,5 +1,6 @@
 
 #include <math.h>                   // for sin,cos,pow... compile with -lm
+#include <stdio.h>
 
 #include "CellFunctions.h"
 #include "ShellFunctions.h" // convenience
@@ -165,7 +166,8 @@ void CellIni(CellProps *Cells,
     (Cells + index_Cell)->Fluid  = Nod[i][6];
 
     // Which thread does it belongs to
-    (Cells + index_Cell)->ThreadNumber = MYTHREAD;
+    //(Cells + index_Cell)->ThreadNumber = MYTHREAD;
+    // Implemented in iterate.c search: upc_forall(i = 0; i < 2*LAYER*THREADS; i++; &BCells[i]) { (BCells+i)->ThreadNumber = MYTHREAD; }
 
     // INITIALIZE VARIABLEs
     (Cells + index_Cell)->U   = 0;
@@ -229,10 +231,98 @@ void CellIni(CellProps *Cells,
       }
     }
 
-    // CORNER DETERMINATION
-    (Cells + index_Cell)->Boundary   = 0;  // IT IS NOT BOUNDARY NODE
-    (Cells + index_Cell)->Corner = 0;      // IT IS NOT A CORNER
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    //////////WITH THE ACTUAL MESH THERE ARE NO CORNERS///////////////
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
 
+    // CORNER DETERMINATION
+    (Cells + index_Cell)->Boundary   = 0;  // IT IS NOT BOUNDARY NODE   (0->Fluid / 1-> Wall / 2->Inlet or outlet / 3-> Edge / 4-> Corner 
+    (Cells + index_Cell)->Corner = 0;      // IT IS NOT A CORNER // WITH THE NEW SYSTEM, THIS IS NOT IMPORTANT ANYMORE
+
+    int number_solid_lattices;
+    number_solid_lattices = 0;
+    int boundary;
+    boundary = 0;
+
+    for (int j = 0; j < 19; ++j)
+    {
+      if ((Cells + index_Cell)->BC_ID[j]!=0)
+      {
+        boundary = (Cells + index_Cell)->BC_ID[j];
+        ++number_solid_lattices;
+      }
+    }
+    switch(number_solid_lattices)
+    {
+      case 5:
+        if (boundary == 1)                    // SOLID PLANE
+        {
+          (Cells + index_Cell)->Boundary = 1;
+        }
+        else if (boundary ==2)              // FLOW PLANE                                                                                                                                                 
+        {
+          (Cells + index_Cell)->Boundary = 2;
+        }
+        else
+        {
+          printf("Attention! Node %i is not in a wall nor an inlet/outlet!! (See CellFunctions.c, CORNER DETERMINATION)\n", (Cells + index_Cell)->ID);
+        }
+            break;
+      case 9: (Cells + index_Cell)->Boundary = 3;   break; // EDGE                                                                                                                                                                           
+      case 12: (Cells + index_Cell)->Boundary = 4;  break; // CORNER
+    }
+
+    /*<--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    // (0->Fluid / 1-> Wall / 2->Inlet or outlet / 3-> Edge (Wall-Wall) / 4-> Edge (Wall-Inlet or outlet) / 5-> Corner (Wall-Wall) / 6-> Corner (Wall-Inlet or outlet)                             | 
+    
+    bool different_types_of_boundaries;
+    different_types_of_boundaries = false;
+                                                                                                                                                                                               |                                                                                                                                   
+    switch(number_solid_lattices)                                                                                                                                                                  |                                                                                                                                                                   
+    {                                                                                                                                                                                              |                                                                                                                                                                                                                                                                                                        
+      case 5:                                                                                                                                                                                      |                                                                                                                                                
+        if (boundary == 1)                  // SOLID PLANE                                                                                                                                         |                         
+        {                                                                                                                                                                                          |                                                                                                                                          
+          (Cells + index_Cell)->Boundary = 1;                                                                                                                                                      |            
+        }                                                                                                                                                                                          |                                                                                                                                           
+        else if (boundary ==2)              // FLOW PLANE                                                                                                                                          |                        
+        {                                                                                                                                                                                          |                                                                                                                                            
+          (Cells + index_Cell)->Boundary = 2;                                                                                                                                                      |                                                                                                                                                                              
+        }                                                                                                                                                                                          |                                                                                                                                                                                                                                                                                                            
+        else                                                                                                                                                                                       |                                                                                                                                             
+        {                                                                                                                                                                                          |                                                                                                                                          
+          printf("Attention! Node %i is not in a wall nor an inlet/outlet!! (See CellFunctions.c, CORNER DETERMINATION)\n", (Cells + index_Cell)->ID);                                             |                                                                                                                     
+        }                                                                                                                                                                                          |
+        break;                                                                                                                                                                                     |                                                                                                                                               
+      case 9:                                                                                                                                                                                      |                                                                                                                                              
+        if (different_types_of_boundaries)  // SOLID EDGE                                                                                                                                          |                                                                                                                                                                                          
+        {                                                                                                                                                                                          |                                                                                                                                          
+          (Cells + index_Cell)->Boundary = 3;                                                                                                                                                      |            
+        }                                                                                                                                                                                          |
+        else                                // SOLID - FLOW EDGE                                                                                                                                   |                               
+        {                                                                                                                                                                                          |                                                                                                                                          
+          (Cells + index_Cell)->Boundary = 4;                                                                                                                                                      |
+        }                                                                                                                                                                                          |
+        break;                                                                                                                                                                                     |
+      case 12:                                                                                                                                                                                     |
+        if (different_types_of_boundaries)  // SOLID CORNERS                                                                                                                                       |
+        {                                                                                                                                                                                          |                                                                                                                                                                                                                                                                                                                                   
+          (Cells + index_Cell)->Boundary = 5;                                                                                                                                                      |
+        }                                                                                                                                                                                          |
+        else                                // SOLID - FLOW CORNER                                                                                                                                 |
+        {                                                                                                                                                                                          |
+          (Cells + index_Cell)->Boundary = 6;                                                                                                                                                      |
+        }                                                                                                                                                                                          |
+        break;                                                                                                                                                                                     |
+      default: printf("Attention! Node %i is not in a wall, inlet/outlet, edge or corner!! (See CellFunctions.c, CORNER DETERMINATION)\n", (Cells + index_Cell)->ID);                              |
+    } ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    /*
     for(j = 1; j < 19; j++)
     {
       if ((Cells + index_Cell)->BC_ID[j] != 0)
@@ -260,10 +350,23 @@ void CellIni(CellProps *Cells,
           {
             (Cells + index_Cell)->Boundary=1;
             (Cells + index_Cell)->Corner=1;
-          }*/
+          }
         }
-      }
-    }
+      }*/
+
+
+    /*
+
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    //////////WITH THE ACTUAL MESH THERE ARE NO CORNERS///////////////
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+
+    WITH THE NEW APPROACH, CORNERS ARE TREATED AS WALLS
 
     //Boundary=0 NO BC
     //Boundary=1 WALL
@@ -325,6 +428,7 @@ void CellIni(CellProps *Cells,
         (Cells + index_Cell)->BC_ID[18]=1;
       }
     }
+    */
 
     // INITIALIZE STREAMING (STREAM EVERYWHERE)
     for(j = 0; j < 19; j++)
@@ -364,8 +468,11 @@ void CellIni(CellProps *Cells,
             break;
 
     }
-    (Cells + index_Cell)->U = (Cells + index_Cell)->Uo; // ???????????????????????????????????
 
+
+    (Cells + index_Cell)->U = (Cells + index_Cell)->Uo; // ???????????????????????????????????
+    (Cells + index_Cell)->V = (Cells + index_Cell)->Vo;
+    (Cells + index_Cell)->W = (Cells + index_Cell)->Wo;
 
   } // END OF for LOOP
 } // END OF FUNCTION
@@ -526,8 +633,7 @@ void D3Q19Vars(double* w, int* cx, int* cy, int* cz, int* opp, int* c)
 void BGKW(CellProps *Cells, int i, double* w, int* cx, int* cy, double Omega)
 {
 
-  double T1 = ((Cells+i)->U) * ((Cells+i)->U) +
-              ((Cells+i)->V) * ((Cells+i)->V);
+  double T1 = ((Cells+i)->U) * ((Cells+i)->U) + ((Cells+i)->V) * ((Cells+i)->V) + ((Cells+i)->W) * ((Cells+i)->W);
   double T2 = 0.0;
   int k;
   for (k=0; k<9; k++)
