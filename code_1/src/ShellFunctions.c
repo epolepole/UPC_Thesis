@@ -2,13 +2,10 @@
 #include <assert.h>    // ensure successfull allocation
 #include <stdbool.h>   // bool variables
 #include <stdio.h>     // printf...
-#include <string.h> 
-#include <upc_relaxed.h>                 // Required for UPC 
+#include <string.h>
 
 #include <dirent.h>    // Directory management
 #include <sys/stat.h>  // system commands ?
-#include <sys/types.h> // Extra types of variables, google it
-#include <unistd.h>    // standard symbolic constants and types
 
 
 /////////////////////////////////////////////////////////////////////////

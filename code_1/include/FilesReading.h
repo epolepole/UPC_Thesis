@@ -12,7 +12,7 @@ void CompDataNode(float **Nodes);
 
 void CompDataConn(float** BCconn);
 
-void ReadIniData(char* IniFileName, float* Uavg, float* Vavg, float* rho_ini,
+void ReadIniData(char* IniFileName, float* Uavg, float* Vavg, float* Wavg, float* rho_ini,
                  float* Viscosity, int* InletProfile, int* CollisionModel,
                  int* CurvedBoundaries, int* OutletProfile, int* Iterations,
                  int* AutosaveEvery, int* AutosaveAfter, int* PostprocProg,

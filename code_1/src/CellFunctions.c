@@ -1,10 +1,8 @@
-#include <stdio.h>                  // printf();
-#include <stdlib.h>                 // for malloc();
-#include <stdbool.h>                // for bool type variables!
-#include <math.h>                   // for sin,cos,pow... compile with -lm
-#include <upc_relaxed.h>            // Required for UPC 
 
-#include "include/ShellFunctions.h" // convenience
+#include <math.h>                   // for sin,cos,pow... compile with -lm
+
+#include "CellFunctions.h"
+#include "ShellFunctions.h" // convenience
 
 /*==================================================
 =========Initialization for the MRT model===========
@@ -18,7 +16,7 @@ void MRTInitializer(double** tm, double** stmiv, double Omega)
 
   ///////////// Declarations ////////////////
   int i, j, l;  // loop variables
-  
+
   // declarations for this collision model
   float sumcc;
   float sm[9];
@@ -39,35 +37,35 @@ void MRTInitializer(double** tm, double** stmiv, double Omega)
   };*/
 
   float tminv[9][9] =
-  {
-      {4.*(1./36), -4.*(1./36),  4.*(1./36),         0.0,         0.0,         0.0,         0.0,         0.0,         0.0},
-      {4.*(1./36),    -(1./36), -2.*(1./36),  6.*(1./36), -6.*(1./36),         0.0,         0.0,  9.*(1./36),         0.0},
-      {4.*(1./36),    -(1./36), -2.*(1./36),         0.0,         0.0,  6.*(1./36), -6.*(1./36), -9.*(1./36),         0.0},
-      {4.*(1./36),    -(1./36), -2.*(1./36), -6.*(1./36),  6.*(1./36),         0.0,         0.0,  9.*(1./36),         0.0},
-      {4.*(1./36),    -(1./36), -2.*(1./36),         0.0,         0.0, -6.*(1./36),  6.*(1./36), -9.*(1./36),         0.0},
-      {4.*(1./36),  2.*(1./36),     (1./36),  6.*(1./36),  3.*(1./36),  6.*(1./36),  3.*(1./36),         0.0,  9.*(1./36)},
-      {4.*(1./36),  2.*(1./36),     (1./36), -6.*(1./36), -3.*(1./36),  6.*(1./36),  3.*(1./36),         0.0, -9.*(1./36)},
-      {4.*(1./36),  2.*(1./36),     (1./36), -6.*(1./36), -3.*(1./36), -6.*(1./36), -3.*(1./36),         0.0,  9.*(1./36)},
-      {4.*(1./36),  2.*(1./36),     (1./36),  6.*(1./36),  3.*(1./36), -6.*(1./36), -3.*(1./36),         0.0, -9.*(1./36)}
-  };      
+          {
+                  {4.*(1./36), -4.*(1./36),  4.*(1./36),         0.0,         0.0,         0.0,         0.0,         0.0,         0.0},
+                  {4.*(1./36),    -(1./36), -2.*(1./36),  6.*(1./36), -6.*(1./36),         0.0,         0.0,  9.*(1./36),         0.0},
+                  {4.*(1./36),    -(1./36), -2.*(1./36),         0.0,         0.0,  6.*(1./36), -6.*(1./36), -9.*(1./36),         0.0},
+                  {4.*(1./36),    -(1./36), -2.*(1./36), -6.*(1./36),  6.*(1./36),         0.0,         0.0,  9.*(1./36),         0.0},
+                  {4.*(1./36),    -(1./36), -2.*(1./36),         0.0,         0.0, -6.*(1./36),  6.*(1./36), -9.*(1./36),         0.0},
+                  {4.*(1./36),  2.*(1./36),     (1./36),  6.*(1./36),  3.*(1./36),  6.*(1./36),  3.*(1./36),         0.0,  9.*(1./36)},
+                  {4.*(1./36),  2.*(1./36),     (1./36), -6.*(1./36), -3.*(1./36),  6.*(1./36),  3.*(1./36),         0.0, -9.*(1./36)},
+                  {4.*(1./36),  2.*(1./36),     (1./36), -6.*(1./36), -3.*(1./36), -6.*(1./36), -3.*(1./36),         0.0,  9.*(1./36)},
+                  {4.*(1./36),  2.*(1./36),     (1./36),  6.*(1./36),  3.*(1./36), -6.*(1./36), -3.*(1./36),         0.0, -9.*(1./36)}
+          };
 
 
 
   float temp[9][9] = {
-    {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-    {-4.,-1.,-1.,-1.,-1.,2.0,2.0,2.0,2.0},
-    {4.0,-2.,-2.,-2.,-2.,1.0,1.0,1.0,1.0},
-    {0.0,1.0,0.0,-1.,0.0,1.0,-1.,-1.,1.0},
-    {0.0,-2.,0.0,2.0,0.0,1.0,-1.,-1.,1.0},
-    {0.0,0.0,1.0,0.0,-1.,1.0,1.0,-1.,-1.},
-    {0.0,0.0,-2.,0.0,2.0,1.0,1.0,-1.,-1.},
-    {0.0,1.0,-1.,1.0,-1.,0.0,0.0,0.0,0.0},
-    {0.0,0.0,0.0,0.0,0.0,1.0,-1.,1.0,-1.} 
+          {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
+          {-4.,-1.,-1.,-1.,-1.,2.0,2.0,2.0,2.0},
+          {4.0,-2.,-2.,-2.,-2.,1.0,1.0,1.0,1.0},
+          {0.0,1.0,0.0,-1.,0.0,1.0,-1.,-1.,1.0},
+          {0.0,-2.,0.0,2.0,0.0,1.0,-1.,-1.,1.0},
+          {0.0,0.0,1.0,0.0,-1.,1.0,1.0,-1.,-1.},
+          {0.0,0.0,-2.,0.0,2.0,1.0,1.0,-1.,-1.},
+          {0.0,1.0,-1.,1.0,-1.,0.0,0.0,0.0,0.0},
+          {0.0,0.0,0.0,0.0,0.0,1.0,-1.,1.0,-1.}
   };
 
 
   ///////////// Fill up variables ////////////////
-  
+
   // Filling up tm
   for (i = 0; i < 9; i++)
   {
@@ -104,7 +102,7 @@ void MRTInitializer(double** tm, double** stmiv, double Omega)
   {
     for(j=0;j<9;j++)
     {
-        stmiv[i][j]=tminv[i][j]*sm[j];
+      stmiv[i][j]=tminv[i][j]*sm[j];
     }
   }
 
@@ -115,16 +113,16 @@ void MRTInitializer(double** tm, double** stmiv, double Omega)
 ============Initialization of the cells=============
 ==================================================*/
 
-void CellIni(struct CellProps *Cells,
-             float  **Nod,             
+void CellIni(CellProps *Cells,
+             float  **Nod,
              float  **Con,
              float  Uavg,
-             float  Vavg, 
-             float  Wavg,             
+             float  Vavg,
+             float  Wavg,
              int    InletProfile,
-             int    CollisionModel,      
+             int    CollisionModel,
              int*   opp,
-             float  rho_ini) 
+             float  rho_ini)
 {
   ///////////// DECLARATION /////////////////
   int i, j, l, k;  // loop variables
@@ -147,7 +145,7 @@ void CellIni(struct CellProps *Cells,
   Qlat[15] = sqrt(2);
   Qlat[16] = sqrt(2);
   Qlat[17] = sqrt(2);
-  Qlat[18] = sqrt(2);  
+  Qlat[18] = sqrt(2);
 
   int index_Cell;
 
@@ -161,8 +159,8 @@ void CellIni(struct CellProps *Cells,
     // FIND X, Y and Z of the actual cell
     (Cells + index_Cell)->CoordX = Nod[i][3];
     (Cells + index_Cell)->CoordY = Nod[i][4];
-    (Cells + index_Cell)->CoordZ = Nod[i][5];    
-    
+    (Cells + index_Cell)->CoordZ = Nod[i][5];
+
     // CHECK FLUID OR NOT
     (Cells + index_Cell)->Fluid  = Nod[i][6];
 
@@ -173,7 +171,7 @@ void CellIni(struct CellProps *Cells,
     (Cells + index_Cell)->U   = 0;
     (Cells + index_Cell)->V   = 0;
     (Cells + index_Cell)->Rho = rho_ini;
-  
+
     // REMEMBER BCCONNECTOR FILE
     //  _________________________________________________________________________________________________________________
     // |        0      |       1      |       2      |     3     |    4    |    5     |    6     |    7     |      8     |
@@ -194,7 +192,7 @@ void CellIni(struct CellProps *Cells,
     //   |         /   |   \         |         /   |   \         |         /   |   \         |
     //   |       /     |     \       |       /     |     \       |       /     |     \       |
     //   |     10      4       9     |     14      6      13     |     18      6       17    |
-    
+
     // BC types: *1->wall; *2->inlet; *3->outlet
 
     (Cells + index_Cell)->BoundaryID = 0;  // IT IS NOT BOUNDARY NODE
@@ -202,14 +200,14 @@ void CellIni(struct CellProps *Cells,
     for(j = 0; j < 19; j++)
     {
       (Cells + index_Cell)->BC_ID[j]= 0  ; // IT IS NOT BOUNDARY LATTICE
-      (Cells + index_Cell)->Q[j]    = 0.5; 
+      (Cells + index_Cell)->Q[j]    = 0.5;
     }
 
     //SEARCH FOR BC TYPE, BOUNDARY ID AND DISTANCES IN THE LATTICE
     for(j = 0; j < *NumConn; j++)
     {
       if (
-          ( (int)Con[j][0] == (int)Nod[i][0] )\
+              ( (int)Con[j][0] == (int)Nod[i][0] )\
           && ( (int)Con[j][1] == (int)Nod[i][1] )\
           && ( (int)Con[j][1] == (int)Nod[i][2] ) )
       {
@@ -220,10 +218,10 @@ void CellIni(struct CellProps *Cells,
           {
             (Cells + index_Cell)->BC_ID[k]   = Con[j][4];
             (Cells + index_Cell)->BoundaryID = Con[j][8];
-            
+
             // find distance from the boundary
             (Cells + index_Cell)->Q[k] = sqrt(
-              pow(Con[j][5]- ((Cells + index_Cell)->CoordX),2)\
+                    pow(Con[j][5]- ((Cells + index_Cell)->CoordX),2)\
               + pow(Con[j][6]-((Cells + index_Cell)->CoordY),2)\
               + pow(Con[j][7]-((Cells + index_Cell)->CoordZ),2)) / ((*Delta)*Qlat[k]);
           }
@@ -237,17 +235,17 @@ void CellIni(struct CellProps *Cells,
 
     for(j = 1; j < 19; j++)
     {
-      if ((Cells + index_Cell)->BC_ID[j] != 0) 
+      if ((Cells + index_Cell)->BC_ID[j] != 0)
       { // Lattice-direction j is not surrounded by fluid
-        
-        if ((Cells + index_Cell)->Boundary == 0) 
+
+        if ((Cells + index_Cell)->Boundary == 0)
         {// The BC of the node becomes the BC of the first lattice direction which doesn't point to fluid
           (Cells + index_Cell)->Boundary = (Cells + index_Cell)->BC_ID[j];
         }
-    
+
         else
         {// In the same node two lattice directions have different BC (corners). This automatically means that the node is a corner.
-          if (((Cells + index_Cell)->Boundary) != ((Cells + index_Cell)->BC_ID[j]) ) 
+          if (((Cells + index_Cell)->Boundary) != ((Cells + index_Cell)->BC_ID[j]) )
           {
             (Cells + index_Cell)->Boundary=1;
             (Cells + index_Cell)->Corner=1;
@@ -271,8 +269,8 @@ void CellIni(struct CellProps *Cells,
     //Boundary=1 WALL
     //Boundary=2 INLET
     //Boundary=3 OUTLET
-  
-  
+
+
     // IF TWO PERPENDICULAR LATTICE DIRECTIONS ARE NOT SURROUNDED BY FLUID IT MEANS THAT IT IS
     // A CORNER. IT IS MANDATORY THAT THE DIAGONAL LATTICE DIRECTION BETWEEN THEM CORRESPONDS
     // TO A WALL. HENCE, ALL THE CASES ARE CHECKED AND DIAGONAL DIRECTIONS EQUALED TO 1
@@ -280,79 +278,79 @@ void CellIni(struct CellProps *Cells,
     {
       if ((Cells + index_Cell)->BC_ID[1] != 0 && (Cells + index_Cell)->BC_ID[3] != 0 )
       {
-          (Cells + index_Cell)->BC_ID[7]=1;
+        (Cells + index_Cell)->BC_ID[7]=1;
       }
       if ((Cells + index_Cell)->BC_ID[1] != 0 && (Cells + index_Cell)->BC_ID[4] != 0 )
       {
-          (Cells + index_Cell)->BC_ID[9]=1;
+        (Cells + index_Cell)->BC_ID[9]=1;
       }
       if ((Cells + index_Cell)->BC_ID[1] != 0 && (Cells + index_Cell)->BC_ID[5] != 0 )
       {
-          (Cells + index_Cell)->BC_ID[11]=1;
+        (Cells + index_Cell)->BC_ID[11]=1;
       }
       if ((Cells + index_Cell)->BC_ID[1] != 0 && (Cells + index_Cell)->BC_ID[6] != 0 )
       {
-          (Cells + index_Cell)->BC_ID[13]=1;
+        (Cells + index_Cell)->BC_ID[13]=1;
       }
       if ((Cells + index_Cell)->BC_ID[2] != 0 && (Cells + index_Cell)->BC_ID[4] != 0 )
       {
-          (Cells + index_Cell)->BC_ID[10]=1;
+        (Cells + index_Cell)->BC_ID[10]=1;
       }
       if ((Cells + index_Cell)->BC_ID[2] != 0 && (Cells + index_Cell)->BC_ID[3] != 0 )
       {
-          (Cells + index_Cell)->BC_ID[8]=1;
+        (Cells + index_Cell)->BC_ID[8]=1;
       }
       if ((Cells + index_Cell)->BC_ID[2] != 0 && (Cells + index_Cell)->BC_ID[5] != 0 )
       {
-          (Cells + index_Cell)->BC_ID[12]=1;
+        (Cells + index_Cell)->BC_ID[12]=1;
       }
       if ((Cells + index_Cell)->BC_ID[2] != 0 && (Cells + index_Cell)->BC_ID[6] != 0 )
       {
-          (Cells + index_Cell)->BC_ID[14]=1;
+        (Cells + index_Cell)->BC_ID[14]=1;
       }
       if ((Cells + index_Cell)->BC_ID[3] != 0 && (Cells + index_Cell)->BC_ID[5] != 0 )
       {
-          (Cells + index_Cell)->BC_ID[15]=1;
+        (Cells + index_Cell)->BC_ID[15]=1;
       }
       if ((Cells + index_Cell)->BC_ID[3] != 0 && (Cells + index_Cell)->BC_ID[6] != 0 )
       {
-          (Cells + index_Cell)->BC_ID[17]=1;
+        (Cells + index_Cell)->BC_ID[17]=1;
       }
       if ((Cells + index_Cell)->BC_ID[4] != 0 && (Cells + index_Cell)->BC_ID[5] != 0 )
       {
-          (Cells + index_Cell)->BC_ID[16]=1;
+        (Cells + index_Cell)->BC_ID[16]=1;
       }
       if ((Cells + index_Cell)->BC_ID[4] != 0 && (Cells + index_Cell)->BC_ID[6] != 0 )
       {
-          (Cells + index_Cell)->BC_ID[18]=1;
+        (Cells + index_Cell)->BC_ID[18]=1;
       }
     }
 
     // INITIALIZE STREAMING (STREAM EVERYWHERE)
-    for(j = 0; j < 19; j++)  
+    for(j = 0; j < 19; j++)
     {
       (Cells + index_Cell)->StreamLattice[j] = 1;
     }
-  
-  
+
+
     // DON'T STREAM TO SOLIDS
     for(j = 0; j < 19; j++)
     {
       if ((Cells + index_Cell)->BC_ID[j]!=0)
       {
-          (Cells + index_Cell)->StreamLattice[opp[j]]= 0 ;
+        (Cells + index_Cell)->StreamLattice[opp[j]]= 0 ;
       }
     }
 
     // INLET VELOCITY // THIS IS CRAPPY, NOT USED!
     switch(InletProfile)
     {
-      case 1: 
-      ////////////////////////////////////////////////////////////////////
-      ////////////////////////////////////////////////////////////////////
-      ////////////////////////TO DEVELOPE/////////////////////////////////
-      ////////////////////////////////////////////////////////////////////
-      ////////////////////////////////////////////////////////////////////
+      case 1:
+        ////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////
+        ////////////////////////TO DEVELOPE/////////////////////////////////
+        ////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////
         //Uo=1.5*Uavg*(1-4*(pow((CoordY-MinInletCoordY-0.5*(MaxInletCoordY-MinInletCoordY)),2)));
         //Uo=4*1.5*Uavg*CoordY*(41-CoordY)/(41*41);
         //(Cells + index_Cell)->Uo = 4*1.5*Uavg*(((Cells + index_Cell)->CoordY)-(*MinInletCoordY))*(((*MaxInletCoordY)-(*MinInletCoordY))-(((Cells + index_Cell)->CoordY)-(*MinInletCoordY)))/(((*MaxInletCoordY)-(*MinInletCoordY))*((*MaxInletCoordY)-(*MinInletCoordY)));
@@ -361,21 +359,21 @@ void CellIni(struct CellProps *Cells,
         break;
       case 2:
         (Cells + index_Cell)->Uo = Uavg;
-        (Cells + index_Cell)->Vo = Vavg;
-        (Cells + index_Cell)->Wo = Wavg;
-      break;
-  
-  }
-  (Cells + index_Cell)->U = (Cells + index_Cell)->Uo; // ???????????????????????????????????
+            (Cells + index_Cell)->Vo = Vavg;
+            (Cells + index_Cell)->Wo = Wavg;
+            break;
+
+    }
+    (Cells + index_Cell)->U = (Cells + index_Cell)->Uo; // ???????????????????????????????????
 
 
   } // END OF for LOOP
 } // END OF FUNCTION
 
 
-  /*==================================================
-  ========Creating constant lattice parameters========
-  ==================================================*/
+/*==================================================
+========Creating constant lattice parameters========
+==================================================*/
 
 void D3Q19Vars(double* w, int* cx, int* cy, int* cz, int* opp, int* c)
 {
@@ -393,18 +391,18 @@ void D3Q19Vars(double* w, int* cx, int* cy, int* cz, int* opp, int* c)
   //  |         /   |   \         |         /   |   \         |         /   |   \         |
   //  |       /     |     \       |       /     |     \       |       /     |     \       |
   //  |     10      4       9     |     14      6      13     |     18      6       17    |
-  
+
   int i;
 
   // D3Q19 properties  
   w[0]=12./36.;
 
   for (i=1; i<7; i++ )
-      w[i]=2./36.;
+    w[i]=2./36.;
 
   for (i=7; i<18; i++ )
-      w[i]=1./36.;
-  
+    w[i]=1./36.;
+
   cx[0]  =  0;
   cx[1]  =  1;
   cx[2]  = -1;
@@ -490,7 +488,7 @@ void D3Q19Vars(double* w, int* cx, int* cy, int* cz, int* opp, int* c)
   // m: number of rows (y-direction)
   // LAYER = n*m
 
-                               // Streaming comes from which node?
+  // Streaming comes from which node?
   c[0]  =          0         ;
   c[1]  = -1                 ; // (i-1)
   c[2]  =  1                 ; // (i+1)
@@ -521,14 +519,14 @@ void D3Q19Vars(double* w, int* cx, int* cy, int* cz, int* opp, int* c)
 ////////////////////////////////////////////////////////////////////////////////////
 
 
-  /*==================================================
-  =============Function for the BGKW model============
-  ==================================================*/
+/*==================================================
+=============Function for the BGKW model============
+==================================================*/
 
-void BGKW(struct CellProps *Cells, int i, double* w, int* cx, int* cy, double Omega)
+void BGKW(CellProps *Cells, int i, double* w, int* cx, int* cy, double Omega)
 {
 
-  double T1 = ((Cells+i)->U) * ((Cells+i)->U) + 
+  double T1 = ((Cells+i)->U) * ((Cells+i)->U) +
               ((Cells+i)->V) * ((Cells+i)->V);
   double T2 = 0.0;
   int k;
@@ -540,41 +538,41 @@ void BGKW(struct CellProps *Cells, int i, double* w, int* cx, int* cy, double Om
   }
 }
 
-  /*==================================================
-  =============Function for the TRT model=============
-  ==================================================*/
+/*==================================================
+=============Function for the TRT model=============
+==================================================*/
 
-void TRT(struct CellProps *Cells, int i, double* w, int* cx, int* cy, int* opp, double Omega, double OmegaA)
+void TRT(CellProps *Cells, int i, double* w, int* cx, int* cy, int* opp, double Omega, double OmegaA)
 {
   double T1 = ((Cells +i)->U)*((Cells +i)->U)+((Cells +i)->V)*((Cells +i)->V);
   double T2 = 0.0;
   int k;
   for (k=0; k<9; k++)
   {
-      T2                  = ((Cells +i)->U)   *cx[k] + ((Cells +i)->V)*cy[k];
-      (Cells +i)->Feq[k]  = ((Cells +i)->Rho) *w[k]*(1.0+3.0*T2+4.5*T2*T2-1.5*T1);
+    T2                  = ((Cells +i)->U)   *cx[k] + ((Cells +i)->V)*cy[k];
+    (Cells +i)->Feq[k]  = ((Cells +i)->Rho) *w[k]*(1.0+3.0*T2+4.5*T2*T2-1.5*T1);
   }
-  
+
   float F_p[9],Feq_p[9],F_m[9],Feq_m[9];
   for (k=0; k<9; k++)
   {
-      F_p[k]   = 0.5*( (Cells +i)->F[k]   + (Cells +i)->F[opp[k]]   );
-      Feq_p[k] = 0.5*( (Cells +i)->Feq[k] + (Cells +i)->Feq[opp[k]] );
-      F_m[k]   = 0.5*( (Cells +i)->F[k]   - (Cells +i)->F[opp[k]]   );
-      Feq_m[k] = 0.5*( (Cells +i)->Feq[k] - (Cells +i)->Feq[opp[k]] );
-      
-      (Cells +i)->METAF[k] = (Cells +i)->F[k] - 
-                             (F_p[k]-Feq_p[k])*Omega - 
-                             (F_m[k]-Feq_m[k])*OmegaA;
+    F_p[k]   = 0.5*( (Cells +i)->F[k]   + (Cells +i)->F[opp[k]]   );
+    Feq_p[k] = 0.5*( (Cells +i)->Feq[k] + (Cells +i)->Feq[opp[k]] );
+    F_m[k]   = 0.5*( (Cells +i)->F[k]   - (Cells +i)->F[opp[k]]   );
+    Feq_m[k] = 0.5*( (Cells +i)->Feq[k] - (Cells +i)->Feq[opp[k]] );
+
+    (Cells +i)->METAF[k] = (Cells +i)->F[k] -
+                           (F_p[k]-Feq_p[k])*Omega -
+                           (F_m[k]-Feq_m[k])*OmegaA;
   }
 }
 
 
-  /*==================================================
-  =============Function for the MRT model=============
-  ==================================================*/
+/*==================================================
+=============Function for the MRT model=============
+==================================================*/
 
-void MRT(struct CellProps *Cells, int i, double** tm, double** stmiv)
+void MRT(CellProps *Cells, int i, double** tm, double** stmiv)
 {
   int k, l;
   double fmom[9],fmeq[9];
@@ -593,7 +591,7 @@ void MRT(struct CellProps *Cells, int i, double** tm, double** stmiv)
   fmeq[6] =-((Cells +i)->Rho)*((Cells +i)->V);
   fmeq[7] = ((Cells +i)->Rho)*(U*U-V*V);
   fmeq[8] = ((Cells +i)->Rho)*U*V;
-  
+
   for (k=0; k<9;k++)
   {
     suma=0.0;
@@ -608,17 +606,17 @@ void MRT(struct CellProps *Cells, int i, double** tm, double** stmiv)
     sumb=0.0;
     for (l=0; l<9;l++)
       sumb = sumb + stmiv[k][l]*(fmom[l]-fmeq[l]);
-    
+
     (Cells +i)->METAF[k] = ((Cells +i)->F[k]) - sumb;
   }
 }
 
 
-  /*==================================================
-  ======Function to update the distribution fct.======
-  ==================================================*/
+/*==================================================
+======Function to update the distribution fct.======
+==================================================*/
 
-void UpdateF(struct CellProps *Cells, int i)
+void UpdateF(CellProps *Cells, int i)
 {
   int k;
   for(k=0;k<9;k++)
@@ -626,11 +624,11 @@ void UpdateF(struct CellProps *Cells, int i)
 }
 
 
-  /*==================================================
-  ======Function to update the macroscopic var.=======
-  ==================================================*/
+/*==================================================
+======Function to update the macroscopic var.=======
+==================================================*/
 
-void UpdateMacroscopic(struct CellProps *Cells, int i, int* cx, int* cy, int CalculateDragLift)
+void UpdateMacroscopic(CellProps *Cells, int i, int* cx, int* cy, int CalculateDragLift)
 {
   double Ssum, Usum, Vsum;
   int k;
@@ -639,7 +637,7 @@ void UpdateMacroscopic(struct CellProps *Cells, int i, int* cx, int* cy, int Cal
   {
     Ssum=0.0;
     for (k=0; k<9; k++)
-        Ssum = Ssum+(Cells+i)->F[k];
+      Ssum = Ssum+(Cells+i)->F[k];
 
     (Cells+i)->Rho = Ssum;
 
@@ -658,14 +656,14 @@ void UpdateMacroscopic(struct CellProps *Cells, int i, int* cx, int* cy, int Cal
 
   if ((Cells+i)->BC_ID[1]==3) // for outlet on the right
   {
-      (Cells+i)->V=0.0;
+    (Cells+i)->V=0.0;
   }
 
   //   DRAG/LIFT FORCE
   if (CalculateDragLift != 0 && (Cells+i)->BoundaryID==CalculateDragLift)
   {
-     (Cells+i)->DragF = ((Cells+i)->Rho)/3*(20-(Cells+i)->CoordX)/5;
-     (Cells+i)->LiftF = ((Cells+i)->Rho)/3*(20-(Cells+i)->CoordY)/5;
+    (Cells+i)->DragF = ((Cells+i)->Rho)/3*(20-(Cells+i)->CoordX)/5;
+    (Cells+i)->LiftF = ((Cells+i)->Rho)/3*(20-(Cells+i)->CoordY)/5;
   }
 
 }

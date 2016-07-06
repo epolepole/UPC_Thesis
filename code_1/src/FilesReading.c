@@ -2,9 +2,8 @@
 
 #include <stdio.h>                  // printf();
 #include <stdlib.h>                 // for malloc();
-#include <upc_relaxed.h>            // Required for UPC 
 
-#include "include/ShellFunctions.h" // For convenience
+#include "ShellFunctions.h" // For convenience
 
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////

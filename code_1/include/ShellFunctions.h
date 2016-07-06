@@ -8,6 +8,25 @@ scalar-vector-matrix allocation and this header includes the multifunctional
 #ifndef SHELLFUNCTIONS_H
 #define SHELLFUNCTIONS_H
 
+#if __UPC__ == 0
+
+
+#define MYTHREAD  0
+#define THREADS  8
+
+#define shared_block(var)
+#define shared
+
+#define upc_barrier
+#define upc_forall(a) ();
+
+#else
+#define shared_block(var) shared [var]
+#endif
+
+#define main_thread(c) if (MYTHREAD == 0) { c }
+
+
 ////////////////////////////////////////////////////
 ///////////////////// DEFINE ///////////////////////
 ////////////////////////////////////////////////////
@@ -24,21 +43,6 @@ scalar-vector-matrix allocation and this header includes the multifunctional
 ////////////// SHARED DECLARATIONS /////////////////
 ////////////////////////////////////////////////////
 
-//shared [BLOCKSIZE+2*NN] struct CellProps  *SCells;
-shared [BLOCKSIZE]      struct CellProps  *WCells; // Writing Cells: cells to write data
-shared [2*NN]           struct CellProps  *BCells; // Boundary cells
-shared [4]              double sResiduals[4*THREADS]; // variable to store residuals
-
-shared [] int    *NumNodes;       // This will store the number of lines of the read files
-shared [] int    *NumConn;        // This will store the number of lines of the read files
-shared [] int    *n;              // number of nodes in the x direction   
-shared [] int    *m;              // number of nodes in the y direction
-shared [] int    *NumInletNodes;  // number of inlet nodes
-shared [] double *Delta;          // grid spacing
-shared [] double *MaxInletCoordY; // maximum inlet coordinate in y
-shared [] double *MinInletCoordY; // minimum inlet coordinate in y
-
-shared int loop;
 
 typedef double MyReal;
 
@@ -46,34 +50,54 @@ typedef double MyReal;
 /////////////////// STRUCT FOR CELLS ////////////////////
 /////////////////////////////////////////////////////////
 
-struct CellProps
+typedef struct
 {
-  int    Fluid;    
-  int    Corner;          
-  int    StreamLattice[19];
-  int    ID;             
-  int    Boundary;    
-  int    BoundaryID;  
-  int    BC_ID[19];
-  int    ThreadNumber;         
-  MyReal Q[19];           
-  MyReal CoordX;   
-  MyReal CoordY;
-  MyReal CoordZ;
-  MyReal U;
-  MyReal V;
-  MyReal W;
-  MyReal Rho;
-  MyReal Uo;    
-  MyReal Vo;
-  MyReal Wo;    
-  MyReal DragF;
-  MyReal LiftF;
-  MyReal F[19];
-  MyReal Feq[19];
-  MyReal METAF[19];
-  MyReal Fneighbours[19];	
-};
+    int    Fluid;
+    int    Corner;
+    int    StreamLattice[19];
+    int    ID;
+    int    Boundary;
+    int    BoundaryID;
+    int    BC_ID[19];
+    int    ThreadNumber;
+    MyReal Q[19];
+    MyReal CoordX;
+    MyReal CoordY;
+    MyReal CoordZ;
+    MyReal U;
+    MyReal V;
+    MyReal W;
+    MyReal Rho;
+    MyReal Uo;
+    MyReal Vo;
+    MyReal Wo;
+    MyReal DragF;
+    MyReal LiftF;
+    MyReal F[19];
+    MyReal Feq[19];
+    MyReal METAF[19];
+    MyReal Fneighbours[19];
+}CellProps ;
+
+//shared [BLOCKSIZE+2*NN] CellProps  *SCells;
+shared_block(BLOCKSIZE])     CellProps  *WCells; // Writing Cells: cells to write data
+shared_block(2*NN)           CellProps  *BCells; // Boundary cells
+shared_block(4)              double sResiduals[4*THREADS]; // variable to store residuals
+
+shared  int    *NumNodes;       // This will store the number of lines of the read files
+shared  int    *NumConn;        // This will store the number of lines of the read files
+shared  int    *n;              // number of nodes in the x direction
+shared  int    *m;              // number of nodes in the y direction
+shared  int    *NumInletNodes;  // number of inlet nodes
+shared  double *Delta;          // grid spacing
+shared  double *MaxInletCoordY; // maximum inlet coordinate in y
+shared  double *MinInletCoordY; // minimum inlet coordinate in y
+
+shared int loop;
+
+
+
+
 
 int    *Create1DArrayInt(int length);
 float  *Create1DArrayFloat(int length);

@@ -1,13 +1,10 @@
 // In a Linux System compile and run as (e.g. Ubuntu):
 // upcc -T=4 main.c Iterate.c ShellFunctions.c FilesReading.c FilesWriting.c CellFunctions.c BoundaryConditions.c ComputeResiduals.c -lm -o LBMSolver && upcrun LBMSolver
 
-#include <string.h>                      // String operations
-#include <upc_relaxed.h>                 // Required for UPC 
+#include <stdio.h>
 
-#include "include/Iterate.h"             // Iteration takes place
-#include "include/ShellFunctions.h"      // For convenience
-#include "include/FilesReading.h"        // For reading files
-#include "include/CellFunctions.h"       // For cell modifications
+#include "Iterate.h"             // Iteration takes place
+#include "FilesReading.h"        // For reading files
 
 int main(int argc, char* argv[])
 {
@@ -64,7 +61,7 @@ int main(int argc, char* argv[])
             BCconnectorDataFile,   // data from mesher            
             Uavg,                  // mean x velocity 
             Vavg,                  // mean y velocity 
-            W avg,                  // mean z velocity 
+            Wavg,                  // mean z velocity
             rho_ini,               // initial density
             Viscosity,             // viscosity of fluid 
             InletProfile,          // do we have inlet profile? 
