@@ -31,5 +31,9 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
                int AutosaveEvery,  int postproc_prog,  int CalculateDragLift,
                float ConvergenceCritVeloc, float ConvergenceCritRho);
 
+void print_cells_info(CellProps* Cells);
+void print_boundary_type(CellProps* Cells);
+void print_cell_line(FILE* file, const CellProps* Cell);
+CellProps* cell_from_id(CellProps* Cells, int ID);
 
 #endif

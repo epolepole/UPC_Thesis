@@ -1,12 +1,14 @@
 /* The Cell structure is defined here. The functions are responsible for
 scalar-vector-matrix allocation and this header includes the multifunctional
 "min" and "max" functions too (comparison of two number). */
+#ifndef SHELLFUNCTIONS_H
+#define SHELLFUNCTIONS_H
 
 #include <stdbool.h>  // bool variables
 #include <string.h>   // string handling
+#include <upc.h>
 
-#ifndef SHELLFUNCTIONS_H
-#define SHELLFUNCTIONS_H
+
 
 #if __UPC__ == 0
 
@@ -24,7 +26,8 @@ scalar-vector-matrix allocation and this header includes the multifunctional
 #define shared_block(var) shared [var]
 #endif
 
-#define main_thread(c) if (MYTHREAD == 0) { c }
+//#define main_thread(c) if (MYTHREAD == 0) { c }
+#define main_thread if(MYTHREAD == 0)
 
 
 ////////////////////////////////////////////////////

@@ -11,101 +11,101 @@
 // This function fills up tm and stimv with variables
 void MRTInitializer(double** tm, double** stmiv, double Omega)
 {
-  // RETURN THESE VALUES:
-  // float tm[9][9];
-  // float stmiv[9][9];
+    // RETURN THESE VALUES:
+    // float tm[9][9];
+    // float stmiv[9][9];
 
-  ///////////// Declarations ////////////////
-  int i, j, l;  // loop variables
+    ///////////// Declarations ////////////////
+    int i, j, l;  // loop variables
 
-  // declarations for this collision model
-  float sumcc;
-  float sm[9];
-  float ev[9][9];
-  /*
-  const float a1=1./36.;
-  float tminv[9][9]=
-  {
-      {4.*a1, -4.*a1,  4.*a1,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0},
-      {4.*a1,    -a1, -2.*a1,  6.*a1, -6.*a1,    0.0,    0.0,  9.*a1,    0.0},
-      {4.*a1,    -a1, -2.*a1,    0.0,    0.0,  6.*a1, -6.*a1, -9.*a1,    0.0},
-      {4.*a1,    -a1, -2.*a1, -6.*a1,  6.*a1,    0.0,    0.0,  9.*a1,    0.0},
-      {4.*a1,    -a1, -2.*a1,    0.0,    0.0, -6.*a1,  6.*a1, -9.*a1,    0.0},
-      {4.*a1,  2.*a1,     a1,  6.*a1,  3.*a1,  6.*a1,  3.*a1,    0.0,  9.*a1},
-      {4.*a1,  2.*a1,     a1, -6.*a1, -3.*a1,  6.*a1,  3.*a1,    0.0, -9.*a1},
-      {4.*a1,  2.*a1,     a1, -6.*a1, -3.*a1, -6.*a1, -3.*a1,    0.0,  9.*a1},
-      {4.*a1,  2.*a1,     a1,  6.*a1,  3.*a1, -6.*a1, -3.*a1,    0.0, -9.*a1}
-  };*/
-
-  float tminv[9][9] =
-          {
-                  {4.*(1./36), -4.*(1./36),  4.*(1./36),         0.0,         0.0,         0.0,         0.0,         0.0,         0.0},
-                  {4.*(1./36),    -(1./36), -2.*(1./36),  6.*(1./36), -6.*(1./36),         0.0,         0.0,  9.*(1./36),         0.0},
-                  {4.*(1./36),    -(1./36), -2.*(1./36),         0.0,         0.0,  6.*(1./36), -6.*(1./36), -9.*(1./36),         0.0},
-                  {4.*(1./36),    -(1./36), -2.*(1./36), -6.*(1./36),  6.*(1./36),         0.0,         0.0,  9.*(1./36),         0.0},
-                  {4.*(1./36),    -(1./36), -2.*(1./36),         0.0,         0.0, -6.*(1./36),  6.*(1./36), -9.*(1./36),         0.0},
-                  {4.*(1./36),  2.*(1./36),     (1./36),  6.*(1./36),  3.*(1./36),  6.*(1./36),  3.*(1./36),         0.0,  9.*(1./36)},
-                  {4.*(1./36),  2.*(1./36),     (1./36), -6.*(1./36), -3.*(1./36),  6.*(1./36),  3.*(1./36),         0.0, -9.*(1./36)},
-                  {4.*(1./36),  2.*(1./36),     (1./36), -6.*(1./36), -3.*(1./36), -6.*(1./36), -3.*(1./36),         0.0,  9.*(1./36)},
-                  {4.*(1./36),  2.*(1./36),     (1./36),  6.*(1./36),  3.*(1./36), -6.*(1./36), -3.*(1./36),         0.0, -9.*(1./36)}
-          };
-
-
-
-  float temp[9][9] = {
-          {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-          {-4.,-1.,-1.,-1.,-1.,2.0,2.0,2.0,2.0},
-          {4.0,-2.,-2.,-2.,-2.,1.0,1.0,1.0,1.0},
-          {0.0,1.0,0.0,-1.,0.0,1.0,-1.,-1.,1.0},
-          {0.0,-2.,0.0,2.0,0.0,1.0,-1.,-1.,1.0},
-          {0.0,0.0,1.0,0.0,-1.,1.0,1.0,-1.,-1.},
-          {0.0,0.0,-2.,0.0,2.0,1.0,1.0,-1.,-1.},
-          {0.0,1.0,-1.,1.0,-1.,0.0,0.0,0.0,0.0},
-          {0.0,0.0,0.0,0.0,0.0,1.0,-1.,1.0,-1.}
-  };
-
-
-  ///////////// Fill up variables ////////////////
-
-  // Filling up tm
-  for (i = 0; i < 9; i++)
-  {
-    for (j = 0; j < 9; j++)
-      tm[i][j] = temp[i][j];
-  }
-
-  // Filling up stimv
-  sm[0] = 1.0;
-  sm[1] = 1.4;
-  sm[2] = 1.4;
-  sm[3] = 1.0;
-  sm[4] = 1.2;
-  sm[5] = 1.0;
-  sm[6] = 1.2;
-  sm[7] = Omega;
-  sm[8] = Omega;
-
-  for(i=0;i<9;i++)
-  {
-    for(j=0;j<9;j++)
+    // declarations for this collision model
+    float sumcc;
+    float sm[9];
+    float ev[9][9];
+    /*
+    const float a1=1./36.;
+    float tminv[9][9]=
     {
-      sumcc=0.0;
-      for(l=0;l<9;l++)
-      {
-        sumcc=sumcc+tminv[i][l]*tm[l][j];
-      }
+        {4.*a1, -4.*a1,  4.*a1,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0},
+        {4.*a1,    -a1, -2.*a1,  6.*a1, -6.*a1,    0.0,    0.0,  9.*a1,    0.0},
+        {4.*a1,    -a1, -2.*a1,    0.0,    0.0,  6.*a1, -6.*a1, -9.*a1,    0.0},
+        {4.*a1,    -a1, -2.*a1, -6.*a1,  6.*a1,    0.0,    0.0,  9.*a1,    0.0},
+        {4.*a1,    -a1, -2.*a1,    0.0,    0.0, -6.*a1,  6.*a1, -9.*a1,    0.0},
+        {4.*a1,  2.*a1,     a1,  6.*a1,  3.*a1,  6.*a1,  3.*a1,    0.0,  9.*a1},
+        {4.*a1,  2.*a1,     a1, -6.*a1, -3.*a1,  6.*a1,  3.*a1,    0.0, -9.*a1},
+        {4.*a1,  2.*a1,     a1, -6.*a1, -3.*a1, -6.*a1, -3.*a1,    0.0,  9.*a1},
+        {4.*a1,  2.*a1,     a1,  6.*a1,  3.*a1, -6.*a1, -3.*a1,    0.0, -9.*a1}
+    };*/
 
-      ev[i][j]=sumcc;
-    }
-  }
+    float tminv[9][9] =
+            {
+                    {4.*(1./36), -4.*(1./36),  4.*(1./36),         0.0,         0.0,         0.0,         0.0,         0.0,         0.0},
+                    {4.*(1./36),    -(1./36), -2.*(1./36),  6.*(1./36), -6.*(1./36),         0.0,         0.0,  9.*(1./36),         0.0},
+                    {4.*(1./36),    -(1./36), -2.*(1./36),         0.0,         0.0,  6.*(1./36), -6.*(1./36), -9.*(1./36),         0.0},
+                    {4.*(1./36),    -(1./36), -2.*(1./36), -6.*(1./36),  6.*(1./36),         0.0,         0.0,  9.*(1./36),         0.0},
+                    {4.*(1./36),    -(1./36), -2.*(1./36),         0.0,         0.0, -6.*(1./36),  6.*(1./36), -9.*(1./36),         0.0},
+                    {4.*(1./36),  2.*(1./36),     (1./36),  6.*(1./36),  3.*(1./36),  6.*(1./36),  3.*(1./36),         0.0,  9.*(1./36)},
+                    {4.*(1./36),  2.*(1./36),     (1./36), -6.*(1./36), -3.*(1./36),  6.*(1./36),  3.*(1./36),         0.0, -9.*(1./36)},
+                    {4.*(1./36),  2.*(1./36),     (1./36), -6.*(1./36), -3.*(1./36), -6.*(1./36), -3.*(1./36),         0.0,  9.*(1./36)},
+                    {4.*(1./36),  2.*(1./36),     (1./36),  6.*(1./36),  3.*(1./36), -6.*(1./36), -3.*(1./36),         0.0, -9.*(1./36)}
+            };
 
-  for(i=0;i<9;i++)
-  {
-    for(j=0;j<9;j++)
+
+
+    float temp[9][9] = {
+            {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
+            {-4.,-1.,-1.,-1.,-1.,2.0,2.0,2.0,2.0},
+            {4.0,-2.,-2.,-2.,-2.,1.0,1.0,1.0,1.0},
+            {0.0,1.0,0.0,-1.,0.0,1.0,-1.,-1.,1.0},
+            {0.0,-2.,0.0,2.0,0.0,1.0,-1.,-1.,1.0},
+            {0.0,0.0,1.0,0.0,-1.,1.0,1.0,-1.,-1.},
+            {0.0,0.0,-2.,0.0,2.0,1.0,1.0,-1.,-1.},
+            {0.0,1.0,-1.,1.0,-1.,0.0,0.0,0.0,0.0},
+            {0.0,0.0,0.0,0.0,0.0,1.0,-1.,1.0,-1.}
+    };
+
+
+    ///////////// Fill up variables ////////////////
+
+    // Filling up tm
+    for (i = 0; i < 9; i++)
     {
-      stmiv[i][j]=tminv[i][j]*sm[j];
+        for (j = 0; j < 9; j++)
+            tm[i][j] = temp[i][j];
     }
-  }
+
+    // Filling up stimv
+    sm[0] = 1.0;
+    sm[1] = 1.4;
+    sm[2] = 1.4;
+    sm[3] = 1.0;
+    sm[4] = 1.2;
+    sm[5] = 1.0;
+    sm[6] = 1.2;
+    sm[7] = Omega;
+    sm[8] = Omega;
+
+    for(i=0;i<9;i++)
+    {
+        for(j=0;j<9;j++)
+        {
+            sumcc=0.0;
+            for(l=0;l<9;l++)
+            {
+                sumcc=sumcc+tminv[i][l]*tm[l][j];
+            }
+
+            ev[i][j]=sumcc;
+        }
+    }
+
+    for(i=0;i<9;i++)
+    {
+        for(j=0;j<9;j++)
+        {
+            stmiv[i][j]=tminv[i][j]*sm[j];
+        }
+    }
 
 } // End of function
 
@@ -125,356 +125,361 @@ void CellIni(CellProps *Cells,
              int*   opp,
              float  rho_ini)
 {
-  ///////////// DECLARATION /////////////////
-  int i, j, l, k;  // loop variables
-  float Qlat[19];  // Q lattice, length of the discrete directions
-  Qlat[0]  =    0   ;
-  Qlat[1]  =    1   ;
-  Qlat[2]  =    1   ;
-  Qlat[3]  =    1   ;
-  Qlat[4]  =    1   ;
-  Qlat[5]  =    1   ;
-  Qlat[6]  =    1   ;
-  Qlat[7]  = sqrt(2);
-  Qlat[8]  = sqrt(2);
-  Qlat[9]  = sqrt(2);
-  Qlat[10] = sqrt(2);
-  Qlat[11] = sqrt(2);
-  Qlat[12] = sqrt(2);
-  Qlat[13] = sqrt(2);
-  Qlat[14] = sqrt(2);
-  Qlat[15] = sqrt(2);
-  Qlat[16] = sqrt(2);
-  Qlat[17] = sqrt(2);
-  Qlat[18] = sqrt(2);
+    ///////////// DECLARATION /////////////////
+    int i, j, l, k;  // loop variables
+    float Qlat[19];  // Q lattice, length of the discrete directions
+    Qlat[0]  =    0   ;
+    Qlat[1]  =    1   ;
+    Qlat[2]  =    1   ;
+    Qlat[3]  =    1   ;
+    Qlat[4]  =    1   ;
+    Qlat[5]  =    1   ;
+    Qlat[6]  =    1   ;
+    Qlat[7]  = sqrt(2);
+    Qlat[8]  = sqrt(2);
+    Qlat[9]  = sqrt(2);
+    Qlat[10] = sqrt(2);
+    Qlat[11] = sqrt(2);
+    Qlat[12] = sqrt(2);
+    Qlat[13] = sqrt(2);
+    Qlat[14] = sqrt(2);
+    Qlat[15] = sqrt(2);
+    Qlat[16] = sqrt(2);
+    Qlat[17] = sqrt(2);
+    Qlat[18] = sqrt(2);
 
-  int index_Cell;
+    int index_Cell;
 
-  for (i = MYTHREAD * BLOCKSIZE; i < BLOCKSIZE * (MYTHREAD + 1); i++ )
-  {
-    index_Cell = LAYER - MYTHREAD * BLOCKSIZE + i;
-
-    // FIND ID of the actual cell
-    (Cells + index_Cell)->ID = i;
-
-    // FIND X, Y and Z of the actual cell
-    (Cells + index_Cell)->CoordX = Nod[i][3];
-    (Cells + index_Cell)->CoordY = Nod[i][4];
-    (Cells + index_Cell)->CoordZ = Nod[i][5];
-
-    // CHECK FLUID OR NOT
-    (Cells + index_Cell)->Fluid  = Nod[i][6];
-
-    // Which thread does it belongs to
-    //(Cells + index_Cell)->ThreadNumber = MYTHREAD;
-    // Implemented in iterate.c search: upc_forall(i = 0; i < 2*LAYER*THREADS; i++; &BCells[i]) { (BCells+i)->ThreadNumber = MYTHREAD; }
-
-    // INITIALIZE VARIABLEs
-    (Cells + index_Cell)->U   = 0;
-    (Cells + index_Cell)->V   = 0;
-    (Cells + index_Cell)->Rho = rho_ini;
-
-    // REMEMBER BCCONNECTOR FILE
-    //  _________________________________________________________________________________________________________________
-    // |        0      |       1      |       2      |     3     |    4    |    5     |    6     |    7     |      8     |
-    // |  node index i | node index j | node index k | latticeID | BC type | x coord  | y coord  | z coord  | Boundary ID|
-    // |_______________|______________|______________|___________|_________|__________|__________|__________|____________| 
-    //     
-    // lattice ID is based on the following speed model and it depends on the BC
-    //  ID lattice
-    //
-    //   |       xy - plane          |       xz - plane          |       yz - plane          | 
-    //   |                           |                           |                           |
-    //   |     8       3       7     |     12      5      11     |     16      5       15    |
-    //   |       \     |     /       |       \     |     /       |       \     |     /       |
-    //   |         \   |   /         |         \   |   /         |         \   |   /         |
-    //   |           \ | /           |           \ | /           |           \ | /           |
-    //   |     2 - - - 0 - - - 1     |     2 - - - 0 - - - 1     |     4 - - - 0 - - - 3     |
-    //   |           / | \           |           / | \           |           / | \           |
-    //   |         /   |   \         |         /   |   \         |         /   |   \         |
-    //   |       /     |     \       |       /     |     \       |       /     |     \       |
-    //   |     10      4       9     |     14      6      13     |     18      6       17    |
-
-    // BC types: *1->wall; *2->inlet; *3->outlet
-
-    (Cells + index_Cell)->BoundaryID = 0;  // IT IS NOT BOUNDARY NODE
-
-    for(j = 0; j < 19; j++)
+    for (i = MYTHREAD * BLOCKSIZE; i < BLOCKSIZE * (MYTHREAD + 1); i++ )
     {
-      (Cells + index_Cell)->BC_ID[j]= 0  ; // IT IS NOT BOUNDARY LATTICE
-      (Cells + index_Cell)->Q[j]    = 0.5;
-    }
+        index_Cell = LAYER - MYTHREAD * BLOCKSIZE + i;
 
-    //SEARCH FOR BC TYPE, BOUNDARY ID AND DISTANCES IN THE LATTICE
-    for(j = 0; j < *NumConn; j++)
-    {
-      if (
-              ( (int)Con[j][0] == (int)Nod[i][0] )\
+        // FIND ID of the actual cell
+        (Cells + index_Cell)->ID = i;
+
+        // FIND X, Y and Z of the actual cell
+        (Cells + index_Cell)->CoordX = Nod[i][3];
+        (Cells + index_Cell)->CoordY = Nod[i][4];
+        (Cells + index_Cell)->CoordZ = Nod[i][5];
+
+        // CHECK FLUID OR NOT
+        (Cells + index_Cell)->Fluid  = (int) Nod[i][6];
+
+        // Which thread does it belongs to
+        //(Cells + index_Cell)->ThreadNumber = MYTHREAD;
+        // Implemented in iterate.c search: upc_forall(i = 0; i < 2*LAYER*THREADS; i++; &BCells[i]) { (BCells+i)->ThreadNumber = MYTHREAD; }
+
+        // INITIALIZE VARIABLEs
+        (Cells + index_Cell)->U   = 0;
+        (Cells + index_Cell)->V   = 0;
+        (Cells + index_Cell)->W   = 0;
+        (Cells + index_Cell)->Rho = rho_ini;
+
+        // REMEMBER BCCONNECTOR FILE
+        //  _________________________________________________________________________________________________________________
+        // |        0      |       1      |       2      |     3     |    4    |    5     |    6     |    7     |      8     |
+        // |  node index i | node index j | node index k | latticeID | BC type | x coord  | y coord  | z coord  | Boundary ID|
+        // |_______________|______________|______________|___________|_________|__________|__________|__________|____________|
+        //
+        // lattice ID is based on the following speed model and it depends on the BC
+        //  ID lattice
+        //
+        //   |       xy - plane          |       xz - plane          |       yz - plane          |
+        //   |                           |                           |                           |
+        //   |     8       3       7     |     12      5      11     |     16      5       15    |
+        //   |       \     |     /       |       \     |     /       |       \     |     /       |
+        //   |         \   |   /         |         \   |   /         |         \   |   /         |
+        //   |           \ | /           |           \ | /           |           \ | /           |
+        //   |     2 - - - 0 - - - 1     |     2 - - - 0 - - - 1     |     4 - - - 0 - - - 3     |
+        //   |           / | \           |           / | \           |           / | \           |
+        //   |         /   |   \         |         /   |   \         |         /   |   \         |
+        //   |       /     |     \       |       /     |     \       |       /     |     \       |
+        //   |     10      4       9     |     14      6      13     |     18      6       17    |
+
+        // BC types: *1->wall; *2->inlet; *3->outlet
+
+        (Cells + index_Cell)->BoundaryID = 0;  // IT IS NOT BOUNDARY NODE
+
+        for(j = 0; j < 19; j++)
+        {
+            (Cells + index_Cell)->BC_ID[j]= 0  ; // IT IS NOT BOUNDARY LATTICE
+            (Cells + index_Cell)->Q[j]    = 0.5;
+        }
+
+        //SEARCH FOR BC TYPE, BOUNDARY ID AND DISTANCES IN THE LATTICE
+        for(j = 0; j < *NumConn; j++)
+        {
+
+            //When current cell is on the con iteration
+            if (
+                    ( (int)Con[j][0] == (int)Nod[i][0] )\
           && ( (int)Con[j][1] == (int)Nod[i][1] )\
-          && ( (int)Con[j][1] == (int)Nod[i][2] ) )
-      {
-        for(k = 1; k < 19; k++)
+          && ( (int)Con[j][2] == (int)Nod[i][2] ) )
+            {
+                for(k = 1; k < 19; k++)
+                {
+
+                    //Checks the direction cell it connects to
+                    if ( Con[j][3] == k )
+                    {
+                        (Cells + index_Cell)->BC_ID[k]   = (int) Con[j][4];         //Gets the connection type(1:static, 2:mobile)
+                        (Cells + index_Cell)->BoundaryID = (int) Con[j][8];         //Sets the direction as boundary node
+
+                        // find distance from the boundary
+                        (Cells + index_Cell)->Q[k] = sqrt(
+                                pow(Con[j][5]- ((Cells + index_Cell)->CoordX),2)\
+                                + pow(Con[j][6]-((Cells + index_Cell)->CoordY),2)\
+                                + pow(Con[j][7]-((Cells + index_Cell)->CoordZ),2)) / ((*Delta)*Qlat[k]);
+                    }
+                }
+            }
+        }
+
+        //////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////
+        //////////WITH THE ACTUAL MESH THERE ARE NO CORNERS///////////////
+        //////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////
+
+        // CORNER DETERMINATION
+        (Cells + index_Cell)->Boundary = 0;  // IT IS NOT BOUNDARY NODE   (0->Fluid / 1-> Wall / 2->Inlet or outlet / 3-> Edge / 4-> Corner
+        (Cells + index_Cell)->Corner = 0;      // IT IS NOT A CORNER // WITH THE NEW SYSTEM, THIS IS NOT IMPORTANT ANYMORE
+
+        int number_solid_lattices;
+        number_solid_lattices = 0;
+        int boundary;
+        boundary = 0;
+
+        for (j = 0; j < 19; ++j)
         {
 
-          if ( Con[j][3] == k )
-          {
-            (Cells + index_Cell)->BC_ID[k]   = Con[j][4];
-            (Cells + index_Cell)->BoundaryID = Con[j][8];
-
-            // find distance from the boundary
-            (Cells + index_Cell)->Q[k] = sqrt(
-                    pow(Con[j][5]- ((Cells + index_Cell)->CoordX),2)\
-              + pow(Con[j][6]-((Cells + index_Cell)->CoordY),2)\
-              + pow(Con[j][7]-((Cells + index_Cell)->CoordZ),2)) / ((*Delta)*Qlat[k]);
-          }
+            if ((Cells + index_Cell)->BC_ID[j]!=0)
+            {
+                boundary = (Cells + index_Cell)->BC_ID[j];
+                ++number_solid_lattices;
+            }
         }
-      }
-    }
 
-    //////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////
-    //////////WITH THE ACTUAL MESH THERE ARE NO CORNERS///////////////
-    //////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////
-
-    // CORNER DETERMINATION
-    (Cells + index_Cell)->Boundary   = 0;  // IT IS NOT BOUNDARY NODE   (0->Fluid / 1-> Wall / 2->Inlet or outlet / 3-> Edge / 4-> Corner 
-    (Cells + index_Cell)->Corner = 0;      // IT IS NOT A CORNER // WITH THE NEW SYSTEM, THIS IS NOT IMPORTANT ANYMORE
-
-    int number_solid_lattices;
-    number_solid_lattices = 0;
-    int boundary;
-    boundary = 0;
-
-    for (int j = 0; j < 19; ++j)
-    {
-      if ((Cells + index_Cell)->BC_ID[j]!=0)
-      {
-        boundary = (Cells + index_Cell)->BC_ID[j];
-        ++number_solid_lattices;
-      }
-    }
-    switch(number_solid_lattices)
-    {
-      case 5:
-        if (boundary == 1)                    // SOLID PLANE
+        switch(number_solid_lattices)
         {
-          (Cells + index_Cell)->Boundary = 1;
+            case 5:
+                if (boundary == 1)                    // SOLID PLANE
+                {
+                    (Cells + index_Cell)->Boundary = 1;
+                }
+                else if (boundary ==2)                // FLOW PLANE
+                {
+                    (Cells + index_Cell)->Boundary = 2;
+                }
+                else
+                {
+                    printf("Attention! Node %i is not in a wall nor an inlet/outlet!! (See CellFunctions.c, CORNER DETERMINATION)\n", (Cells + index_Cell)->ID);
+                }
+                break;
+            case 9: (Cells + index_Cell)->Boundary = 3;   break; // EDGE
+            case 12: (Cells + index_Cell)->Boundary = 4;  break; // CORNER
         }
-        else if (boundary ==2)              // FLOW PLANE                                                                                                                                                 
+
+        /*<--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        // (0->Fluid / 1-> Wall / 2->Inlet or outlet / 3-> Edge (Wall-Wall) / 4-> Edge (Wall-Inlet or outlet) / 5-> Corner (Wall-Wall) / 6-> Corner (Wall-Inlet or outlet)                             |
+
+        bool different_types_of_boundaries;
+        different_types_of_boundaries = false;
+                                                                                                                                                                                                   |
+        switch(number_solid_lattices)                                                                                                                                                                  |
+        {                                                                                                                                                                                              |
+          case 5:                                                                                                                                                                                      |
+            if (boundary == 1)                  // SOLID PLANE                                                                                                                                         |
+            {                                                                                                                                                                                          |
+              (Cells + index_Cell)->Boundary = 1;                                                                                                                                                      |
+            }                                                                                                                                                                                          |
+            else if (boundary ==2)              // FLOW PLANE                                                                                                                                          |
+            {                                                                                                                                                                                          |
+              (Cells + index_Cell)->Boundary = 2;                                                                                                                                                      |
+            }                                                                                                                                                                                          |
+            else                                                                                                                                                                                       |
+            {                                                                                                                                                                                          |
+              printf("Attention! Node %i is not in a wall nor an inlet/outlet!! (See CellFunctions.c, CORNER DETERMINATION)\n", (Cells + index_Cell)->ID);                                             |
+            }                                                                                                                                                                                          |
+            break;                                                                                                                                                                                     |
+          case 9:                                                                                                                                                                                      |
+            if (different_types_of_boundaries)  // SOLID EDGE                                                                                                                                          |
+            {                                                                                                                                                                                          |
+              (Cells + index_Cell)->Boundary = 3;                                                                                                                                                      |
+            }                                                                                                                                                                                          |
+            else                                // SOLID - FLOW EDGE                                                                                                                                   |
+            {                                                                                                                                                                                          |
+              (Cells + index_Cell)->Boundary = 4;                                                                                                                                                      |
+            }                                                                                                                                                                                          |
+            break;                                                                                                                                                                                     |
+          case 12:                                                                                                                                                                                     |
+            if (different_types_of_boundaries)  // SOLID CORNERS                                                                                                                                       |
+            {                                                                                                                                                                                          |
+              (Cells + index_Cell)->Boundary = 5;                                                                                                                                                      |
+            }                                                                                                                                                                                          |
+            else                                // SOLID - FLOW CORNER                                                                                                                                 |
+            {                                                                                                                                                                                          |
+              (Cells + index_Cell)->Boundary = 6;                                                                                                                                                      |
+            }                                                                                                                                                                                          |
+            break;                                                                                                                                                                                     |
+          default: printf("Attention! Node %i is not in a wall, inlet/outlet, edge or corner!! (See CellFunctions.c, CORNER DETERMINATION)\n", (Cells + index_Cell)->ID);                              |
+        } ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        /*
+        for(j = 1; j < 19; j++)
         {
-          (Cells + index_Cell)->Boundary = 2;
-        }
-        else
+          if ((Cells + index_Cell)->BC_ID[j] != 0)
+          { // Lattice-direction j is not surrounded by fluid
+
+            if ((Cells + index_Cell)->Boundary == 0)
+            {// The BC of the node becomes the BC of the first lattice direction which doesn't point to fluid
+              (Cells + index_Cell)->Boundary = (Cells + index_Cell)->BC_ID[j];
+            }
+
+            else
+            {// In the same node two lattice directions have different BC (corners). This automatically means that the node is a corner.
+              if (((Cells + index_Cell)->Boundary) != ((Cells + index_Cell)->BC_ID[j]) )
+              {
+                (Cells + index_Cell)->Boundary=1;
+                (Cells + index_Cell)->Corner=1;
+              }
+              /*
+              if (((Cells + index_Cell)->Boundary) < ((Cells + index_Cell)->BC_ID[j]) )
+              {
+                (Cells + index_Cell)->Boundary=1;
+                (Cells + index_Cell)->Corner=1;
+              }
+              if ((Cells + index_Cell)->Boundary > (Cells + index_Cell)->BC_ID[j])
+              {
+                (Cells + index_Cell)->Boundary=1;
+                (Cells + index_Cell)->Corner=1;
+              }
+            }
+          }*/
+
+
+        /*
+
+        //////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////
+        //////////WITH THE ACTUAL MESH THERE ARE NO CORNERS///////////////
+        //////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////
+
+        WITH THE NEW APPROACH, CORNERS ARE TREATED AS WALLS
+
+        //Boundary=0 NO BC
+        //Boundary=1 WALL
+        //Boundary=2 INLET
+        //Boundary=3 OUTLET
+
+
+        // IF TWO PERPENDICULAR LATTICE DIRECTIONS ARE NOT SURROUNDED BY FLUID IT MEANS THAT IT IS
+        // A CORNER. IT IS MANDATORY THAT THE DIAGONAL LATTICE DIRECTION BETWEEN THEM CORRESPONDS
+        // TO A WALL. HENCE, ALL THE CASES ARE CHECKED AND DIAGONAL DIRECTIONS EQUALED TO 1
+        if ( ((Cells + index_Cell)->Corner) == 1)
         {
-          printf("Attention! Node %i is not in a wall nor an inlet/outlet!! (See CellFunctions.c, CORNER DETERMINATION)\n", (Cells + index_Cell)->ID);
-        }
-            break;
-      case 9: (Cells + index_Cell)->Boundary = 3;   break; // EDGE                                                                                                                                                                           
-      case 12: (Cells + index_Cell)->Boundary = 4;  break; // CORNER
-    }
-
-    /*<--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // (0->Fluid / 1-> Wall / 2->Inlet or outlet / 3-> Edge (Wall-Wall) / 4-> Edge (Wall-Inlet or outlet) / 5-> Corner (Wall-Wall) / 6-> Corner (Wall-Inlet or outlet)                             | 
-    
-    bool different_types_of_boundaries;
-    different_types_of_boundaries = false;
-                                                                                                                                                                                               |                                                                                                                                   
-    switch(number_solid_lattices)                                                                                                                                                                  |                                                                                                                                                                   
-    {                                                                                                                                                                                              |                                                                                                                                                                                                                                                                                                        
-      case 5:                                                                                                                                                                                      |                                                                                                                                                
-        if (boundary == 1)                  // SOLID PLANE                                                                                                                                         |                         
-        {                                                                                                                                                                                          |                                                                                                                                          
-          (Cells + index_Cell)->Boundary = 1;                                                                                                                                                      |            
-        }                                                                                                                                                                                          |                                                                                                                                           
-        else if (boundary ==2)              // FLOW PLANE                                                                                                                                          |                        
-        {                                                                                                                                                                                          |                                                                                                                                            
-          (Cells + index_Cell)->Boundary = 2;                                                                                                                                                      |                                                                                                                                                                              
-        }                                                                                                                                                                                          |                                                                                                                                                                                                                                                                                                            
-        else                                                                                                                                                                                       |                                                                                                                                             
-        {                                                                                                                                                                                          |                                                                                                                                          
-          printf("Attention! Node %i is not in a wall nor an inlet/outlet!! (See CellFunctions.c, CORNER DETERMINATION)\n", (Cells + index_Cell)->ID);                                             |                                                                                                                     
-        }                                                                                                                                                                                          |
-        break;                                                                                                                                                                                     |                                                                                                                                               
-      case 9:                                                                                                                                                                                      |                                                                                                                                              
-        if (different_types_of_boundaries)  // SOLID EDGE                                                                                                                                          |                                                                                                                                                                                          
-        {                                                                                                                                                                                          |                                                                                                                                          
-          (Cells + index_Cell)->Boundary = 3;                                                                                                                                                      |            
-        }                                                                                                                                                                                          |
-        else                                // SOLID - FLOW EDGE                                                                                                                                   |                               
-        {                                                                                                                                                                                          |                                                                                                                                          
-          (Cells + index_Cell)->Boundary = 4;                                                                                                                                                      |
-        }                                                                                                                                                                                          |
-        break;                                                                                                                                                                                     |
-      case 12:                                                                                                                                                                                     |
-        if (different_types_of_boundaries)  // SOLID CORNERS                                                                                                                                       |
-        {                                                                                                                                                                                          |                                                                                                                                                                                                                                                                                                                                   
-          (Cells + index_Cell)->Boundary = 5;                                                                                                                                                      |
-        }                                                                                                                                                                                          |
-        else                                // SOLID - FLOW CORNER                                                                                                                                 |
-        {                                                                                                                                                                                          |
-          (Cells + index_Cell)->Boundary = 6;                                                                                                                                                      |
-        }                                                                                                                                                                                          |
-        break;                                                                                                                                                                                     |
-      default: printf("Attention! Node %i is not in a wall, inlet/outlet, edge or corner!! (See CellFunctions.c, CORNER DETERMINATION)\n", (Cells + index_Cell)->ID);                              |
-    } ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-    /*
-    for(j = 1; j < 19; j++)
-    {
-      if ((Cells + index_Cell)->BC_ID[j] != 0)
-      { // Lattice-direction j is not surrounded by fluid
-
-        if ((Cells + index_Cell)->Boundary == 0)
-        {// The BC of the node becomes the BC of the first lattice direction which doesn't point to fluid
-          (Cells + index_Cell)->Boundary = (Cells + index_Cell)->BC_ID[j];
-        }
-
-        else
-        {// In the same node two lattice directions have different BC (corners). This automatically means that the node is a corner.
-          if (((Cells + index_Cell)->Boundary) != ((Cells + index_Cell)->BC_ID[j]) )
+          if ((Cells + index_Cell)->BC_ID[1] != 0 && (Cells + index_Cell)->BC_ID[3] != 0 )
           {
-            (Cells + index_Cell)->Boundary=1;
-            (Cells + index_Cell)->Corner=1;
+            (Cells + index_Cell)->BC_ID[7]=1;
           }
-          /*
-          if (((Cells + index_Cell)->Boundary) < ((Cells + index_Cell)->BC_ID[j]) ) 
+          if ((Cells + index_Cell)->BC_ID[1] != 0 && (Cells + index_Cell)->BC_ID[4] != 0 )
           {
-            (Cells + index_Cell)->Boundary=1;
-            (Cells + index_Cell)->Corner=1;
+            (Cells + index_Cell)->BC_ID[9]=1;
           }
-          if ((Cells + index_Cell)->Boundary > (Cells + index_Cell)->BC_ID[j])
+          if ((Cells + index_Cell)->BC_ID[1] != 0 && (Cells + index_Cell)->BC_ID[5] != 0 )
           {
-            (Cells + index_Cell)->Boundary=1;
-            (Cells + index_Cell)->Corner=1;
+            (Cells + index_Cell)->BC_ID[11]=1;
+          }
+          if ((Cells + index_Cell)->BC_ID[1] != 0 && (Cells + index_Cell)->BC_ID[6] != 0 )
+          {
+            (Cells + index_Cell)->BC_ID[13]=1;
+          }
+          if ((Cells + index_Cell)->BC_ID[2] != 0 && (Cells + index_Cell)->BC_ID[4] != 0 )
+          {
+            (Cells + index_Cell)->BC_ID[10]=1;
+          }
+          if ((Cells + index_Cell)->BC_ID[2] != 0 && (Cells + index_Cell)->BC_ID[3] != 0 )
+          {
+            (Cells + index_Cell)->BC_ID[8]=1;
+          }
+          if ((Cells + index_Cell)->BC_ID[2] != 0 && (Cells + index_Cell)->BC_ID[5] != 0 )
+          {
+            (Cells + index_Cell)->BC_ID[12]=1;
+          }
+          if ((Cells + index_Cell)->BC_ID[2] != 0 && (Cells + index_Cell)->BC_ID[6] != 0 )
+          {
+            (Cells + index_Cell)->BC_ID[14]=1;
+          }
+          if ((Cells + index_Cell)->BC_ID[3] != 0 && (Cells + index_Cell)->BC_ID[5] != 0 )
+          {
+            (Cells + index_Cell)->BC_ID[15]=1;
+          }
+          if ((Cells + index_Cell)->BC_ID[3] != 0 && (Cells + index_Cell)->BC_ID[6] != 0 )
+          {
+            (Cells + index_Cell)->BC_ID[17]=1;
+          }
+          if ((Cells + index_Cell)->BC_ID[4] != 0 && (Cells + index_Cell)->BC_ID[5] != 0 )
+          {
+            (Cells + index_Cell)->BC_ID[16]=1;
+          }
+          if ((Cells + index_Cell)->BC_ID[4] != 0 && (Cells + index_Cell)->BC_ID[6] != 0 )
+          {
+            (Cells + index_Cell)->BC_ID[18]=1;
           }
         }
-      }*/
+        */
+
+        // INITIALIZE STREAMING (STREAM EVERYWHERE)
+        for(j = 0; j < 19; j++)
+        {
+            (Cells + index_Cell)->StreamLattice[j] = 1;
+        }
 
 
-    /*
+        // DON'T STREAM TO SOLIDS
+        for(j = 0; j < 19; j++)
+        {
+            if ((Cells + index_Cell)->BC_ID[j]!=0)
+            {
+                (Cells + index_Cell)->StreamLattice[opp[j]]= 0 ;
+            }
+        }
 
-    //////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////
-    //////////WITH THE ACTUAL MESH THERE ARE NO CORNERS///////////////
-    //////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////
+        // INLET VELOCITY // THIS IS CRAPPY, NOT USED!
+        switch(InletProfile)
+        {
+            case 1:
+                ////////////////////////////////////////////////////////////////////
+                ////////////////////////////////////////////////////////////////////
+                ////////////////////////TO DEVELOPE/////////////////////////////////
+                ////////////////////////////////////////////////////////////////////
+                ////////////////////////////////////////////////////////////////////
+                //Uo=1.5*Uavg*(1-4*(pow((CoordY-MinInletCoordY-0.5*(MaxInletCoordY-MinInletCoordY)),2)));
+                //Uo=4*1.5*Uavg*CoordY*(41-CoordY)/(41*41);
+                //(Cells + index_Cell)->Uo = 4*1.5*Uavg*(((Cells + index_Cell)->CoordY)-(*MinInletCoordY))*(((*MaxInletCoordY)-(*MinInletCoordY))-(((Cells + index_Cell)->CoordY)-(*MinInletCoordY)))/(((*MaxInletCoordY)-(*MinInletCoordY))*((*MaxInletCoordY)-(*MinInletCoordY)));
+                //(Cells + index_Cell)->Vo = Vavg;
+                //(Cells + index_Cell)->Wo = ?????????
+                break;
+            case 2:
+                (Cells + index_Cell)->Uo = Uavg;
+                (Cells + index_Cell)->Vo = Vavg;
+                (Cells + index_Cell)->Wo = Wavg;
+                break;
 
-    WITH THE NEW APPROACH, CORNERS ARE TREATED AS WALLS
-
-    //Boundary=0 NO BC
-    //Boundary=1 WALL
-    //Boundary=2 INLET
-    //Boundary=3 OUTLET
-
-
-    // IF TWO PERPENDICULAR LATTICE DIRECTIONS ARE NOT SURROUNDED BY FLUID IT MEANS THAT IT IS
-    // A CORNER. IT IS MANDATORY THAT THE DIAGONAL LATTICE DIRECTION BETWEEN THEM CORRESPONDS
-    // TO A WALL. HENCE, ALL THE CASES ARE CHECKED AND DIAGONAL DIRECTIONS EQUALED TO 1
-    if ( ((Cells + index_Cell)->Corner) == 1)
-    {
-      if ((Cells + index_Cell)->BC_ID[1] != 0 && (Cells + index_Cell)->BC_ID[3] != 0 )
-      {
-        (Cells + index_Cell)->BC_ID[7]=1;
-      }
-      if ((Cells + index_Cell)->BC_ID[1] != 0 && (Cells + index_Cell)->BC_ID[4] != 0 )
-      {
-        (Cells + index_Cell)->BC_ID[9]=1;
-      }
-      if ((Cells + index_Cell)->BC_ID[1] != 0 && (Cells + index_Cell)->BC_ID[5] != 0 )
-      {
-        (Cells + index_Cell)->BC_ID[11]=1;
-      }
-      if ((Cells + index_Cell)->BC_ID[1] != 0 && (Cells + index_Cell)->BC_ID[6] != 0 )
-      {
-        (Cells + index_Cell)->BC_ID[13]=1;
-      }
-      if ((Cells + index_Cell)->BC_ID[2] != 0 && (Cells + index_Cell)->BC_ID[4] != 0 )
-      {
-        (Cells + index_Cell)->BC_ID[10]=1;
-      }
-      if ((Cells + index_Cell)->BC_ID[2] != 0 && (Cells + index_Cell)->BC_ID[3] != 0 )
-      {
-        (Cells + index_Cell)->BC_ID[8]=1;
-      }
-      if ((Cells + index_Cell)->BC_ID[2] != 0 && (Cells + index_Cell)->BC_ID[5] != 0 )
-      {
-        (Cells + index_Cell)->BC_ID[12]=1;
-      }
-      if ((Cells + index_Cell)->BC_ID[2] != 0 && (Cells + index_Cell)->BC_ID[6] != 0 )
-      {
-        (Cells + index_Cell)->BC_ID[14]=1;
-      }
-      if ((Cells + index_Cell)->BC_ID[3] != 0 && (Cells + index_Cell)->BC_ID[5] != 0 )
-      {
-        (Cells + index_Cell)->BC_ID[15]=1;
-      }
-      if ((Cells + index_Cell)->BC_ID[3] != 0 && (Cells + index_Cell)->BC_ID[6] != 0 )
-      {
-        (Cells + index_Cell)->BC_ID[17]=1;
-      }
-      if ((Cells + index_Cell)->BC_ID[4] != 0 && (Cells + index_Cell)->BC_ID[5] != 0 )
-      {
-        (Cells + index_Cell)->BC_ID[16]=1;
-      }
-      if ((Cells + index_Cell)->BC_ID[4] != 0 && (Cells + index_Cell)->BC_ID[6] != 0 )
-      {
-        (Cells + index_Cell)->BC_ID[18]=1;
-      }
-    }
-    */
-
-    // INITIALIZE STREAMING (STREAM EVERYWHERE)
-    for(j = 0; j < 19; j++)
-    {
-      (Cells + index_Cell)->StreamLattice[j] = 1;
-    }
+        }
 
 
-    // DON'T STREAM TO SOLIDS
-    for(j = 0; j < 19; j++)
-    {
-      if ((Cells + index_Cell)->BC_ID[j]!=0)
-      {
-        (Cells + index_Cell)->StreamLattice[opp[j]]= 0 ;
-      }
-    }
+        (Cells + index_Cell)->U = (Cells + index_Cell)->Uo; // ???????????????????????????????????
+        (Cells + index_Cell)->V = (Cells + index_Cell)->Vo;
+        (Cells + index_Cell)->W = (Cells + index_Cell)->Wo;
 
-    // INLET VELOCITY // THIS IS CRAPPY, NOT USED!
-    switch(InletProfile)
-    {
-      case 1:
-        ////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////
-        ////////////////////////TO DEVELOPE/////////////////////////////////
-        ////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////
-        //Uo=1.5*Uavg*(1-4*(pow((CoordY-MinInletCoordY-0.5*(MaxInletCoordY-MinInletCoordY)),2)));
-        //Uo=4*1.5*Uavg*CoordY*(41-CoordY)/(41*41);
-        //(Cells + index_Cell)->Uo = 4*1.5*Uavg*(((Cells + index_Cell)->CoordY)-(*MinInletCoordY))*(((*MaxInletCoordY)-(*MinInletCoordY))-(((Cells + index_Cell)->CoordY)-(*MinInletCoordY)))/(((*MaxInletCoordY)-(*MinInletCoordY))*((*MaxInletCoordY)-(*MinInletCoordY)));
-        //(Cells + index_Cell)->Vo = Vavg;
-        //(Cells + index_Cell)->Wo = ?????????
-        break;
-      case 2:
-        (Cells + index_Cell)->Uo = Uavg;
-            (Cells + index_Cell)->Vo = Vavg;
-            (Cells + index_Cell)->Wo = Wavg;
-            break;
-
-    }
-
-
-    (Cells + index_Cell)->U = (Cells + index_Cell)->Uo; // ???????????????????????????????????
-    (Cells + index_Cell)->V = (Cells + index_Cell)->Vo;
-    (Cells + index_Cell)->W = (Cells + index_Cell)->Wo;
-
-  } // END OF for LOOP
+    } // END OF for LOOP
 } // END OF FUNCTION
 
 
@@ -484,137 +489,137 @@ void CellIni(CellProps *Cells,
 
 void D3Q19Vars(double* w, int* cx, int* cy, int* cz, int* opp, int* c)
 {
-  // Fill up variables with constants
-  //  ID lattice
-  //
-  //  |       xy - plane          |       xz - plane          |       yz - plane          | 
-  //  |                           |                           |                           |
-  //  |     8       3       7     |     12      5      11     |     16      5       15    |
-  //  |       \     |     /       |       \     |     /       |       \     |     /       |
-  //  |         \   |   /         |         \   |   /         |         \   |   /         |
-  //  |           \ | /           |           \ | /           |           \ | /           |
-  //  |     2 - - - 0 - - - 1     |     2 - - - 0 - - - 1     |     4 - - - 0 - - - 3     |
-  //  |           / | \           |           / | \           |           / | \           |
-  //  |         /   |   \         |         /   |   \         |         /   |   \         |
-  //  |       /     |     \       |       /     |     \       |       /     |     \       |
-  //  |     10      4       9     |     14      6      13     |     18      6       17    |
+    // Fill up variables with constants
+    //  ID lattice
+    //
+    //  |       xy - plane          |       xz - plane          |       yz - plane          |
+    //  |                           |                           |                           |
+    //  |     8       3       7     |     12      5      11     |     16      5       15    |
+    //  |       \     |     /       |       \     |     /       |       \     |     /       |
+    //  |         \   |   /         |         \   |   /         |         \   |   /         |
+    //  |           \ | /           |           \ | /           |           \ | /           |
+    //  |     2 - - - 0 - - - 1     |     2 - - - 0 - - - 1     |     4 - - - 0 - - - 3     |
+    //  |           / | \           |           / | \           |           / | \           |
+    //  |         /   |   \         |         /   |   \         |         /   |   \         |
+    //  |       /     |     \       |       /     |     \       |       /     |     \       |
+    //  |     10      4       9     |     14      6      13     |     18      6       17    |
 
-  int i;
+    int i;
 
-  // D3Q19 properties  
-  w[0]=12./36.;
+    // D3Q19 properties
+    w[0]=12./36.;
 
-  for (i=1; i<7; i++ )
-    w[i]=2./36.;
+    for (i=1; i<7; i++ )
+        w[i]=2./36.;
 
-  for (i=7; i<18; i++ )
-    w[i]=1./36.;
+    for (i=7; i<18; i++ )
+        w[i]=1./36.;
 
-  cx[0]  =  0;
-  cx[1]  =  1;
-  cx[2]  = -1;
-  cx[3]  =  0;
-  cx[4]  =  0;
-  cx[5]  =  0;
-  cx[6]  =  0;
-  cx[7]  =  1;
-  cx[8]  = -1;
-  cx[9]  =  1;
-  cx[10] = -1;
-  cx[11] =  1;
-  cx[12] = -1;
-  cx[13] =  1;
-  cx[14] = -1;
-  cx[15] =  0;
-  cx[16] =  0;
-  cx[17] =  0;
-  cx[18] =  0;
+    cx[0]  =  0;
+    cx[1]  =  1;
+    cx[2]  = -1;
+    cx[3]  =  0;
+    cx[4]  =  0;
+    cx[5]  =  0;
+    cx[6]  =  0;
+    cx[7]  =  1;
+    cx[8]  = -1;
+    cx[9]  =  1;
+    cx[10] = -1;
+    cx[11] =  1;
+    cx[12] = -1;
+    cx[13] =  1;
+    cx[14] = -1;
+    cx[15] =  0;
+    cx[16] =  0;
+    cx[17] =  0;
+    cx[18] =  0;
 
-  cy[0]  =  0;
-  cy[1]  =  0;
-  cy[2]  =  0;
-  cy[3]  =  1;
-  cy[4]  = -1;
-  cy[5]  =  0;
-  cy[6]  =  0;
-  cy[7]  =  1;
-  cy[8]  = -1;
-  cy[9]  =  1;
-  cy[10] = -1;
-  cy[11] =  0;
-  cy[12] =  0;
-  cy[13] =  0;
-  cy[14] =  0;
-  cy[15] =  1;
-  cy[16] = -1;
-  cy[17] =  1;
-  cy[18] = -1;
+    cy[0]  =  0;
+    cy[1]  =  0;
+    cy[2]  =  0;
+    cy[3]  =  1;
+    cy[4]  = -1;
+    cy[5]  =  0;
+    cy[6]  =  0;
+    cy[7]  =  1;
+    cy[8]  = -1;
+    cy[9]  =  1;
+    cy[10] = -1;
+    cy[11] =  0;
+    cy[12] =  0;
+    cy[13] =  0;
+    cy[14] =  0;
+    cy[15] =  1;
+    cy[16] = -1;
+    cy[17] =  1;
+    cy[18] = -1;
 
-  cz[0]  =  0;
-  cz[1]  =  0;
-  cz[2]  =  0;
-  cz[3]  =  0;
-  cz[4]  =  0;
-  cz[5]  =  1;
-  cz[6]  = -1;
-  cz[7]  =  0;
-  cz[8]  =  0;
-  cz[9]  =  0;
-  cz[10] =  0;
-  cz[11] =  1;
-  cz[12] =  1;
-  cz[13] = -1;
-  cz[14] = -1;
-  cz[15] =  1;
-  cz[16] =  1;
-  cz[17] = -1;
-  cz[18] = -1;
+    cz[0]  =  0;
+    cz[1]  =  0;
+    cz[2]  =  0;
+    cz[3]  =  0;
+    cz[4]  =  0;
+    cz[5]  =  1;
+    cz[6]  = -1;
+    cz[7]  =  0;
+    cz[8]  =  0;
+    cz[9]  =  0;
+    cz[10] =  0;
+    cz[11] =  1;
+    cz[12] =  1;
+    cz[13] = -1;
+    cz[14] = -1;
+    cz[15] =  1;
+    cz[16] =  1;
+    cz[17] = -1;
+    cz[18] = -1;
 
 
-  opp[0]  =  0;
-  opp[1]  =  2;
-  opp[2]  =  1;
-  opp[3]  =  4;
-  opp[4]  =  3;
-  opp[5]  =  6;
-  opp[6]  =  5;
-  opp[7]  = 10;
-  opp[8]  =  9;
-  opp[9]  =  8;
-  opp[10] =  7;
-  opp[11] = 14;
-  opp[12] = 13;
-  opp[13] = 12;
-  opp[14] = 11;
-  opp[15] = 18;
-  opp[16] = 17;
-  opp[17] = 16;
-  opp[18] = 15;
+    opp[0]  =  0;
+    opp[1]  =  2;
+    opp[2]  =  1;
+    opp[3]  =  4;
+    opp[4]  =  3;
+    opp[5]  =  6;
+    opp[6]  =  5;
+    opp[7]  = 10;
+    opp[8]  =  9;
+    opp[9]  =  8;
+    opp[10] =  7;
+    opp[11] = 14;
+    opp[12] = 13;
+    opp[13] = 12;
+    opp[14] = 11;
+    opp[15] = 18;
+    opp[16] = 17;
+    opp[17] = 16;
+    opp[18] = 15;
 
-  // n: number of cols (x-direction)
-  // m: number of rows (y-direction)
-  // LAYER = n*m
+    // n: number of cols (x-direction)
+    // m: number of rows (y-direction)
+    // LAYER = n*m
 
-  // Streaming comes from which node?
-  c[0]  =          0         ;
-  c[1]  = -1                 ; // (i-1)
-  c[2]  =  1                 ; // (i+1)
-  c[3]  =    -1*(*n)         ; //         (j-1)    
-  c[4]  =       (*n)         ; //         (j+1)    
-  c[5]  =            -1*LAYER; //                 (k-1)
-  c[6]  =               LAYER; //                 (k+1)
-  c[7]  = -1 -1*(*n)         ; // (i-1)   (j-1)    
-  c[8]  =  1 -1*(*n)         ; // (i+1)   (j-1)    
-  c[9]  = -1 +  (*n)         ; // (i-1)   (j+1)    
-  c[10] =  1 +  (*n)         ; // (i+1)   (j+1)    
-  c[11] = -1         -1*LAYER; // (i-1)           (k-1)
-  c[12] =  1         -1*LAYER; // (i+1)           (k-1)
-  c[13] = -1         +1*LAYER; // (i-1)           (k+1)
-  c[14] =  1         +1*LAYER; // (i+1)           (k+1)
-  c[15] =    -1*(*n) -1*LAYER; //         (j-1)   (k-1)
-  c[16] =       (*n) -1*LAYER; //         (j+1)   (k-1)
-  c[17] =    -1*(*n) +1*LAYER; //         (j-1)   (k+1)
-  c[18] =       (*n) +1*LAYER; //         (j+1)   (k+1)
+    // Streaming comes from which node?
+    c[0]  =          0         ;
+    c[1]  = -1                 ; // (i-1)
+    c[2]  =  1                 ; // (i+1)
+    c[3]  =    -1*(*n)         ; //         (j-1)
+    c[4]  =       (*n)         ; //         (j+1)
+    c[5]  =            -1*LAYER; //                 (k-1)
+    c[6]  =               LAYER; //                 (k+1)
+    c[7]  = -1 -1*(*n)         ; // (i-1)   (j-1)
+    c[8]  =  1 -1*(*n)         ; // (i+1)   (j-1)
+    c[9]  = -1 +  (*n)         ; // (i-1)   (j+1)
+    c[10] =  1 +  (*n)         ; // (i+1)   (j+1)
+    c[11] = -1         -1*LAYER; // (i-1)           (k-1)
+    c[12] =  1         -1*LAYER; // (i+1)           (k-1)
+    c[13] = -1         +1*LAYER; // (i-1)           (k+1)
+    c[14] =  1         +1*LAYER; // (i+1)           (k+1)
+    c[15] =    -1*(*n) -1*LAYER; //         (j-1)   (k-1)
+    c[16] =       (*n) -1*LAYER; //         (j+1)   (k-1)
+    c[17] =    -1*(*n) +1*LAYER; //         (j-1)   (k+1)
+    c[18] =       (*n) +1*LAYER; //         (j+1)   (k+1)
 
 } // End of function
 
@@ -633,15 +638,15 @@ void D3Q19Vars(double* w, int* cx, int* cy, int* cz, int* opp, int* c)
 void BGKW(CellProps *Cells, int i, double* w, int* cx, int* cy, double Omega)
 {
 
-  double T1 = ((Cells+i)->U) * ((Cells+i)->U) + ((Cells+i)->V) * ((Cells+i)->V) + ((Cells+i)->W) * ((Cells+i)->W);
-  double T2 = 0.0;
-  int k;
-  for (k=0; k<9; k++)
-  {
-    T2                  = ((Cells+i)->U)*cx[k] + ((Cells+i)->V)*cy[k];
-    (Cells+i)->Feq[k]   = ((Cells+i)->Rho)*w[k]*( 1.0 + 3.0*T2 + 4.5*T2*T2 - 1.5*T1 );
-    (Cells+i)->METAF[k] = Omega*((Cells+i)->Feq[k])+(1.0-Omega)*((Cells+i)->F[k]);
-  }
+    double T1 = ((Cells+i)->U) * ((Cells+i)->U) + ((Cells+i)->V) * ((Cells+i)->V) + ((Cells+i)->W) * ((Cells+i)->W);
+    double T2 = 0.0;
+    int k;
+    for (k=0; k<9; k++)
+    {
+        T2                  = ((Cells+i)->U)*cx[k] + ((Cells+i)->V)*cy[k];
+        (Cells+i)->Feq[k]   = ((Cells+i)->Rho)*w[k]*( 1.0 + 3.0*T2 + 4.5*T2*T2 - 1.5*T1 );
+        (Cells+i)->METAF[k] = Omega*((Cells+i)->Feq[k])+(1.0-Omega)*((Cells+i)->F[k]);
+    }
 }
 
 /*==================================================
@@ -650,27 +655,27 @@ void BGKW(CellProps *Cells, int i, double* w, int* cx, int* cy, double Omega)
 
 void TRT(CellProps *Cells, int i, double* w, int* cx, int* cy, int* opp, double Omega, double OmegaA)
 {
-  double T1 = ((Cells +i)->U)*((Cells +i)->U)+((Cells +i)->V)*((Cells +i)->V);
-  double T2 = 0.0;
-  int k;
-  for (k=0; k<9; k++)
-  {
-    T2                  = ((Cells +i)->U)   *cx[k] + ((Cells +i)->V)*cy[k];
-    (Cells +i)->Feq[k]  = ((Cells +i)->Rho) *w[k]*(1.0+3.0*T2+4.5*T2*T2-1.5*T1);
-  }
+    double T1 = ((Cells +i)->U)*((Cells +i)->U)+((Cells +i)->V)*((Cells +i)->V);
+    double T2 = 0.0;
+    int k;
+    for (k=0; k<9; k++)
+    {
+        T2                  = ((Cells +i)->U)   *cx[k] + ((Cells +i)->V)*cy[k];
+        (Cells +i)->Feq[k]  = ((Cells +i)->Rho) *w[k]*(1.0+3.0*T2+4.5*T2*T2-1.5*T1);
+    }
 
-  float F_p[9],Feq_p[9],F_m[9],Feq_m[9];
-  for (k=0; k<9; k++)
-  {
-    F_p[k]   = 0.5*( (Cells +i)->F[k]   + (Cells +i)->F[opp[k]]   );
-    Feq_p[k] = 0.5*( (Cells +i)->Feq[k] + (Cells +i)->Feq[opp[k]] );
-    F_m[k]   = 0.5*( (Cells +i)->F[k]   - (Cells +i)->F[opp[k]]   );
-    Feq_m[k] = 0.5*( (Cells +i)->Feq[k] - (Cells +i)->Feq[opp[k]] );
+    float F_p[9],Feq_p[9],F_m[9],Feq_m[9];
+    for (k=0; k<9; k++)
+    {
+        F_p[k]   = 0.5*( (Cells +i)->F[k]   + (Cells +i)->F[opp[k]]   );
+        Feq_p[k] = 0.5*( (Cells +i)->Feq[k] + (Cells +i)->Feq[opp[k]] );
+        F_m[k]   = 0.5*( (Cells +i)->F[k]   - (Cells +i)->F[opp[k]]   );
+        Feq_m[k] = 0.5*( (Cells +i)->Feq[k] - (Cells +i)->Feq[opp[k]] );
 
-    (Cells +i)->METAF[k] = (Cells +i)->F[k] -
-                           (F_p[k]-Feq_p[k])*Omega -
-                           (F_m[k]-Feq_m[k])*OmegaA;
-  }
+        (Cells +i)->METAF[k] = (Cells +i)->F[k] -
+                               (F_p[k]-Feq_p[k])*Omega -
+                               (F_m[k]-Feq_m[k])*OmegaA;
+    }
 }
 
 
@@ -680,41 +685,41 @@ void TRT(CellProps *Cells, int i, double* w, int* cx, int* cy, int* opp, double 
 
 void MRT(CellProps *Cells, int i, double** tm, double** stmiv)
 {
-  int k, l;
-  double fmom[9],fmeq[9];
-  double U, V;
-  double suma,sumb;
+    int k, l;
+    double fmom[9],fmeq[9];
+    double U, V;
+    double suma,sumb;
 
-  U = (Cells +i)->U;
-  V = (Cells +i)->V;
+    U = (Cells +i)->U;
+    V = (Cells +i)->V;
 
-  fmeq[0] =  (Cells +i)->Rho;
-  fmeq[1] = ((Cells +i)->Rho)*(-2.0+3.0*((Cells +i)->Rho)*(U*U+V*V));
-  fmeq[2] = ((Cells +i)->Rho)*(1.0-3.0*((Cells +i)->Rho)*(U*U+V*V));
-  fmeq[3] = ((Cells +i)->Rho)*((Cells +i)->U);
-  fmeq[4] =-((Cells +i)->Rho)*((Cells +i)->U);
-  fmeq[5] = ((Cells +i)->Rho)*((Cells +i)->V);
-  fmeq[6] =-((Cells +i)->Rho)*((Cells +i)->V);
-  fmeq[7] = ((Cells +i)->Rho)*(U*U-V*V);
-  fmeq[8] = ((Cells +i)->Rho)*U*V;
+    fmeq[0] =  (Cells +i)->Rho;
+    fmeq[1] = ((Cells +i)->Rho)*(-2.0+3.0*((Cells +i)->Rho)*(U*U+V*V));
+    fmeq[2] = ((Cells +i)->Rho)*(1.0-3.0*((Cells +i)->Rho)*(U*U+V*V));
+    fmeq[3] = ((Cells +i)->Rho)*((Cells +i)->U);
+    fmeq[4] =-((Cells +i)->Rho)*((Cells +i)->U);
+    fmeq[5] = ((Cells +i)->Rho)*((Cells +i)->V);
+    fmeq[6] =-((Cells +i)->Rho)*((Cells +i)->V);
+    fmeq[7] = ((Cells +i)->Rho)*(U*U-V*V);
+    fmeq[8] = ((Cells +i)->Rho)*U*V;
 
-  for (k=0; k<9;k++)
-  {
-    suma=0.0;
-    for (l=0; l<9;l++)
-      suma = suma + tm[k][l]*((Cells +i)->F[l]);
+    for (k=0; k<9;k++)
+    {
+        suma=0.0;
+        for (l=0; l<9;l++)
+            suma = suma + tm[k][l]*((Cells +i)->F[l]);
 
-    fmom[k]=suma;
-  }
+        fmom[k]=suma;
+    }
 
-  for (k=0; k<9;k++)
-  {
-    sumb=0.0;
-    for (l=0; l<9;l++)
-      sumb = sumb + stmiv[k][l]*(fmom[l]-fmeq[l]);
+    for (k=0; k<9;k++)
+    {
+        sumb=0.0;
+        for (l=0; l<9;l++)
+            sumb = sumb + stmiv[k][l]*(fmom[l]-fmeq[l]);
 
-    (Cells +i)->METAF[k] = ((Cells +i)->F[k]) - sumb;
-  }
+        (Cells +i)->METAF[k] = ((Cells +i)->F[k]) - sumb;
+    }
 }
 
 
@@ -724,9 +729,9 @@ void MRT(CellProps *Cells, int i, double** tm, double** stmiv)
 
 void UpdateF(CellProps *Cells, int i)
 {
-  int k;
-  for(k=0;k<9;k++)
-    (Cells+i)->F[k] = (Cells+i)->METAF[k];
+    int k;
+    for(k=0;k<9;k++)
+        (Cells+i)->F[k] = (Cells+i)->METAF[k];
 }
 
 
@@ -736,40 +741,40 @@ void UpdateF(CellProps *Cells, int i)
 
 void UpdateMacroscopic(CellProps *Cells, int i, int* cx, int* cy, int CalculateDragLift)
 {
-  double Ssum, Usum, Vsum;
-  int k;
+    double Ssum, Usum, Vsum;
+    int k;
 
-  if ((Cells+i)->Fluid==1)
-  {
-    Ssum=0.0;
-    for (k=0; k<9; k++)
-      Ssum = Ssum+(Cells+i)->F[k];
-
-    (Cells+i)->Rho = Ssum;
-
-    //printf("Rho[%d][%d] = %f\n", j, i, Ssum);
-
-    Usum = 0.0;
-    Vsum = 0.0;
-    for (k=0; k<9; k++)
+    if ((Cells+i)->Fluid==1)
     {
-      Usum = Usum + ((Cells+i)->F[k])*cx[k];
-      Vsum = Vsum + ((Cells+i)->F[k])*cy[k];
+        Ssum=0.0;
+        for (k=0; k<9; k++)
+            Ssum = Ssum+(Cells+i)->F[k];
+
+        (Cells+i)->Rho = Ssum;
+
+        //printf("Rho[%d][%d] = %f\n", j, i, Ssum);
+
+        Usum = 0.0;
+        Vsum = 0.0;
+        for (k=0; k<9; k++)
+        {
+            Usum = Usum + ((Cells+i)->F[k])*cx[k];
+            Vsum = Vsum + ((Cells+i)->F[k])*cy[k];
+        }
+        (Cells+i)->U = Usum/((Cells+i)->Rho);
+        (Cells+i)->V = Vsum/((Cells+i)->Rho);
     }
-    (Cells+i)->U = Usum/((Cells+i)->Rho);
-    (Cells+i)->V = Vsum/((Cells+i)->Rho);
-  }
 
-  if ((Cells+i)->BC_ID[1]==3) // for outlet on the right
-  {
-    (Cells+i)->V=0.0;
-  }
+    if ((Cells+i)->BC_ID[1]==3) // for outlet on the right
+    {
+        (Cells+i)->V=0.0;
+    }
 
-  //   DRAG/LIFT FORCE
-  if (CalculateDragLift != 0 && (Cells+i)->BoundaryID==CalculateDragLift)
-  {
-    (Cells+i)->DragF = ((Cells+i)->Rho)/3*(20-(Cells+i)->CoordX)/5;
-    (Cells+i)->LiftF = ((Cells+i)->Rho)/3*(20-(Cells+i)->CoordY)/5;
-  }
+    //   DRAG/LIFT FORCE
+    if (CalculateDragLift != 0 && (Cells+i)->BoundaryID==CalculateDragLift)
+    {
+        (Cells+i)->DragF = ((Cells+i)->Rho)/3*(20-(Cells+i)->CoordX)/5;
+        (Cells+i)->LiftF = ((Cells+i)->Rho)/3*(20-(Cells+i)->CoordY)/5;
+    }
 
 }

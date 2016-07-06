@@ -1,12 +1,10 @@
 #include <stdio.h>                      // printf();
-#include <math.h>                       // need to compile with -lm
 #include <stdlib.h>                     // for calloc();
-#include <stdbool.h>                    // Include for bool type variables!
-#include <string.h>                     // String operations
 #include <time.h>                       // time functions
-#include <upc_relaxed.h>                // Required for UPC 
+#include <upc.h>                // Required for UPC
 #include <CellFunctions.h>
 #include <ComputeResiduals.h>
+#include <ShellFunctions.h>
 
 ////////////////////////////////////////////////////
 ////////////////// OWN HEADERS /////////////////////
@@ -251,6 +249,21 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
 
 
 
+    //Things to print for each thread
+    //Point coordinates and values
+    //Cells contain, all the nodes, on the different threads.
+    upc_barrier;
+    //if(MYTHREAD == 0)
+        //out_cells_file = shared fopen("Results/outCells.dat","a");
+
+    upc_barrier;
+    print_cells_info(Cells);
+    upc_barrier;
+    print_boundary_type(Cells);
+    upc_barrier;
+
+    //For every boundary type, print which points correspond to them.
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
     /* FALTA IMPRIMIR TODO LO QUE PASA EN ESTA FUNCIÓN A LO GRANDE, COMO SI NO HUBIESE UN MAÑANA */
@@ -292,4 +305,162 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     free(cz);
     free(c);
     free(opp);
+}
+
+void print_cells_info(CellProps* Cells) {
+    upc_barrier;
+    FILE* out_cells_file;
+    char out_cells_filename [50];
+    sprintf(out_cells_filename,"Results/outCells/T_%i.dat",MYTHREAD);
+    out_cells_file = fopen(out_cells_filename,"w");
+    for (int t_to_print_from = 0; t_to_print_from<THREADS;t_to_print_from++){
+        if (MYTHREAD == t_to_print_from)
+        {
+            printf("Going to Thread %i\n",MYTHREAD);
+            fprintf(out_cells_file,"Printing from thread %i\n",MYTHREAD);
+            fprintf(out_cells_file,"   ID   |  i |  j |  k ||    x    |    y    |    z\n");
+            for(int cell_to_print = LAYER; cell_to_print< BLOCKSIZE+LAYER; cell_to_print++) {
+                print_cell_line(out_cells_file,Cells+cell_to_print);
+            }
+        }
+        upc_barrier;
+    }
+    fclose(out_cells_file);
+    upc_barrier;
+}
+
+void print_boundary_type(CellProps* Cells) {
+    main_thread
+        printf("printing boundaries T%i\n",MYTHREAD);
+
+
+    int count_B[4];
+    count_B[0]=0;
+    count_B[1]=0;
+    count_B[2]=0;
+    count_B[3]=0;
+
+    int* N_B[4];
+
+    N_B[0] = (int*)malloc(BLOCKSIZE*sizeof(int));
+    N_B[1] = (int*)malloc(BLOCKSIZE*sizeof(int));
+    N_B[2] = (int*)malloc(BLOCKSIZE*sizeof(int));
+    N_B[3] = (int*)malloc(BLOCKSIZE*sizeof(int));
+
+    upc_barrier;
+    main_thread
+        printf("Get cell boundary info\n");
+    for (int node_to_look = LAYER;node_to_look<BLOCKSIZE+LAYER;node_to_look++) {
+        int BT;
+        //printf("TEST, thread %i\n",MYTHREAD);
+        if (node_to_look == LAYER)    {
+            printf("Thread: %i,Node: %i,BT: %i\n",MYTHREAD,node_to_look,(Cells+node_to_look)->Boundary);
+            int index_n, index_i, index_j, index_k;
+            index_n = (Cells+LAYER)->ID;
+            index_i = index_n/(NM*NL);
+            index_j = (index_n - index_i * NM* NL)/NM;
+            index_k = (index_n - index_i * NM* NL - index_j * NM);
+            printf("%7i |%3i |%3i |%3i || %5.5f | %5.5f | %5.5f \n",
+                    index_n,
+                    index_i,
+                    index_j,
+                    index_k,
+                    (Cells+LAYER)->CoordX,
+                    (Cells+LAYER)->CoordY,
+                    (Cells+LAYER)->CoordZ
+            );
+        }
+
+
+
+        if ((BT = (Cells+node_to_look)->Boundary-1) !=-1 ) {
+            //printf("BT: %i\n",BT);
+            N_B[BT][count_B[BT]] = (Cells+node_to_look)->ID;
+            count_B[BT]++;
+        }
+    }
+    upc_barrier;
+    main_thread
+        printf("Start saving to files\n");
+
+    char* b_filename[4];
+    char* b1_filename = "Results/boundary/solidplane_boundary.dat";
+    char* b2_filename = "Results/boundary/fluidplane_boundary.dat";
+    char* b3_filename = "Results/boundary/edge_boundary.dat";
+    char* b4_filename = "Results/boundary/corner_boundary.dat";
+    b_filename[0] = b1_filename;
+    b_filename[1] = b2_filename;
+    b_filename[2] = b3_filename;
+    b_filename[3] = b4_filename;
+    if (MYTHREAD == 0) {
+    printf(b_filename[0]);
+    printf("\n");
+    printf(b1_filename);
+    printf("\n");
+    printf(b_filename[1]);
+    printf("\n");
+    printf(b2_filename);
+    printf("\n");
+    printf(b_filename[2]);
+    printf("\n");
+    printf(b3_filename);
+    printf("\n");
+    printf(b_filename[3]);
+    printf("\n");
+    printf(b4_filename);
+    printf("\n");}
+
+    if (MYTHREAD == 0){
+        for(int BT = 0; BT<4; BT++) {
+            FILE* b_file = fopen(b_filename[BT],"w");
+            fclose(b_file);
+        }
+    }
+
+    upc_barrier;
+    for (int t_to_print_from = 0; t_to_print_from<THREADS;t_to_print_from++){
+        if (MYTHREAD == t_to_print_from) {
+
+            for(int BT = 0; BT<4; BT++) {
+                FILE* b_file = fopen(b_filename[BT],"a");
+                fprintf(b_file,"Printing from thread %i\n",MYTHREAD);
+                fprintf(b_file,"   ID   |  i |  j |  k ||    x    |    y    |    z\n");
+                for(int c=0;c<count_B[BT];c++){
+                    print_cell_line(b_file,cell_from_id(Cells,N_B[BT][c]));
+                }
+                fclose(b_file);
+            }
+        }
+        upc_barrier;
+    }
+
+
+
+    free(N_B[0]);
+    free(N_B[1]);
+    free(N_B[2]);
+    free(N_B[3]);
+
+}
+
+void print_cell_line(FILE* file, const CellProps* Cell) {
+    int index_n, index_i, index_j, index_k;
+    index_n = Cell->ID;
+    index_i = index_n/(NM*NL);
+    index_j = (index_n - index_i * NM* NL)/NM;
+    index_k = (index_n - index_i * NM* NL - index_j * NM);
+    fprintf(file,"%7i |%3i |%3i |%3i || %5.5f | %5.5f | %5.5f \n",
+            index_n,
+            index_i,
+            index_j,
+            index_k,
+            Cell->CoordX,
+            Cell->CoordY,
+            Cell->CoordZ
+    );
+}
+
+CellProps* cell_from_id(CellProps* Cells, int ID){
+    int n = ID + LAYER - MYTHREAD*BLOCKSIZE;
+    return (Cells+n);
 }
