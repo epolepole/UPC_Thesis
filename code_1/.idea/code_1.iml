@@ -5,6 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Iterate.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/ComputeResiduals.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/FilesReading.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/ShellFunctions.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/CellFunctions.c" isTestSource="false" />

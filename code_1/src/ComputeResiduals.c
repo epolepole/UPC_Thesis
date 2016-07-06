@@ -3,12 +3,11 @@
 #include <stdlib.h>
 #include <math.h>
 #include <upc_relaxed.h>                 // Required for UPC
-#include <time.h>
 
 #include "ComputeResiduals.h"
 
 
-void ComputeResiduals(struct CellProps *Cells, double* Residuals,
+void ComputeResiduals(CellProps *Cells, double* Residuals,
                       double* sumVel0, double* sumVel1,
                       double* sumRho0, double* sumRho1,
                       int ComputeDragLift, int* iter, int* Iterations)
@@ -39,7 +38,7 @@ void ComputeResiduals(struct CellProps *Cells, double* Residuals,
     //*sumRho1 = 0;
 
     // sum up velocity and density
-    for(i = (*n);  i < (MLIM+1)*(*n);  i++)
+    for(i = (*n);  i < (LAYER+1)*(*n);  i++)
     {
 
         //LsumVel1 = LsumVel1 + sqrt( ((Cells+i)->U)*((Cells+i)->U)  +  ((Cells+i)->V)*((Cells+i)->V)  );

@@ -2,6 +2,7 @@
 // upcc -T=4 main.c Iterate.c ShellFunctions.c FilesReading.c FilesWriting.c CellFunctions.c BoundaryConditions.c ComputeResiduals.c -lm -o LBMSolver && upcrun LBMSolver
 
 #include <stdio.h>
+#include <ShellFunctions.h>
 
 #include "Iterate.h"             // Iteration takes place
 #include "FilesReading.h"        // For reading files

@@ -264,10 +264,10 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     //I will start from the end
 
     tInstant1 = clock(); // Start measuring time
-    ComputeResiduals(Cells, Residuals,
+    /*ComputeResiduals(Cells, Residuals,
                      sumVel0, sumVel1,
                      sumRho0, sumRho1,
-                     CalculateDragLift, &iter, &Iterations);
+                     CalculateDragLift, &iter, &Iterations);*/
     //ComputeResiduals(Cells, Residuals, sumVel0, sumVel1, sumRho0, sumRho1, CalculateDragLift, &iter, &Iterations);
     tInstant2 = clock(); // End of time measuremet
     tResiduals = tResiduals + (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC;
