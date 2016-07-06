@@ -1,4 +1,4 @@
 #!/bin/bash
 
-./rebuild.sh
-./run.sh
+./rebuild.sh $1 $2
+./run.sh $1

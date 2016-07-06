@@ -1,8 +1,8 @@
 #!/bin/bash
 
 cd build/bin
-if true ; then
-upcrun -backtrace LBMSolver
+if [ $1 == "R" ] ; then
+    upcrun -backtrace LBMSolver
 else
-upcrun -freeze=0 -backtrace LBMSolver
+    upcrun -freeze=0 -backtrace LBMSolver
 fi
