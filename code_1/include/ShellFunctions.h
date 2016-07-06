@@ -88,6 +88,7 @@ shared  int    *NumNodes;       // This will store the number of lines of the re
 shared  int    *NumConn;        // This will store the number of lines of the read files
 shared  int    *n;              // number of nodes in the x direction
 shared  int    *m;              // number of nodes in the y direction
+shared  int    *o;              // number of nodes in the z direction
 shared  int    *NumInletNodes;  // number of inlet nodes
 shared  double *Delta;          // grid spacing
 shared  double *MaxInletCoordY; // maximum inlet coordinate in y

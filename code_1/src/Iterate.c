@@ -6,6 +6,7 @@
 #include <time.h>                       // time functions
 #include <upc_relaxed.h>                // Required for UPC 
 #include <CellFunctions.h>
+#include <ComputeResiduals.h>
 
 ////////////////////////////////////////////////////
 ////////////////// OWN HEADERS /////////////////////
@@ -113,6 +114,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     Delta          = (shared double*)upc_alloc(1*sizeof(double));
     m              = (shared int*)upc_alloc(1*sizeof(int));
     n              = (shared int*)upc_alloc(1*sizeof(int));
+    o              = (shared int*)upc_alloc(1*sizeof(int));
     NumNodes       = (shared int*)upc_alloc(1*sizeof(int));
     NumConn        = (shared int*)upc_alloc(1*sizeof(int));
     MaxInletCoordY = (shared double*)upc_alloc(1*sizeof(double));
@@ -257,6 +259,20 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
 
     tInstant2 = clock(); // Measure time of initialization
     tInitialization = (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC;
+
+
+    //I will start from the end
+
+    tInstant1 = clock(); // Start measuring time
+    ComputeResiduals(Cells, Residuals,
+                     sumVel0, sumVel1,
+                     sumRho0, sumRho1,
+                     CalculateDragLift, &iter, &Iterations);
+    //ComputeResiduals(Cells, Residuals, sumVel0, sumVel1, sumRho0, sumRho1, CalculateDragLift, &iter, &Iterations);
+    tInstant2 = clock(); // End of time measuremet
+    tResiduals = tResiduals + (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC;
+
+
 
     upc_barrier;         // Synchronise
 
