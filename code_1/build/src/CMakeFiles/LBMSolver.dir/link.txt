@@ -1,1 +1,0 @@
-/usr/local/berkeley_upc/bin/upcc  -T 8   CMakeFiles/LBMSolver.dir/main.c.o CMakeFiles/LBMSolver.dir/ShellFunctions.c.o CMakeFiles/LBMSolver.dir/FilesReading.c.o CMakeFiles/LBMSolver.dir/CellFunctions.c.o CMakeFiles/LBMSolver.dir/Iterate.c.o  -o ../bin/LBMSolver  -lm 
