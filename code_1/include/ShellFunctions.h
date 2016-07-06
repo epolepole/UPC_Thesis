@@ -80,7 +80,7 @@ typedef struct
 }CellProps ;
 
 //shared [BLOCKSIZE+2*NN] CellProps  *SCells;
-shared_block(BLOCKSIZE])     CellProps  *WCells; // Writing Cells: cells to write data
+shared_block(BLOCKSIZE)     CellProps  *WCells; // Writing Cells: cells to write data
 shared_block(2*NN)           CellProps  *BCells; // Boundary cells
 shared_block(4)              double sResiduals[4*THREADS]; // variable to store residuals
 
