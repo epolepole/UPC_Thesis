@@ -6,3 +6,4 @@ if [ $1 == "R" ] ; then
 else
     upcrun -freeze=0 -backtrace LBMSolver
 fi
+cd ../../
