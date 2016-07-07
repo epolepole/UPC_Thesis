@@ -12,10 +12,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7cb5bf53-186d-4ef3-819c-fd2ffae90c7b" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/include/ShellFunctions.h" afterPath="$PROJECT_DIR$/include/ShellFunctions.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/run.sh" afterPath="$PROJECT_DIR$/run.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/FilesWriting.c" afterPath="$PROJECT_DIR$/src/FilesWriting.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/include/BlockSizeDefiner.h" afterPath="$PROJECT_DIR$/include/BlockSizeDefiner.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/CellFunctions.c" afterPath="$PROJECT_DIR$/src/CellFunctions.c" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Iterate.c" afterPath="$PROJECT_DIR$/src/Iterate.c" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main.c" afterPath="$PROJECT_DIR$/src/main.c" />
     </list>
@@ -38,39 +36,58 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Iterate.c" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Iterate.c" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Iterate.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="61">
-              <caret line="628" column="0" selection-start-line="628" selection-start-column="0" selection-end-line="628" selection-end-column="0" />
+            <state relative-caret-position="266">
+              <caret line="514" column="11" selection-start-line="514" selection-start-column="6" selection-end-line="514" selection-end-column="11" />
               <folding>
                 <element signature="e#0#52#0" expanded="true" />
                 <element signature="e#524#580#0" expanded="true" />
-                <element signature="e#5239#7786#0" expanded="false" />
-                <element signature="e#8186#8880#0" expanded="false" />
-                <element signature="e#9168#10500#0" expanded="false" />
-                <element signature="e#10501#10796#0" expanded="false" />
-                <element signature="e#10797#12776#0" expanded="false" />
-                <element signature="e#12777#13107#0" expanded="false" />
-                <element signature="e#13113#13556#0" expanded="false" />
-                <element signature="e#13558#14342#0" expanded="false" />
-                <element signature="e#14344#14818#0" expanded="false" />
-                <element signature="e#14819#15107#0" expanded="false" />
-                <element signature="e#15108#15947#0" expanded="false" />
-                <element signature="e#15948#16432#0" expanded="false" />
-                <element signature="e#16433#16683#0" expanded="false" />
-                <element signature="e#16685#17001#0" expanded="false" />
-                <element signature="e#17002#17111#0" expanded="false" />
-                <element signature="e#17132#17564#0" expanded="false" />
-                <element signature="e#17567#21533#0" expanded="false" />
-                <element signature="e#21536#22232#0" expanded="false" />
-                <element signature="e#22649#22990#0" expanded="false" />
-                <element signature="e#22991#26125#0" expanded="false" />
-                <element signature="e#26126#27011#0" expanded="false" />
-                <element signature="e#27012#30397#0" expanded="false" />
-                <element signature="e#30398#30897#0" expanded="false" />
-                <element signature="e#30900#31037#0" expanded="false" />
+                <element signature="e#8187#8881#0" expanded="false" />
+                <element signature="e#8882#9168#0" expanded="false" />
+                <element signature="e#9169#10501#0" expanded="false" />
+                <element signature="e#10502#10797#0" expanded="false" />
+                <element signature="e#10798#12777#0" expanded="false" />
+                <element signature="e#12778#13108#0" expanded="false" />
+                <element signature="e#13114#13557#0" expanded="false" />
+                <element signature="e#13559#14343#0" expanded="false" />
+                <element signature="e#14345#14819#0" expanded="false" />
+                <element signature="e#14820#15108#0" expanded="false" />
+                <element signature="e#15109#15948#0" expanded="false" />
+                <element signature="e#16434#16684#0" expanded="false" />
+                <element signature="e#16686#17002#0" expanded="false" />
+                <element signature="e#17133#17565#0" expanded="false" />
+                <element signature="e#17568#21534#0" expanded="false" />
+                <element signature="e#21537#22233#0" expanded="false" />
+                <element signature="e#22234#22649#0" expanded="false" />
+                <element signature="e#22650#22991#0" expanded="false" />
+                <element signature="e#22992#26126#0" expanded="false" />
+                <element signature="e#26127#27012#0" expanded="false" />
+                <element signature="e#27013#30398#0" expanded="false" />
+                <element signature="e#30399#30898#0" expanded="false" />
+                <element signature="e#30901#31038#0" expanded="false" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BCconnectors.dat" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Mesh/BCconnectors.dat">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Nodes.dat" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Mesh/Nodes.dat">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -98,8 +115,18 @@
       <file leaf-file-name="main.c" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="345">
-              <caret line="19" column="33" selection-start-line="19" selection-start-column="33" selection-end-line="19" selection-end-column="33" />
+            <state relative-caret-position="644">
+              <caret line="81" column="0" selection-start-line="81" selection-start-column="0" selection-end-line="81" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BlockSizeDefiner.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/include/BlockSizeDefiner.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="184">
+              <caret line="8" column="22" selection-start-line="8" selection-start-column="22" selection-end-line="8" selection-end-column="22" />
               <folding />
             </state>
           </provider>
@@ -115,56 +142,24 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BlockSizeDefiner.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/include/BlockSizeDefiner.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="161">
-              <caret line="7" column="13" selection-start-line="7" selection-start-column="8" selection-end-line="7" selection-end-column="13" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="FilesReading.c" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/FilesReading.c">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="126">
-              <caret line="42" column="63" selection-start-line="42" selection-start-column="9" selection-end-line="42" selection-end-column="63" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="Iterate.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/include/Iterate.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="46">
-              <caret line="83" column="12" selection-start-line="83" selection-start-column="5" selection-end-line="83" selection-end-column="23" />
+            <state relative-caret-position="361">
+              <caret line="73" column="77" selection-start-line="73" selection-start-column="77" selection-end-line="73" selection-end-column="77" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ShellFunctions.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/include/ShellFunctions.h">
+      <file leaf-file-name="CellFunctions.c" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/CellFunctions.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="414">
-              <caret line="56" column="0" selection-start-line="56" selection-start-column="0" selection-end-line="56" selection-end-column="0" />
+            <state relative-caret-position="493">
+              <caret line="458" column="29" selection-start-line="458" selection-start-column="29" selection-end-line="458" selection-end-column="29" />
               <folding>
-                <element signature="e#1333#1838#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="FilesWriting.c" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/FilesWriting.c">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="230">
-              <caret line="13" column="0" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
-              <folding>
-                <element signature="e#0#37#0" expanded="true" />
-                <element signature="e#2372#4587#0" expanded="false" />
+                <element signature="e#11392#20984#0" expanded="false" />
+                <element signature="e#20995#24081#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -190,17 +185,18 @@
         <option value="$PROJECT_DIR$/build/bin/Results/boundary/corner_boundary.dat" />
         <option value="$PROJECT_DIR$/include/CellFunctions.h" />
         <option value="$PROJECT_DIR$/src/ComputeResiduals.c" />
-        <option value="$PROJECT_DIR$/src/CellFunctions.c" />
         <option value="$PROJECT_DIR$/SetUpData.ini" />
         <option value="$PROJECT_DIR$/include/Iterate.h" />
         <option value="$PROJECT_DIR$/include/BoundaryConditions.h" />
         <option value="$PROJECT_DIR$/src/BoundaryConditions.c" />
-        <option value="$PROJECT_DIR$/src/main.c" />
         <option value="$PROJECT_DIR$/include/ShellFunctions.h" />
-        <option value="$PROJECT_DIR$/src/Iterate.c" />
         <option value="$PROJECT_DIR$/src/FilesWriting.c" />
         <option value="$PROJECT_DIR$/rebuild.sh" />
         <option value="$PROJECT_DIR$/run.sh" />
+        <option value="$PROJECT_DIR$/src/main.c" />
+        <option value="$PROJECT_DIR$/include/BlockSizeDefiner.h" />
+        <option value="$PROJECT_DIR$/src/Iterate.c" />
+        <option value="$PROJECT_DIR$/src/CellFunctions.c" />
       </list>
     </option>
   </component>
@@ -284,61 +280,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="include" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code_1" />
-              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code_1" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="build" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code_1" />
-              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code_1" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="build" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="bin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code_1" />
-              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code_1" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="build" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="bin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Results" />
+              <option name="myItemId" value="Mesh" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -567,11 +509,11 @@
     <frame x="1280" y="24" width="1920" height="1003" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19820769" sideWeight="0.49589685" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16130732" sideWeight="0.49589685" order="1" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1594203" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.0490524" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3449074" sideWeight="0.509375" order="1" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2800441" sideWeight="0.490625" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.051819183" sideWeight="0.490625" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32887402" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30152872" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32998884" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -618,7 +560,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="5" />
+      <option name="time" value="6" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -679,20 +621,6 @@
         <state relative-caret-position="115">
           <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Mesh/BCconnectors.dat">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Mesh/Nodes.dat">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3795">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
         </state>
       </provider>
     </entry>
@@ -825,7 +753,7 @@
         <state relative-caret-position="394">
           <caret line="928" column="52" selection-start-line="928" selection-start-column="52" selection-end-line="928" selection-end-column="52" />
           <folding>
-            <element signature="e#0#48#0" expanded="true" />
+            <element signature="e#0#48#0" expanded="false" />
             <element signature="e#348#421#0" expanded="false" />
             <element signature="e#9659#9732#0" expanded="false" />
             <element signature="e#10030#10891#0" expanded="false" />
@@ -870,46 +798,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/CellFunctions.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="160" column="45" selection-start-line="160" selection-start-column="45" selection-end-line="160" selection-end-column="48" />
-          <folding>
-            <element signature="e#11364#20956#0" expanded="false" />
-            <element signature="e#20967#24053#0" expanded="false" />
-            <element signature="e#26030#29967#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/build/bin/Results/InitialData.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="92">
-          <caret line="4" column="94" selection-start-line="4" selection-start-column="94" selection-end-line="4" selection-end-column="94" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/include/BlockSizeDefiner.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="161">
-          <caret line="7" column="13" selection-start-line="7" selection-start-column="8" selection-end-line="7" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/FilesReading.c">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="126">
           <caret line="42" column="63" selection-start-line="42" selection-start-column="9" selection-end-line="42" selection-end-column="63" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/include/Iterate.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="46">
-          <caret line="83" column="12" selection-start-line="83" selection-start-column="5" selection-end-line="83" selection-end-column="23" />
           <folding />
         </state>
       </provider>
@@ -929,16 +821,40 @@
         <state relative-caret-position="230">
           <caret line="13" column="0" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
           <folding>
-            <element signature="e#0#37#0" expanded="true" />
+            <element signature="e#0#37#0" expanded="false" />
             <element signature="e#2372#4587#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/include/Iterate.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="361">
+          <caret line="73" column="77" selection-start-line="73" selection-start-column="77" selection-end-line="73" selection-end-column="77" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/bin/Results/InitialData.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="92">
+          <caret line="4" column="94" selection-start-line="4" selection-start-column="94" selection-end-line="4" selection-end-column="94" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/BlockSizeDefiner.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="8" column="22" selection-start-line="8" selection-start-column="22" selection-end-line="8" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="19" column="33" selection-start-line="19" selection-start-column="33" selection-end-line="19" selection-end-column="33" />
+        <state relative-caret-position="644">
+          <caret line="81" column="0" selection-start-line="81" selection-start-column="0" selection-end-line="81" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -947,6 +863,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="368">
           <caret line="16" column="95" selection-start-line="16" selection-start-column="88" selection-end-line="16" selection-end-column="95" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Mesh/Nodes.dat">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -961,35 +885,53 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Iterate.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="61">
-          <caret line="628" column="0" selection-start-line="628" selection-start-column="0" selection-end-line="628" selection-end-column="0" />
+        <state relative-caret-position="266">
+          <caret line="514" column="11" selection-start-line="514" selection-start-column="6" selection-end-line="514" selection-end-column="11" />
           <folding>
             <element signature="e#0#52#0" expanded="true" />
             <element signature="e#524#580#0" expanded="true" />
-            <element signature="e#5239#7786#0" expanded="false" />
-            <element signature="e#8186#8880#0" expanded="false" />
-            <element signature="e#9168#10500#0" expanded="false" />
-            <element signature="e#10501#10796#0" expanded="false" />
-            <element signature="e#10797#12776#0" expanded="false" />
-            <element signature="e#12777#13107#0" expanded="false" />
-            <element signature="e#13113#13556#0" expanded="false" />
-            <element signature="e#13558#14342#0" expanded="false" />
-            <element signature="e#14344#14818#0" expanded="false" />
-            <element signature="e#14819#15107#0" expanded="false" />
-            <element signature="e#15108#15947#0" expanded="false" />
-            <element signature="e#15948#16432#0" expanded="false" />
-            <element signature="e#16433#16683#0" expanded="false" />
-            <element signature="e#16685#17001#0" expanded="false" />
-            <element signature="e#17002#17111#0" expanded="false" />
-            <element signature="e#17132#17564#0" expanded="false" />
-            <element signature="e#17567#21533#0" expanded="false" />
-            <element signature="e#21536#22232#0" expanded="false" />
-            <element signature="e#22649#22990#0" expanded="false" />
-            <element signature="e#22991#26125#0" expanded="false" />
-            <element signature="e#26126#27011#0" expanded="false" />
-            <element signature="e#27012#30397#0" expanded="false" />
-            <element signature="e#30398#30897#0" expanded="false" />
-            <element signature="e#30900#31037#0" expanded="false" />
+            <element signature="e#8187#8881#0" expanded="false" />
+            <element signature="e#8882#9168#0" expanded="false" />
+            <element signature="e#9169#10501#0" expanded="false" />
+            <element signature="e#10502#10797#0" expanded="false" />
+            <element signature="e#10798#12777#0" expanded="false" />
+            <element signature="e#12778#13108#0" expanded="false" />
+            <element signature="e#13114#13557#0" expanded="false" />
+            <element signature="e#13559#14343#0" expanded="false" />
+            <element signature="e#14345#14819#0" expanded="false" />
+            <element signature="e#14820#15108#0" expanded="false" />
+            <element signature="e#15109#15948#0" expanded="false" />
+            <element signature="e#16434#16684#0" expanded="false" />
+            <element signature="e#16686#17002#0" expanded="false" />
+            <element signature="e#17133#17565#0" expanded="false" />
+            <element signature="e#17568#21534#0" expanded="false" />
+            <element signature="e#21537#22233#0" expanded="false" />
+            <element signature="e#22234#22649#0" expanded="false" />
+            <element signature="e#22650#22991#0" expanded="false" />
+            <element signature="e#22992#26126#0" expanded="false" />
+            <element signature="e#26127#27012#0" expanded="false" />
+            <element signature="e#27013#30398#0" expanded="false" />
+            <element signature="e#30399#30898#0" expanded="false" />
+            <element signature="e#30901#31038#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Mesh/BCconnectors.dat">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/CellFunctions.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="493">
+          <caret line="458" column="29" selection-start-line="458" selection-start-column="29" selection-end-line="458" selection-end-column="29" />
+          <folding>
+            <element signature="e#11392#20984#0" expanded="false" />
+            <element signature="e#20995#24081#0" expanded="false" />
           </folding>
         </state>
       </provider>

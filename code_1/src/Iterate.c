@@ -94,6 +94,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     end_measure_time(tCellsInitialization);
 
     upc_barrier;
+
     print_cells_info(Cells);
     upc_barrier;
     print_boundary_type(Cells);

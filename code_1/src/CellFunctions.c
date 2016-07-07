@@ -1,6 +1,7 @@
 
 #include <math.h>                   // for sin,cos,pow... compile with -lm
 #include <stdio.h>
+#include <ShellFunctions.h>
 
 #include "CellFunctions.h"
 #include "ShellFunctions.h" // convenience
@@ -445,11 +446,25 @@ void CellIni(CellProps *Cells,
         // DON'T STREAM TO SOLIDS
         for(j = 0; j < 19; j++)
         {
+
             if ((Cells + index_Cell)->BC_ID[j]!=0)
             {
                 (Cells + index_Cell)->StreamLattice[opp[j]]= 0 ;
             }
+
+            //x de 0 a 10
+            //j = 2
+            //z 0 o 1
+            if(j==2 && index_Cell >= 30 && index_Cell <  41) {
+                printf("Z = 0\n");
+                printf("Str Lattice: %i\n",(Cells + index_Cell)->StreamLattice[j]);
+            }
+            if(j==2 && index_Cell >=LAYER + 30 && index_Cell < LAYER + 41) {
+                printf("Z = 1\n");
+                printf("Str Lattice: %i\n",(Cells + index_Cell)->StreamLattice[j]);
+            }
         }
+
 
         // INLET VELOCITY // THIS IS CRAPPY, NOT USED!
         switch(InletProfile)
@@ -604,7 +619,7 @@ void D3Q19Vars(double* w, int* cx, int* cy, int* cz, int* opp, int* c)
     c[0]  =          0         ;
     c[1]  = -1                 ; // (i-1)
     c[2]  =  1                 ; // (i+1)
-    c[3]  =    -1*(*n)         ; //         (j-1)
+    c[3]  =    -1*NN         ; //         (j-1)
     c[4]  =       (*n)         ; //         (j+1)
     c[5]  =            -1*LAYER; //                 (k-1)
     c[6]  =               LAYER; //                 (k+1)

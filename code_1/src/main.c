@@ -61,25 +61,25 @@ int main(int argc, char* argv[])
   //////////////////////
   // START THE SOLVER //
   //////////////////////
- 
-  Iteration(NodeDataFile,          // data from mesher            
-            BCconnectorDataFile,   // data from mesher            
-            Uavg,                  // mean x velocity 
-            Vavg,                  // mean y velocity 
-            Wavg,                  // mean z velocity
-            rho_ini,               // initial density
-            Viscosity,             // viscosity of fluid 
-            InletProfile,          // do we have inlet profile? 
-            CollisionModel,        // which collision model to use
-            CurvedBoundaries,      // do we have curved boundaries?
-            OutletProfile,         // do we have outlet profile?
-            Iterations,            // how many iterations to perform
-            AutosaveAfter,         // autosave after this many iterations
-            AutosaveEvery,         // autosave every #th iteration
-            PostprocProg,          // postproc with Tecplot or ParaView
-            CalculateDragLift,     // 0: no calculation, 1: calc on BC_ID (1), 2: calc on BC_ID (2), etc
-            ConvergenceCritVeloc,  // convergence criterion for velocity 
-            ConvergenceCritRho);   // convergence criterion for density
+  Iteration(NodeDataFile,          // data from mesher
+              BCconnectorDataFile,   // data from mesher
+              Uavg,                  // mean x velocity
+              Vavg,                  // mean y velocity
+              Wavg,                  // mean z velocity
+              rho_ini,               // initial density
+              Viscosity,             // viscosity of fluid
+              InletProfile,          // do we have inlet profile?
+              CollisionModel,        // which collision model to use
+              CurvedBoundaries,      // do we have curved boundaries?
+              OutletProfile,         // do we have outlet profile?
+              Iterations,            // how many iterations to perform
+              AutosaveAfter,         // autosave after this many iterations
+              AutosaveEvery,         // autosave every #th iteration
+              PostprocProg,          // postproc with Tecplot or ParaView
+              CalculateDragLift,     // 0: no calculation, 1: calc on BC_ID (1), 2: calc on BC_ID (2), etc
+              ConvergenceCritVeloc,  // convergence criterion for velocity
+              ConvergenceCritRho);   // convergence criterion for density
+
 
   ///////////////////////
   // END OF THE SOLVER //

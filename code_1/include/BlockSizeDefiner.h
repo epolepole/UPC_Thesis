@@ -7,7 +7,7 @@
 #define NL 30
 #define LAYER NN*NM
 #define NODES NN*NM*NL
-#define BLOCKSIZE NN*((int)(LAYER/THREADS))
+#define BLOCKSIZE LAYER*((int)(NL/THREADS))
 #define NUMBER_OF_LAYERS ((int)(NL/THREADS))
 
 #endif
