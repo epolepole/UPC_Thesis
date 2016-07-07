@@ -24,11 +24,13 @@ int i, j, k, iter;                      // variables for loops
 FILE* resid_file;                       // file for residuals
 FILE* log_file;                         // file for log
 FILE* TimeMeasurementFile;              // file for time measurement results
+FILE* testing_file;              // file for time measurement results
 char IterOutputFile[50];                // write results to this file after the iterations
 char AutosaveOutputFile[50];            // autosave filename
 char OutputFile[50];                    // initial data will be written to this file
 char FinalOutputFile[50];               // final data will be written to this file
 char fnMemCopyRes[50];
+char testingFileName[50];
 char logFile[50];                       // path of the .log file
 int  AutosaveI;                         // autosave i variable, will be incremented after every autosave
 int* ppp;                               // pointer of the postproc_prog variable

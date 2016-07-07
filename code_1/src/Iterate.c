@@ -99,17 +99,14 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     upc_barrier;
     print_boundary_type(Cells);
     upc_barrier;
-
     end_measure_time(tInitialization);
 
     upc_barrier;         // Synchronise
 
     // PUT INITIALIZED DATA TO BOUNDARIES
-    putCellsToShared(Cells);
-
+    putCellsToShared();
     // COPY CELLS TO WCELLS (writing cells) TO WRITE DATA
-    putCellsToWCells(Cells);
-
+    putCellsToWCells();
 
     write_cells_to_results(postproc_prog);
 
@@ -154,8 +151,8 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
 
     tIterEnd = clock(); // End measuring time of main loop
     tIteration = (float)(tIterEnd - tIterStart ) / CLOCKS_PER_SEC;
-
-    printf("Finished main loop\n");
+    main_thread
+        printf("Finished main loop\n");
 
     upc_barrier;         // Synchronise
 
@@ -170,28 +167,30 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
 void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile, int *Iterations, int AutosaveAfter,
                      int AutosaveEvery, int postproc_prog, int CalculateDragLift, float ConvergenceCritVeloc,
                      float ConvergenceCritRho) {
+    testing_file = fopen(testingFileName,"w");
+    fprintf(testing_file,"  ID  j  METAF[j]  F[j]\n");
     while (Residuals[0] > ConvergenceCritVeloc && Residuals[1] > ConvergenceCritRho && iter < (*Iterations))
-    //while (false)
+        //while (false)
     {
-    printf("T %i, Starting iteration %i\n",MYTHREAD,iter);
+        //printf("T %i, Starting iteration %i\n",MYTHREAD,iter);
 //////////////// COLLISION ////////////////
         init_measure_time;
         CollisionStep(CollisionModel); ////////////////////// !!!!!!!!!!!!!!!!! CX CY!
         end_measure_time(tCollision);
-        printf("T %i, Collision\n",MYTHREAD);
+        //printf("T %i, Collision\n",MYTHREAD);
 
 ////////////// UPDATE DISTR ///////////////
         init_measure_time;
         for(i = LAYER;  i < LAYER + BLOCKSIZE;  i++)
             UpdateF(Cells, i);
         end_measure_time(tUpdateF);
-        printf("T %i, UpdateF\n",MYTHREAD);
+        //printf("T %i, UpdateF\n",MYTHREAD);
 
 // PUT THREAD-BOUNDARY CELLS TO SHARED
         init_measure_time;
         putCellsToShared();
         end_measure_time(tBCells);
-        printf("T %i, BCells\n",MYTHREAD);
+        //printf("T %i, BCells\n",MYTHREAD);
 
         upc_barrier;         // Synchronise
 
@@ -199,54 +198,76 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         init_measure_time;
         getSharedToCells();
         end_measure_time(tBCells);
-        printf("T %i, getShared to cells\n",MYTHREAD);
+        //printf("T %i, getShared to cells\n",MYTHREAD);
+
         upc_barrier;         // Synchronise
 
 ////////////// STREAMING ///////////////
         init_measure_time;
         StreamingStep();
         end_measure_time(tStreaming);
-        printf("T %i, Streaming\n",MYTHREAD);
-
-        upc_barrier;
+        //printf("T %i, Streaming\n",MYTHREAD);
 
 ////////////// BOUNDARIES ///////////////
         init_measure_time;
         HandleBoundariesStep(OutletProfile, CurvedBoundaries);
         end_measure_time(tBoundaries);
-        printf("T %i, Boundaries\n",MYTHREAD);
+        //printf("T %i, Boundaries\n",MYTHREAD);
 
 // UPDATE VELOCITY AND DENSITY
         init_measure_time;
         UpdateMacroscopicStep(CalculateDragLift);
         end_measure_time(tUpdateMacro);
-        printf("T %i, Update Macro\n",MYTHREAD);
+        //printf("T %i, Update Macro\n",MYTHREAD);
 
 ////////////// Residuals ///////////////
         init_measure_time;
         ComputeResiduals(Cells, Residuals, sumVel0, sumVel1, sumRho0, sumRho1, CalculateDragLift, &iter, Iterations);
         end_measure_time(tResiduals);
-        printf("T %i, Residuals\n",MYTHREAD);
+        //printf("T %i, Residuals\n",MYTHREAD);
 
         if(MYTHREAD==0)
             fprintf(resid_file,"%d %5.4e %5.4e %5.4e %f %f\n", iter, (iter+1.0)*(*Delta), Residuals[0], Residuals[1], Residuals[2], Residuals[3]);
 
         iter++; // update loop variable
 
+
+        //Thread, coords,
+        if(MYTHREAD == 0 && iter<3) {
+            for (i = 2*LAYER + NN; i < 2*LAYER+ NN + 10; i++) {
+                for (j = 0; j < 19; j++) {
+                    fprintf(testing_file, "%5i %2i %7.5f %7.5f\n", (Cells + i)->ID, j, (Cells + i)->METAF[j],
+                            (Cells + i)->F[j]);
+                }
+            }
+            for (i = 2 * LAYER+ NN + 30; i < 2 * LAYER+ NN + 40; i++)
+                for (j = 0; j < 19; j++) {
+                    fprintf(testing_file, "%5i %2i %7.5f %7.5f\n", (Cells + i)->ID, j, (Cells + i)->METAF[j],
+                            (Cells + i)->F[j]);
+                }
+            for (i = 3 * LAYER+ NN; i < 3 * LAYER+ NN + 10; i++)
+                for (j = 0; j < 19; j++) {
+                    fprintf(testing_file, "%5i %2i %7.5f %7.5f\n", (Cells + i)->ID, j, (Cells + i)->METAF[j],
+                            (Cells + i)->F[j]);
+                }
+        }
+
+
         if(iter%100==0 && MYTHREAD==0){
             printf("Iterations: %05d/%05d || ", iter, (*Iterations));
             printf("Residuals: l2norm  %e; L2_norm_weighted  %e\n", Residuals[0], Residuals[1]);
         }
 
-        printf("Doing step :%i\n", iter);
+        //printf("Doing step :%i\n", iter);
 
 ////////////// Autosave ///////////////
         auto_save(AutosaveAfter, AutosaveEvery, postproc_prog);
 
     }
-    //////////////////////////////////////////////////////
-    ////////////// END OF MAIN WHILE CYCLE ///////////////
-    //////////////////////////////////////////////////////
+    fclose(testing_file);
+//////////////////////////////////////////////////////
+////////////// END OF MAIN WHILE CYCLE ///////////////
+//////////////////////////////////////////////////////
 
 }
 
@@ -275,7 +296,7 @@ void getSharedToCells(){
     }
 }
 void putCellsToWCells(){
-    printf("Put Cells to W cells things\n");
+    //printf("Put Cells to W cells things\n");
     upc_memput( &WCells[MYTHREAD * BLOCKSIZE], &Cells[LAYER], BLOCKSIZE * sizeof(CellProps));
 
 //upc_memput( &WCells[(1 -(2*MYTHREAD+2) + ( MYTHREAD*(MLIM+2)+1 ))*(*n)], &Cells[(*n)], MLIM*(*n)*sizeof(CellProps) );
@@ -440,6 +461,7 @@ void UpdateMacroscopicStep(int CalculateDragLift){
 void init_vars(int *postproc_prog) {
     iter = 0;                               // variables for loops
     sprintf(logFile,"Results/logFile.log"); // path of the .log file
+    sprintf(testingFileName,"testingThings.txt");
     AutosaveI = 1;                          // autosave i variable, will be incremented after every autosave
     ppp      = postproc_prog;       // for convenience ppp points to postproc_prog
 

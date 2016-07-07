@@ -38,7 +38,7 @@ void WriteResults(char* OutputFile, int* postproc_prog)
         case 2: // TECPLOT
             fprintf(fp1, "Title = \"LBM results\"\n");
             fprintf(fp1, "Variables = \"x\",\"y\",\"z\",\"u\",\"v\",\"w\",\"u mag\",\"rho\",\"press\",\"fluid\"\n");
-            fprintf(fp1, "Zone i=%d, j=%d, k==%d, f=point\n",NN,NM,NL);
+            fprintf(fp1, "Zone i=%d, j=%d, k=%d, f=point\n",NN,NM,NL);
 
             for(i = 0; i < NODES; i++)
             {
@@ -94,7 +94,7 @@ void WriteBCells(char* OutputFile, int* postproc_prog)
         case 2: // TECPLOT
             fprintf(fp1, "Title = \"LBM results\"\n");
             fprintf(fp1, "Variables = \"x\",\"y\",\"z\",\"u\",\"v\",\"w\",\"u mag\",\"rho\",\"press\",\"fluid\"\n");
-            fprintf(fp1, "Zone i=%d, j=%d, k==%d, f=point\n",NN,NM,NL);
+            fprintf(fp1, "Zone i=%d, j=%d, k=%d, f=point\n",NN,NM,NL);
 
             for(i=0;i<(2*THREADS*LAYER);i++)
             {

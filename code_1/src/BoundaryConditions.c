@@ -181,7 +181,7 @@ void InletBC(CellProps *Cells, int i)
 void OutletBoundaries(CellProps *Cells, int j, int i)
 {
     double RhoE;
-    if ((Cells+j*(*n)+i)->BC_ID[1]==3) // outlet boundary on the right side of the domain
+    /*if ((Cells+j*(*n)+i)->BC_ID[1]==3) // outlet boundary on the right side of the domain
     {
 
         RhoE = ((Cells+j*(*n)+i)->F[0]+(Cells+j*(*n)+i)->F[2]+(Cells+j*(*n)+i)->F[4]
@@ -204,7 +204,7 @@ void OutletBoundaries(CellProps *Cells, int j, int i)
     if ((Cells+j*(*n)+i)->BC_ID[4]==3)
     {
         // FILL!!
-    }
+    }*/
 
 }
 
@@ -406,7 +406,7 @@ void WallBC(CellProps *Cells, int i, int* opp)
 void CurvedWallBoundaries(CellProps *Cells, int j, int i, int* opp)
 {
     int k=0;
-    for(k=0;k<9;k++)
+    /*for(k=0;k<9;k++)
     {
         if ((Cells+j*(*n)+i)->BC_ID[k]==1) // if wall
         {
@@ -421,7 +421,7 @@ void CurvedWallBoundaries(CellProps *Cells, int j, int i, int* opp)
                                               +(2*(Cells+j*(*n)+i)->Q[k]-1)/(2*(Cells+j*(*n)+i)->Q[k])*(Cells+j*(*n)+i)->METAF[opp[k]];
             }
         }
-    }
+    }*/
 }
 
 void EdgeBC(CellProps *Cells, int i)
