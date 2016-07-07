@@ -660,10 +660,10 @@ void BGKW(CellProps *Cells, int i, double* w, int* cx, int* cy, int* cz, double 
     double T1 = ((Cells+i)->U) * ((Cells+i)->U) + ((Cells+i)->V) * ((Cells+i)->V) + ((Cells+i)->W) * ((Cells+i)->W);
     double T2 = 0.0;
     int k;
-    for (k=0; k<9; k++)
+    for (k = 0; k < 19; k++)
     {
-        T2                  = ((Cells+i)->U)*cx[k] + ((Cells+i)->V)*cy[k];
-        (Cells+i)->Feq[k]   = ((Cells+i)->Rho)*w[k]*( 1.0 + 3.0*T2 + 4.5*T2*T2 - 1.5*T1 );
+        T2                  = ((Cells+i)->U) * cx[k] + ((Cells+i)->V)*cy[k] + ((Cells+i)->W)*cz[k];
+        (Cells+i)->Feq[k]   = ((Cells+i)->Rho) * w[k] * (1.0 + 3.0*T2 + 4.5*T2*T2 - 1.5*T1);
         (Cells+i)->METAF[k] = Omega*((Cells+i)->Feq[k])+(1.0-Omega)*((Cells+i)->F[k]);
     }
 }
@@ -749,7 +749,7 @@ void MRT(CellProps *Cells, int i, double** tm, double** stmiv)
 void UpdateF(CellProps *Cells, int i)
 {
     int k;
-    for(k=0;k<9;k++)
+    for(k = 0; k < 19; k++)
         (Cells+i)->F[k] = (Cells+i)->METAF[k];
 }
 
