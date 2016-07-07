@@ -758,9 +758,9 @@ void print_boundary_type(CellProps* Cells) {
             printf("Thread: %i,Node: %i,BT: %i\n",MYTHREAD,node_to_look,(Cells+node_to_look)->Boundary);
             int index_n, index_i, index_j, index_k;
             index_n = (Cells+LAYER)->ID;
-            index_i = (index_n - index_i * NM* NL - index_j * NM);
-            index_j = (index_n - index_i * NM* NL)/NM;
-            index_k = index_n/(NM*NL);
+            index_k = index_n/(NM*NN);
+            index_j = (index_n - index_k * NM* NN)/NM;
+            index_i = (index_n - index_k * NM* NN - index_j * NM);
             printf("%7i |%3i |%3i |%3i || %5.5f | %5.5f | %5.5f \n",
                    index_n,
                    index_i,
@@ -846,9 +846,9 @@ void print_boundary_type(CellProps* Cells) {
 void print_cell_line(FILE* file, const CellProps* Cell) {
     int index_n, index_i, index_j, index_k;
     index_n = Cell->ID;
-    index_i = (index_n - index_i * NM* NL - index_j * NM);
-    index_j = (index_n - index_i * NM* NL)/NM;
-    index_k = index_n/(NM*NL);
+    index_k = index_n/(NM*NN);
+    index_j = (index_n - index_k * NM* NN)/NM;
+    index_i = (index_n - index_k * NM* NN - index_j * NM);
     fprintf(file,"%7i |%3i |%3i |%3i || %5.5f | %5.5f | %5.5f \n",
             index_n,
             index_i,

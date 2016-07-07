@@ -214,8 +214,8 @@ void CellIni(CellProps *Cells,
             //When current cell is on the con iteration
             if (
                     ( (int)Con[j][0] == (int)Nod[i][0] )\
-          && ( (int)Con[j][1] == (int)Nod[i][1] )\
-          && ( (int)Con[j][2] == (int)Nod[i][2] ) )
+                && ( (int)Con[j][1] == (int)Nod[i][1] )\
+                && ( (int)Con[j][2] == (int)Nod[i][2] ) )
             {
                 for(k = 1; k < 19; k++)
                 {
@@ -235,6 +235,7 @@ void CellIni(CellProps *Cells,
                 }
             }
         }
+
 
         //////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////
@@ -450,22 +451,20 @@ void CellIni(CellProps *Cells,
             if ((Cells + index_Cell)->BC_ID[j]!=0)
             {
                 (Cells + index_Cell)->StreamLattice[opp[j]]= 0 ;
+
+                if (MYTHREAD == 0 && i == 30) {
+                    printf("opp[%i] = %i\n", j, opp[j]);
+                    printf("Str(%i): %i\n",opp[j],(Cells + index_Cell)->StreamLattice[opp[j]]);
+                }
             }
 
             //x de 0 a 10
             //j = 2
             //z 0 o 1
-            if(index_Cell >= 30 && index_Cell <  41) {
-                printf("Z = 0, ");
-                printf("Index Cell: %i,  ", index_Cell);
-                printf("j: %i, ", j);
-                printf("Str Lattice: %i\n",(Cells + index_Cell)->StreamLattice[j]);
-            }
-            if(index_Cell >=LAYER + 30 && index_Cell < LAYER + 41) {
-                printf("Z = 1, ");
-                printf("Index Cell: %i,  ", index_Cell);
-                printf("j: %i, ", j);
-                printf("Str Lattice: %i\n",(Cells + index_Cell)->StreamLattice[j]);
+            if(MYTHREAD == 0 && i == 30) {
+                printf("i: %i,  ", i);
+                printf("BC_ID(%i): %i, ",j,(Cells + index_Cell)->BC_ID[j]);
+                printf("Str(%i): %i\n",opp[j],(Cells + index_Cell)->StreamLattice[opp[j]]);
             }
         }
 

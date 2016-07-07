@@ -21,9 +21,9 @@ This is the 3D lattice Boltzmann *.log file
 
 :::: Calculated variables from mesh :::: 
 >>> Grid spacing        = 0.000000
->>> # of nodes in x (n) = -703844416
->>> # of nodes in y (m) = -703844400
->>> NumInletNodes       = -703844480
+>>> # of nodes in x (n) = 880906176
+>>> # of nodes in y (m) = 880906192
+>>> NumInletNodes       = 880906112
 
 :::: Parallel properties :::: 
 >>> # of threads        = 5
