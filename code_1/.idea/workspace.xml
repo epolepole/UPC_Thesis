@@ -13,9 +13,7 @@
   <component name="ChangeListManager">
     <list default="true" id="7cb5bf53-186d-4ef3-819c-fd2ffae90c7b" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/include/CellFunctions.h" afterPath="$PROJECT_DIR$/include/CellFunctions.h" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/include/Iterate.h" afterPath="$PROJECT_DIR$/include/Iterate.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ComputeResiduals.c" afterPath="$PROJECT_DIR$/src/ComputeResiduals.c" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Iterate.c" afterPath="$PROJECT_DIR$/src/Iterate.c" />
     </list>
     <ignored path="code_1.iws" />
@@ -52,31 +50,31 @@
       <file leaf-file-name="Iterate.c" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Iterate.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="473">
-              <caret line="140" column="51" selection-start-line="140" selection-start-column="51" selection-end-line="140" selection-end-column="51" />
+            <state relative-caret-position="2704">
+              <caret line="135" column="0" selection-start-line="135" selection-start-column="0" selection-end-line="135" selection-end-column="0" />
               <folding>
                 <element signature="e#0#52#0" expanded="true" />
                 <element signature="e#492#542#0" expanded="true" />
-                <element signature="e#7362#7471#0" expanded="false" />
-                <element signature="e#7473#7888#0" expanded="false" />
-                <element signature="e#7890#8239#0" expanded="false" />
-                <element signature="e#8241#11877#0" expanded="false" />
-                <element signature="e#11879#15013#0" expanded="false" />
-                <element signature="e#15015#15489#0" expanded="false" />
-                <element signature="e#15491#15641#0" expanded="false" />
-                <element signature="e#15643#16058#0" expanded="false" />
-                <element signature="e#16060#16376#0" expanded="false" />
-                <element signature="e#16378#20344#0" expanded="false" />
-                <element signature="e#20346#20778#0" expanded="false" />
-                <element signature="e#20780#21068#0" expanded="false" />
-                <element signature="e#21070#21909#0" expanded="false" />
-                <element signature="e#21911#22395#0" expanded="false" />
-                <element signature="e#22397#22647#0" expanded="false" />
-                <element signature="e#22649#23362#0" expanded="false" />
-                <element signature="e#23364#24213#0" expanded="false" />
-                <element signature="e#24215#27600#0" expanded="false" />
-                <element signature="e#27602#28101#0" expanded="false" />
-                <element signature="e#28103#28222#0" expanded="false" />
+                <element signature="e#6826#6935#0" expanded="false" />
+                <element signature="e#6937#7352#0" expanded="false" />
+                <element signature="e#7354#7703#0" expanded="false" />
+                <element signature="e#7705#11341#0" expanded="false" />
+                <element signature="e#11343#14477#0" expanded="false" />
+                <element signature="e#14479#14953#0" expanded="false" />
+                <element signature="e#14955#15105#0" expanded="false" />
+                <element signature="e#15107#15522#0" expanded="false" />
+                <element signature="e#15524#15840#0" expanded="false" />
+                <element signature="e#15842#19808#0" expanded="false" />
+                <element signature="e#19810#20242#0" expanded="false" />
+                <element signature="e#20244#20532#0" expanded="false" />
+                <element signature="e#20534#21373#0" expanded="false" />
+                <element signature="e#21375#21859#0" expanded="false" />
+                <element signature="e#21861#22111#0" expanded="false" />
+                <element signature="e#22113#22826#0" expanded="false" />
+                <element signature="e#22828#23677#0" expanded="false" />
+                <element signature="e#23679#27064#0" expanded="false" />
+                <element signature="e#27066#27565#0" expanded="false" />
+                <element signature="e#27567#27686#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -85,8 +83,8 @@
       <file leaf-file-name="Iterate.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/include/Iterate.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="207">
-              <caret line="9" column="56" selection-start-line="9" selection-start-column="56" selection-end-line="9" selection-end-column="56" />
+            <state relative-caret-position="161">
+              <caret line="7" column="45" selection-start-line="7" selection-start-column="45" selection-end-line="7" selection-end-column="45" />
               <folding />
             </state>
           </provider>
@@ -251,102 +249,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="code_1" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code_1" />
-              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code_1" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code_1" />
-              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code_1" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Mesh" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code_1" />
-              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code_1" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="include" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code_1" />
-              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code_1" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="build" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code_1" />
-              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code_1" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="build" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="bin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code_1" />
-              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code_1" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="build" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="bin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Mesh" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -925,39 +827,39 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/include/Iterate.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="207">
-          <caret line="9" column="56" selection-start-line="9" selection-start-column="56" selection-end-line="9" selection-end-column="56" />
+        <state relative-caret-position="161">
+          <caret line="7" column="45" selection-start-line="7" selection-start-column="45" selection-end-line="7" selection-end-column="45" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Iterate.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="473">
-          <caret line="140" column="51" selection-start-line="140" selection-start-column="51" selection-end-line="140" selection-end-column="51" />
+        <state relative-caret-position="2704">
+          <caret line="135" column="0" selection-start-line="135" selection-start-column="0" selection-end-line="135" selection-end-column="0" />
           <folding>
             <element signature="e#0#52#0" expanded="true" />
             <element signature="e#492#542#0" expanded="true" />
-            <element signature="e#7362#7471#0" expanded="false" />
-            <element signature="e#7473#7888#0" expanded="false" />
-            <element signature="e#7890#8239#0" expanded="false" />
-            <element signature="e#8241#11877#0" expanded="false" />
-            <element signature="e#11879#15013#0" expanded="false" />
-            <element signature="e#15015#15489#0" expanded="false" />
-            <element signature="e#15491#15641#0" expanded="false" />
-            <element signature="e#15643#16058#0" expanded="false" />
-            <element signature="e#16060#16376#0" expanded="false" />
-            <element signature="e#16378#20344#0" expanded="false" />
-            <element signature="e#20346#20778#0" expanded="false" />
-            <element signature="e#20780#21068#0" expanded="false" />
-            <element signature="e#21070#21909#0" expanded="false" />
-            <element signature="e#21911#22395#0" expanded="false" />
-            <element signature="e#22397#22647#0" expanded="false" />
-            <element signature="e#22649#23362#0" expanded="false" />
-            <element signature="e#23364#24213#0" expanded="false" />
-            <element signature="e#24215#27600#0" expanded="false" />
-            <element signature="e#27602#28101#0" expanded="false" />
-            <element signature="e#28103#28222#0" expanded="false" />
+            <element signature="e#6826#6935#0" expanded="false" />
+            <element signature="e#6937#7352#0" expanded="false" />
+            <element signature="e#7354#7703#0" expanded="false" />
+            <element signature="e#7705#11341#0" expanded="false" />
+            <element signature="e#11343#14477#0" expanded="false" />
+            <element signature="e#14479#14953#0" expanded="false" />
+            <element signature="e#14955#15105#0" expanded="false" />
+            <element signature="e#15107#15522#0" expanded="false" />
+            <element signature="e#15524#15840#0" expanded="false" />
+            <element signature="e#15842#19808#0" expanded="false" />
+            <element signature="e#19810#20242#0" expanded="false" />
+            <element signature="e#20244#20532#0" expanded="false" />
+            <element signature="e#20534#21373#0" expanded="false" />
+            <element signature="e#21375#21859#0" expanded="false" />
+            <element signature="e#21861#22111#0" expanded="false" />
+            <element signature="e#22113#22826#0" expanded="false" />
+            <element signature="e#22828#23677#0" expanded="false" />
+            <element signature="e#23679#27064#0" expanded="false" />
+            <element signature="e#27066#27565#0" expanded="false" />
+            <element signature="e#27567#27686#0" expanded="false" />
           </folding>
         </state>
       </provider>

@@ -114,21 +114,8 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     ////////////////////////////////////////////////////
 
     upc_barrier;         // Synchronise
-    //loop = 0;            // This will measure that how much is done of initialization
-    func_between_time(CellIni( Cells,
-                              Nodes,
-                              BCconn,
-                              Uavg,
-                              Vavg,
-                              Wavg,
-                              InletProfile,
-                              CollisionModel,
-                              opp,
-                              rho_ini);,
-                        tCellsInitialization);
-    init_measure_time
-    /*tInstant1 = clock(); // Measure time of initialization
 
+    init_measure_time;
     CellIni( Cells,
              Nodes,            // Nodes
              BCconn,           // BCconn
@@ -138,9 +125,8 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
              InletProfile,     // INPUT PARAMETER
              CollisionModel,   // INPUT PARAMETER
              opp,              // Opposite direction
-             rho_ini);         // Initial density*/
-
-    end_measure_time(tInitialization)
+             rho_ini);         // Initial density
+    end_measure_time(tCellsInitialization);
 
     upc_barrier;
     print_cells_info(Cells);
@@ -148,8 +134,9 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     print_boundary_type(Cells);
     upc_barrier;
 
-    tInstant2 = clock(); // Measure time of initialization
-    tInitialization = (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC;
+    end_measure_time(tInitialization);
+    //tInstant2 = clock(); // Measure time of initialization
+    //tInitialization = (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC;
 
     upc_barrier;         // Synchronise
 

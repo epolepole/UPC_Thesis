@@ -5,9 +5,9 @@
 
 #include "ShellFunctions.h" // convenience
 
-#define init_measure_time tInstant1 = clock();
+#define init_measure_time tInstant1 = clock()
 #define end_measure_time(t_var) tInstant2 = clock();\
-t_var = (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC;*/
+                                t_var = (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC
 
 #define func_between_time(func,t_container) \
     tInstant1 = clock(); // Start measuring time\
