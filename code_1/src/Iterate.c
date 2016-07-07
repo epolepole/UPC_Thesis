@@ -461,7 +461,7 @@ void UpdateMacroscopicStep(int CalculateDragLift){
 void init_vars(int *postproc_prog) {
     iter = 0;                               // variables for loops
     sprintf(logFile,"Results/logFile.log"); // path of the .log file
-    sprintf(testingFileName,"testingThings.txt");
+    sprintf(testingFileName,"Results/testingThings.txt");
     AutosaveI = 1;                          // autosave i variable, will be incremented after every autosave
     ppp      = postproc_prog;       // for convenience ppp points to postproc_prog
 
