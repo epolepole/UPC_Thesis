@@ -3,6 +3,7 @@
 #ifndef ITERATE_H
 #define ITERATE_H
 
+#include <stdio.h>
 #include "ShellFunctions.h" // convenience
 
 #define init_measure_time tInstant1 = clock()
@@ -27,6 +28,7 @@ char IterOutputFile[50];                // write results to this file after the 
 char AutosaveOutputFile[50];            // autosave filename
 char OutputFile[50];                    // initial data will be written to this file
 char FinalOutputFile[50];               // final data will be written to this file
+char fnMemCopyRes[50];
 char logFile[50];                       // path of the .log file
 int  AutosaveI;                         // autosave i variable, will be incremented after every autosave
 int* ppp;                               // pointer of the postproc_prog variable
@@ -104,7 +106,7 @@ void print_init_info_to_log(float Uavg, float Vavg, float Wavg, float rho_ini, f
 void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog);
 void write_cells_to_results(int postproc_prog);
 void save_init_data(int postproc_prog);
-void export_data(int postproc_prog, const char *fnMemCopyRes);
+void export_data(int postproc_prog);
 void print_cells_info(CellProps* Cells);
 void print_boundary_type(CellProps* Cells);
 void print_cell_line(FILE* file, const CellProps* Cell);

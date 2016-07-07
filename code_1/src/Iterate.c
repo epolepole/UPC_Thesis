@@ -109,7 +109,6 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
 
     // COPY CELLS TO WCELLS (writing cells) TO WRITE DATA
     putCellsToWCells(Cells);
-    char fnMemCopyRes[50];
 
 
     write_cells_to_results(postproc_prog);
@@ -156,9 +155,11 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     tIterEnd = clock(); // End measuring time of main loop
     tIteration = (float)(tIterEnd - tIterStart ) / CLOCKS_PER_SEC;
 
+    printf("Finished main loop\n");
+
     upc_barrier;         // Synchronise
 
-    export_data(postproc_prog, fnMemCopyRes);
+    export_data(postproc_prog);
 
     upc_barrier;         // Synchronise
 
@@ -172,49 +173,60 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
     while (Residuals[0] > ConvergenceCritVeloc && Residuals[1] > ConvergenceCritRho && iter < (*Iterations))
     //while (false)
     {
-
+    printf("T %i, Starting iteration %i\n",MYTHREAD,iter);
 //////////////// COLLISION ////////////////
         init_measure_time;
         CollisionStep(CollisionModel); ////////////////////// !!!!!!!!!!!!!!!!! CX CY!
         end_measure_time(tCollision);
+        printf("T %i, Collision\n",MYTHREAD);
 
 ////////////// UPDATE DISTR ///////////////
         init_measure_time;
         for(i = LAYER;  i < LAYER + BLOCKSIZE;  i++)
             UpdateF(Cells, i);
         end_measure_time(tUpdateF);
+        printf("T %i, UpdateF\n",MYTHREAD);
 
 // PUT THREAD-BOUNDARY CELLS TO SHARED
         init_measure_time;
-        putCellsToShared(Cells);
+        putCellsToShared();
         end_measure_time(tBCells);
+        printf("T %i, BCells\n",MYTHREAD);
 
         upc_barrier;         // Synchronise
 
 //////////////// COPY SHARED BCELLS TO CELLS ////////////////
         init_measure_time;
-        getSharedToCells(Cells);
+        getSharedToCells();
         end_measure_time(tBCells);
+        printf("T %i, getShared to cells\n",MYTHREAD);
+        upc_barrier;         // Synchronise
 
 ////////////// STREAMING ///////////////
         init_measure_time;
-        StreamingStep(Cells, c);
+        StreamingStep();
         end_measure_time(tStreaming);
+        printf("T %i, Streaming\n",MYTHREAD);
+
+        upc_barrier;
 
 ////////////// BOUNDARIES ///////////////
         init_measure_time;
         HandleBoundariesStep(OutletProfile, CurvedBoundaries);
         end_measure_time(tBoundaries);
+        printf("T %i, Boundaries\n",MYTHREAD);
 
 // UPDATE VELOCITY AND DENSITY
         init_measure_time;
         UpdateMacroscopicStep(CalculateDragLift);
         end_measure_time(tUpdateMacro);
+        printf("T %i, Update Macro\n",MYTHREAD);
 
 ////////////// Residuals ///////////////
         init_measure_time;
         ComputeResiduals(Cells, Residuals, sumVel0, sumVel1, sumRho0, sumRho1, CalculateDragLift, &iter, Iterations);
         end_measure_time(tResiduals);
+        printf("T %i, Residuals\n",MYTHREAD);
 
         if(MYTHREAD==0)
             fprintf(resid_file,"%d %5.4e %5.4e %5.4e %f %f\n", iter, (iter+1.0)*(*Delta), Residuals[0], Residuals[1], Residuals[2], Residuals[3]);
@@ -225,6 +237,8 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
             printf("Iterations: %05d/%05d || ", iter, (*Iterations));
             printf("Residuals: l2norm  %e; L2_norm_weighted  %e\n", Residuals[0], Residuals[1]);
         }
+
+        printf("Doing step :%i\n", iter);
 
 ////////////// Autosave ///////////////
         auto_save(AutosaveAfter, AutosaveEvery, postproc_prog);
@@ -319,19 +333,24 @@ void CollisionStep(int CollisionModel){
     */
 
 }
+
 void StreamingStep(){
     int i, j;
     for(i = LAYER;  i < BLOCKSIZE + LAYER;  ++i)
     {
         for(j = 0; j <19; j++)
         {
+
             if (((Cells+i)->StreamLattice[j]) == 1)
             {
+                printf("Thread: %i, i= %i, j=%i\n",MYTHREAD,i,j);
+                printf("(Cells + %i + %i)-> METAF[%i] = %f",i,c[j],(Cells + i + c[j])-> METAF[j]);
                 (Cells +i)->F[j] = (Cells + i + c[j])-> METAF[j];
             }
         }
     }
 }
+
 void HandleBoundariesStep(int OutletProfile, int CurvedBoundaries){
     int i, j, k;
 
@@ -629,7 +648,6 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
 void write_cells_to_results(int postproc_prog) {
 
 // Write boundary cells to Results to see how mesh was distributed
-    char  fnMemCopyRes[50];
     if(MYTHREAD==0)
     {
         switch(postproc_prog)
@@ -647,7 +665,7 @@ void save_init_data(int postproc_prog) {// Write Initialized data
     WriteResults(OutputFile, ppp);
     printf("\nInitialized data was written to %s\n", OutputFile);
 }
-void export_data(int postproc_prog, const char *fnMemCopyRes) {
+void export_data(int postproc_prog) {
     if(MYTHREAD == 0) // EXPORT DATA, TIME MEASUREMENT RESULTS
     {
         // Close residuals file
@@ -703,6 +721,7 @@ void export_data(int postproc_prog, const char *fnMemCopyRes) {
         printf("Final results were written to %s\n", FinalOutputFile);
 
         WriteBCells(fnMemCopyRes, ppp);
+        printf("BCells were written!\n");
         puts("BCells were written!");
     } // END OF THREAD ZERO
 

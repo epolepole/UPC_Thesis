@@ -464,6 +464,7 @@ void CellIni(CellProps *Cells,
             if(MYTHREAD == 0 && i == 30) {
                 printf("i: %i,  ", i);
                 printf("BC_ID(%i): %i, ",j,(Cells + index_Cell)->BC_ID[j]);
+                printf("Str(%i): %i ",j,(Cells + index_Cell)->StreamLattice[j]);
                 printf("Str(%i): %i\n",opp[j],(Cells + index_Cell)->StreamLattice[opp[j]]);
             }
         }
@@ -623,21 +624,21 @@ void D3Q19Vars(double* w, int* cx, int* cy, int* cz, int* opp, int* c)
     c[1]  = -1                 ; // (i-1)
     c[2]  =  1                 ; // (i+1)
     c[3]  =    -1*NN         ; //         (j-1)
-    c[4]  =       (*n)         ; //         (j+1)
+    c[4]  =       NN         ; //         (j+1)
     c[5]  =            -1*LAYER; //                 (k-1)
     c[6]  =               LAYER; //                 (k+1)
-    c[7]  = -1 -1*(*n)         ; // (i-1)   (j-1)
-    c[8]  =  1 -1*(*n)         ; // (i+1)   (j-1)
-    c[9]  = -1 +  (*n)         ; // (i-1)   (j+1)
-    c[10] =  1 +  (*n)         ; // (i+1)   (j+1)
+    c[7]  = -1 -1*NN         ; // (i-1)   (j-1)
+    c[8]  =  1 -1*NN         ; // (i+1)   (j-1)
+    c[9]  = -1 +  NN         ; // (i-1)   (j+1)
+    c[10] =  1 +  NN         ; // (i+1)   (j+1)
     c[11] = -1         -1*LAYER; // (i-1)           (k-1)
     c[12] =  1         -1*LAYER; // (i+1)           (k-1)
     c[13] = -1         +1*LAYER; // (i-1)           (k+1)
     c[14] =  1         +1*LAYER; // (i+1)           (k+1)
-    c[15] =    -1*(*n) -1*LAYER; //         (j-1)   (k-1)
-    c[16] =       (*n) -1*LAYER; //         (j+1)   (k-1)
-    c[17] =    -1*(*n) +1*LAYER; //         (j-1)   (k+1)
-    c[18] =       (*n) +1*LAYER; //         (j+1)   (k+1)
+    c[15] =    -1*NN -1*LAYER; //         (j-1)   (k-1)
+    c[16] =       NN -1*LAYER; //         (j+1)   (k-1)
+    c[17] =    -1*NN +1*LAYER; //         (j-1)   (k+1)
+    c[18] =       NN +1*LAYER; //         (j+1)   (k+1)
 
 } // End of function
 
