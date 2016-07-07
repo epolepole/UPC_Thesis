@@ -12,10 +12,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7cb5bf53-186d-4ef3-819c-fd2ffae90c7b" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/include/BlockSizeDefiner.h" afterPath="$PROJECT_DIR$/include/BlockSizeDefiner.h" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/CellFunctions.c" afterPath="$PROJECT_DIR$/src/CellFunctions.c" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Iterate.c" afterPath="$PROJECT_DIR$/src/Iterate.c" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main.c" afterPath="$PROJECT_DIR$/src/main.c" />
     </list>
     <ignored path="code_1.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -155,8 +152,8 @@
       <file leaf-file-name="CellFunctions.c" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/CellFunctions.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="493">
-              <caret line="458" column="29" selection-start-line="458" selection-start-column="29" selection-end-line="458" selection-end-column="29" />
+            <state relative-caret-position="539">
+              <caret line="460" column="42" selection-start-line="460" selection-start-column="42" selection-end-line="460" selection-end-column="42" />
               <folding>
                 <element signature="e#11392#20984#0" expanded="false" />
                 <element signature="e#20995#24081#0" expanded="false" />
@@ -927,8 +924,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/CellFunctions.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="493">
-          <caret line="458" column="29" selection-start-line="458" selection-start-column="29" selection-end-line="458" selection-end-column="29" />
+        <state relative-caret-position="539">
+          <caret line="460" column="42" selection-start-line="460" selection-start-column="42" selection-end-line="460" selection-end-column="42" />
           <folding>
             <element signature="e#11392#20984#0" expanded="false" />
             <element signature="e#20995#24081#0" expanded="false" />
