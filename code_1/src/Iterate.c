@@ -260,7 +260,9 @@ void getSharedToCells(){
     }
 }
 void putCellsToWCells(){
-    upc_memput( &WCells[MYTHREAD * BLOCKSIZE], &Cells[LAYER], BLOCKSIZE * sizeof(CellProps) );
+    printf("Put Cells to W cells things\n");
+    upc_memput( &WCells[MYTHREAD * BLOCKSIZE], &Cells[LAYER], BLOCKSIZE * sizeof(CellProps));
+
 //upc_memput( &WCells[(1 -(2*MYTHREAD+2) + ( MYTHREAD*(MLIM+2)+1 ))*(*n)], &Cells[(*n)], MLIM*(*n)*sizeof(CellProps) );
 }
 void CollisionStep(int CollisionModel){
@@ -486,7 +488,7 @@ void allocate_residuals() {// allocate residuals
     sumVel1   = Create1DArrayDouble(1);
     sumRho0   = Create1DArrayDouble(1);
     sumRho1   = Create1DArrayDouble(1);
-    Residuals = Create1DArrayDouble(4);
+    Residuals = Create1DArrayDouble(5);
 }
 
 void free_vars() {
@@ -725,6 +727,7 @@ void print_cells_info(CellProps* Cells) {
     }
     fclose(out_cells_file);
     upc_barrier;
+    printf("Cells info printed\n");
 }
 void print_boundary_type(CellProps* Cells) {
     main_thread
@@ -754,9 +757,9 @@ void print_boundary_type(CellProps* Cells) {
             printf("Thread: %i,Node: %i,BT: %i\n",MYTHREAD,node_to_look,(Cells+node_to_look)->Boundary);
             int index_n, index_i, index_j, index_k;
             index_n = (Cells+LAYER)->ID;
-            index_i = index_n/(NM*NL);
+            index_i = (index_n - index_i * NM* NL - index_j * NM);
             index_j = (index_n - index_i * NM* NL)/NM;
-            index_k = (index_n - index_i * NM* NL - index_j * NM);
+            index_k = index_n/(NM*NL);
             printf("%7i |%3i |%3i |%3i || %5.5f | %5.5f | %5.5f \n",
                    index_n,
                    index_i,
@@ -842,9 +845,9 @@ void print_boundary_type(CellProps* Cells) {
 void print_cell_line(FILE* file, const CellProps* Cell) {
     int index_n, index_i, index_j, index_k;
     index_n = Cell->ID;
-    index_i = index_n/(NM*NL);
+    index_i = (index_n - index_i * NM* NL - index_j * NM);
     index_j = (index_n - index_i * NM* NL)/NM;
-    index_k = (index_n - index_i * NM* NL - index_j * NM);
+    index_k = index_n/(NM*NL);
     fprintf(file,"%7i |%3i |%3i |%3i || %5.5f | %5.5f | %5.5f \n",
             index_n,
             index_i,

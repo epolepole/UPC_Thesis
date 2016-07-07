@@ -10,6 +10,8 @@ void WriteResults(char* OutputFile, int* postproc_prog)
     int i;                      // Loop variable
     FILE * fp1;                 // file pointer to output file
     fp1=fopen(OutputFile, "w"); // open file
+    //upc_barrier;
+
     switch(*postproc_prog)
     {
         case 1: // ParaView
