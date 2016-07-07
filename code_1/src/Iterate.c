@@ -5,6 +5,7 @@
 #include <CellFunctions.h>
 #include <ComputeResiduals.h>
 #include <ShellFunctions.h>
+#include <FilesWriting.h>
 
 ////////////////////////////////////////////////////
 ////////////////// OWN HEADERS /////////////////////
@@ -20,135 +21,443 @@
 /////////////////// ITERATION //////////////////////
 ////////////////////////////////////////////////////
 
+void time_meas_vars_init();
+
+void allocate_residuals();
+
+void allocate_lattice_vars();
+
+void allocate_shared();
+
+void allocate_vars();
+
+void read_data(const char *NodeDataFile, const char *BCconnectorDataFile);
+
+void print_init_info_to_log(float Uavg, float Vavg, float Wavg, float rho_ini, float Viscosity, int InletProfile,
+                            int CollisionModel, int CurvedBoundaries, int OutletProfile, int Iterations,
+                            int AutosaveAfter, int AutosaveEvery, int postproc_prog, int CalculateDragLift,
+                            float ConvergenceCritVeloc, float ConvergenceCritRho);
+
+void free_vars();
+
+void init_vars(int *postproc_prog);
+
+void calc_collision_freq(float Viscosity);
+
+void alloc_cells();
+
+void export_data(int postproc_prog, const char *fnMemCopyRes);
+
+void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile, int *Iterations, int AutosaveAfter,
+                     int AutosaveEvery, int postproc_prog, int CalculateDragLift, float ConvergenceCritVeloc,
+                     float ConvergenceCritRho);
+
+void save_init_data(int postproc_prog);
+
+void write_cells_to_results(int postproc_prog);
+
+void free_mesh_data_matrices();
+
 void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
-               float Uavg,         float Vavg,         float Wavg,
-               float rho_ini,      float Viscosity,
-               int InletProfile,   int CollisionModel, int CurvedBoundaries,
-               int OutletProfile,  int Iterations,     int AutosaveAfter,
-               int AutosaveEvery,  int postproc_prog,  int CalculateDragLift,
+               float Uavg, float Vavg, float Wavg,
+               float rho_ini, float Viscosity,
+               int InletProfile, int CollisionModel, int CurvedBoundaries,
+               int OutletProfile, int Iterations, int AutosaveAfter,
+               int AutosaveEvery, int postproc_prog, int CalculateDragLift,
                float ConvergenceCritVeloc, float ConvergenceCritRho)
 {
 
 
-    clock_t tStart;     // Time measurement: declaration, begin
-    if(MYTHREAD==0)
+    main_thread
         tStart = clock(); // BEGIN OF OVERALL TIME MEASUREMENT
 
-    ////////////////////////////////////////////////////
-    ///////////////////// Declare //////////////////////
-    ////////////////////////////////////////////////////
+
+
+    init_vars(&postproc_prog);
+
+    read_data(NodeDataFile, BCconnectorDataFile);
+
+    print_init_info_to_log(Uavg, Vavg, Wavg, rho_ini, Viscosity, InletProfile, CollisionModel, CurvedBoundaries,
+                           OutletProfile, Iterations, AutosaveAfter, AutosaveEvery, postproc_prog, CalculateDragLift,
+                           ConvergenceCritVeloc, ConvergenceCritRho);
 
     ////////////////////////////////////////////////////
-    /////////// LOCAL VARIABLES FOR EACH CPU ///////////
+    ///////////////// INITIALIZE ///////////////////////
     ////////////////////////////////////////////////////
 
-    int i, j, k, iter = 0;                  // variables for loops
-    FILE* resid_file;                       // file for residuals
-    FILE* log_file;                         // file for log
-    FILE* TimeMeasurementFile;              // file for time measurement results
-    char IterOutputFile[50];                // write results to this file after the iterations
-    char AutosaveOutputFile[50];            // autosave filename
-    char OutputFile[50];                    // initial data will be written to this file
-    char FinalOutputFile[50];               // final data will be written to this file
-    char logFile[] = "Results/logFile.log"; // path of the .log file
-    int  AutosaveI = 1;                     // autosave i variable, will be incremented after every autosave
-    int* ppp;                               // pointer of the postproc_prog variable
+    // Fill up D3Q19 variables
+    D3Q19Vars(w, cx, cy, cz, opp, c);
+    calc_collision_freq(Viscosity);
 
-    CellProps *Cells;                // Struct for Cells
 
-    // Time measurement variables
-    float tInitialization  = 0.0; // Time measurement of Initialization
-    float tIteration       = 0.0; // Time measurement of Iteration
-    float tCollision       = 0.0; // Time measurement of Collision
-    float tUpdateF         = 0.0; // Time measurement of UpdateF
-    float tStreaming       = 0.0; // Time measurement of Streaming
-    float tBoundaries      = 0.0; // Time measurement of Boundaries
-    float tUpdateMacro     = 0.0; // Time measurement of Update Macroscopic vars
-    float tResiduals       = 0.0; // Time measurement of calculating residuals
-    float tWriting         = 0.0; // Time measurement of writing data
-    float tBCells          = 0.0; // Time measurement of handling boundaries
-    clock_t tInstant1, tInstant2; // Time measurement points: universal
-    clock_t tIterStart, tIterEnd; // Time measurement points: main loop
+    // Initialize variables for MRT Collision model, if used
+    tm    = Create2DArrayDouble(9, 9);
+    stmiv = Create2DArrayDouble(9, 9);
 
-    // Variables for residuals
-    double *Residuals;
-    double *sumVel0;
-    double *sumVel1;
-    double *sumRho0;
-    double *sumRho1;
+    if (CollisionModel == 3)
+        MRTInitializer(tm, stmiv, Omega);
 
-    float **Nodes;          // matrices for the nodes
-    float **BCconn;         // matrices for connections
 
-    double Omega;
-    double OmegaA;          // collision frequency from the viscosity
-    double **tm;            // variable for the MRT collision model
-    double **stmiv;         // variable for the MRT collision model
+    // PUT THREAD INFO TO BCELLS (boundary cells)
 
-    // D3Q19 Variables of the lattice
-    double* w;              // weight values for the directions
-    int*   cx;              // x coordinate of the discrete lattice directions
-    int*   cy;              // y coordinate of the discrete lattice directions
-    int*   cz;              // z coordinate of the discrete lattice directions
-    int*  opp;              // opposite vector
-    int*    c;              // shift of lattice directions written in vector form
+    upc_forall(i = 0; i < 2*LAYER*THREADS; i++; &BCells[i])
+    { (BCells+i)->ThreadNumber = MYTHREAD; }
+
+    if(MYTHREAD==0)
+    {
+        fprintf(log_file,"\n:::: Initializing ::::\n");
+        printf("\n:::: Initializing ::::\n");
+    } // END OF THREAD ZERO
 
     ////////////////////////////////////////////////////
-    //////////////////// ALLOCATE //////////////////////
+    ///////////////// INITIALIZE CELLS /////////////////
     ////////////////////////////////////////////////////
 
-    // allocate residuals
-    sumVel0   = Create1DArrayDouble(1);
-    sumVel1   = Create1DArrayDouble(1);
-    sumRho0   = Create1DArrayDouble(1);
-    sumRho1   = Create1DArrayDouble(1);
-    Residuals = Create1DArrayDouble(4);
+    upc_barrier;         // Synchronise
+    //loop = 0;            // This will measure that how much is done of initialization
+    func_between_time(CellIni( Cells,
+                              Nodes,
+                              BCconn,
+                              Uavg,
+                              Vavg,
+                              Wavg,
+                              InletProfile,
+                              CollisionModel,
+                              opp,
+                              rho_ini);,
+                        tCellsInitialization);
+    init_measure_time
+    /*tInstant1 = clock(); // Measure time of initialization
 
-    ////////////////////////////
-    // THESE ARE SHARED STUFF //
-    ////////////////////////////
+    CellIni( Cells,
+             Nodes,            // Nodes
+             BCconn,           // BCconn
+             Uavg,             // INPUT PARAMETER
+             Vavg,             // INPUT PARAMETER
+             Wavg,             // INPUT PARAMETER
+             InletProfile,     // INPUT PARAMETER
+             CollisionModel,   // INPUT PARAMETER
+             opp,              // Opposite direction
+             rho_ini);         // Initial density*/
 
-    // allocate mesh properties  :: DEFINED IN ShellFunctions.h
-    Delta          = (shared double*)upc_alloc(1*sizeof(double));
-    m              = (shared int*)upc_alloc(1*sizeof(int));
-    n              = (shared int*)upc_alloc(1*sizeof(int));
-    o              = (shared int*)upc_alloc(1*sizeof(int));
-    NumNodes       = (shared int*)upc_alloc(1*sizeof(int));
-    NumConn        = (shared int*)upc_alloc(1*sizeof(int));
-    MaxInletCoordY = (shared double*)upc_alloc(1*sizeof(double));
-    MinInletCoordY = (shared double*)upc_alloc(1*sizeof(double));
-    NumInletNodes  = (shared int*)upc_alloc(1*sizeof(int));
+    end_measure_time(tInitialization)
 
-    ///////////////////////////////////////////////////////////////////////
-    //// WE HAVE BETTER TO STORE THIS ON EACH CPU, MAKE THINGS EASIER  ////
-    ///////////////////////////////////////////////////////////////////////
+    upc_barrier;
+    print_cells_info(Cells);
+    upc_barrier;
+    print_boundary_type(Cells);
+    upc_barrier;
 
-    // D2Q9 Variables of the lattice
-    w  = Create1DArrayDouble(19); // weight values for the directions
-    c  = Create1DArrayInt(19);    // 
-    cx  = Create1DArrayInt(19);    // x coordinate of the discrete lattice directions
-    cy  = Create1DArrayInt(19);    // y coordinate of the discrete lattice directions
-    cz  = Create1DArrayInt(19);    // z coordinate of the discrete lattice directions
-    opp = Create1DArrayInt(19);    // opposite vector
+    tInstant2 = clock(); // Measure time of initialization
+    tInitialization = (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC;
+
+    upc_barrier;         // Synchronise
+
+    // PUT INITIALIZED DATA TO BOUNDARIES
+    putCellsToShared(Cells);
+
+    // COPY CELLS TO WCELLS (writing cells) TO WRITE DATA
+    putCellsToWCells(Cells);
+    char fnMemCopyRes[50];
+
+
+    write_cells_to_results(postproc_prog);
+
+
+    free_mesh_data_matrices();  //BCNode
+
+    upc_barrier;         // Synchronise
 
     ////////////////////////////////////////////////////
-    ///////////////////// Read data ////////////////////
+    /////////////// SAVE INITIALIZATION ////////////////
     ////////////////////////////////////////////////////
 
-    Nodes   = ReadNodes(NodeDataFile);          // Read Node data
-    BCconn  = ReadBCconn(BCconnectorDataFile);  // Read BCconn data
-    CompDataNode(Nodes);
-    //CompDataConn(BCconn);
+    if(MYTHREAD==0)
+    {
+        fprintf(log_file,"\n:::: Initialization done! ::::\n");
+        printf("\n:::: Initialization done! ::::\n");
+
+
+        save_init_data(postproc_prog);
+
+        // Open residuals file
+        resid_file = fopen("Results/residuals.dat", "w");
+        fprintf(resid_file,"Iter Time Vel_res Rho_res Drag Lift\n");
+
+        fprintf(log_file,"\n:::: Start Iterations ::::\n");
+        printf("\n:::: Start Iterations ::::\n");
+    } // END OF THREAD ZERO
 
     ////////////////////////////////////////////////////
-    /////////////// Print info to log //////////////////
+    /////////////////// ITERATE ////////////////////////
     ////////////////////////////////////////////////////
+
+    Residuals[0] = 100;
+    Residuals[1] = 100;
+
+    upc_barrier;         // Synchronise
+
+    tIterStart = clock(); // Start measuring time of main loop
+
+    main_while_loop(CollisionModel, CurvedBoundaries, OutletProfile, &Iterations, AutosaveAfter, AutosaveEvery,
+                    postproc_prog, CalculateDragLift, ConvergenceCritVeloc, ConvergenceCritRho);
+
+    tIterEnd = clock(); // End measuring time of main loop
+    tIteration = (float)(tIterEnd - tIterStart ) / CLOCKS_PER_SEC;
+
+    upc_barrier;         // Synchronise
+
+    export_data(postproc_prog, fnMemCopyRes);
+
+
+    ////////////////////////////////////////////////////
+    ///////////////// End of line //////////////////////
+    ////////////////////////////////////////////////////
+
+    upc_barrier;         // Synchronise
+
+    free_vars();
+
+}
+
+void free_mesh_data_matrices() {
+
+// We dont need these matrices anymore
+    free(Nodes);
+    free(BCconn);
+}
+
+void write_cells_to_results(int postproc_prog) {
+
+// Write boundary cells to Results to see how mesh was distributed
+    char  fnMemCopyRes[50];
+    if(MYTHREAD==0)
+    {
+        switch(postproc_prog)
+        { case 1: sprintf(fnMemCopyRes, "Results/MyBoundaryCells.csv");   break;
+            case 2: sprintf(fnMemCopyRes, "Results/MyBoundaryCells.dat");   break; }
+
+        WriteBCells(fnMemCopyRes, ppp);
+    }
+}
+
+void save_init_data(int postproc_prog) {// Write Initialized data
+    switch(postproc_prog)
+        { case 1: sprintf(OutputFile, "Results/InitialData.csv");   break;
+            case 2: sprintf(OutputFile, "Results/InitialData.dat");   break; }
+
+    WriteResults(OutputFile, ppp);
+    printf("\nInitialized data was written to %s\n", OutputFile);
+}
+
+void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile, int *Iterations, int AutosaveAfter,
+int AutosaveEvery, int postproc_prog, int CalculateDragLift, float ConvergenceCritVeloc,
+float ConvergenceCritRho) {
+    while (Residuals[0] > ConvergenceCritVeloc && Residuals[1] > ConvergenceCritRho && iter < (*Iterations))
+{
+
+//////////////// COLLISION ////////////////
+tInstant1 = clock();
+CollisionStep(Cells, w, cx, cy,  opp,  Omega,  OmegaA, tm, stmiv, CollisionModel); ////////////////////// !!!!!!!!!!!!!!!!! CX CY!
+tInstant2 = clock();
+tCollision = tCollision + (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC;
+
+////////////// UPDATE DISTR ///////////////
+tInstant1 = clock(); // Start measuring time
+for(i = LAYER;  i < LAYER + BLOCKSIZE;  i++)
+{ UpdateF(Cells, i); }
+tInstant2 = clock();
+tUpdateF = tUpdateF + (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC;
+
+// PUT THREAD-BOUNDARY CELLS TO SHARED
+tInstant1 = clock(); // Start measuring time
+putCellsToShared(Cells);
+tInstant2 = clock(); // End of time measuremet
+tBCells = tBCells + (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC;
+
+upc_barrier;         // Synchronise
+
+//////////////// COPY SHARED BCELLS TO CELLS ////////////////
+tInstant1 = clock();
+getSharedToCells(Cells);
+tInstant2 = clock();
+tBCells = tBCells + (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC;
+
+////////////// STREAMING ///////////////
+tInstant1 = clock(); // Start measuring time
+StreamingStep(Cells, c);
+tInstant2 = clock();
+tStreaming = tStreaming + (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC;
+
+////////////// BOUNDARIES ///////////////
+tInstant1 = clock(); // Start measuring time
+HandleBoundariesStep(Cells, cx, cy, cz, c, opp, OutletProfile, CurvedBoundaries);
+tInstant2 = clock();
+tBoundaries = tBoundaries + (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC;
+
+// UPDATE VELOCITY AND DENSITY
+tInstant1 = clock(); // Start measuring time
+UpdateMacroscopicStep(Cells, cx, cy, CalculateDragLift);
+tInstant2 = clock();
+tUpdateMacro = tUpdateMacro + (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC;
+
+////////////// Residuals ///////////////
+tInstant1 = clock(); // Start measuring time
+ComputeResiduals(Cells, Residuals, sumVel0, sumVel1, sumRho0, sumRho1, CalculateDragLift, &iter, Iterations);
+//ComputeResiduals(Cells, Residuals, sumVel0, sumVel1, sumRho0, sumRho1, CalculateDragLift, &iter, &Iterations);
+tInstant2 = clock(); // End of time measuremet
+tResiduals = tResiduals + (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC;
+
+if(MYTHREAD==0)
+fprintf(resid_file,"%d %5.4e %5.4e %5.4e %f %f\n", iter, (iter+1.0)*(*Delta), Residuals[0], Residuals[1], Residuals[2], Residuals[3]);
+
+iter++; // update loop variable
+
+if(iter%100==0 && MYTHREAD==0){
+printf("Iterations: %05d/%05d || ", iter, (*Iterations));
+printf("Residuals: l2norm  %e; L2_norm_weighted  %e\n", Residuals[0], Residuals[1]);
+}
+
+////////////// Autosave ///////////////
+if(iter == (AutosaveEvery*AutosaveI))
+{
+AutosaveI++;
+if(iter>AutosaveAfter)
+{
+tInstant1 = clock(); // Start measuring time
+switch(postproc_prog) {
+case 1: sprintf(AutosaveOutputFile, "Results/autosave_iter%05d.csv", iter); break;
+case 2: sprintf(AutosaveOutputFile, "Results/autosave_iter%05d.dat", iter); break; }
+putCellsToWCells(Cells); // Put information to WCells and write (Write Cells)
+if (MYTHREAD==0) // AUTOSAVE
+WriteResults(AutosaveOutputFile, ppp);
+tInstant2 = clock(); // End of time measurement
+tWriting = tWriting + (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC;
+}
+}
+//////////////////////////////////////////////////////
+}     ////////////// END OF MAIN WHILE CYCLE ///////////////
+//////////////////////////////////////////////////////
+
+}
+
+void export_data(int postproc_prog, const char *fnMemCopyRes) {
+    if(MYTHREAD == 0) // EXPORT DATA, TIME MEASUREMENT RESULTS
+    {
+        // Close residuals file
+        fclose(resid_file);
+
+        clock_t tEnd = clock();
+        float tOverall = (float)(tEnd - tStart) / CLOCKS_PER_SEC; // Calculate elapsed time
+
+        fprintf(log_file,"\nOverall calculations took %f seconds\n", tOverall);
+        fprintf(log_file,"Main while loop took %f seconds\n",        tIteration);
+        fprintf(log_file,"Initialization took %f seconds\n",         tInitialization);
+        fprintf(log_file,"Collision took %f seconds\n",              tCollision);
+        fprintf(log_file,"UpdateF took %f seconds\n",                tUpdateF);
+        fprintf(log_file,"Streaming took %f seconds\n",              tStreaming);
+        fprintf(log_file,"Calculating Boundaries took %f seconds\n", tBoundaries);
+        fprintf(log_file,"Update Macroscopic took %f seconds\n",     tUpdateMacro);
+        fprintf(log_file,"Calculating Residuals took %f seconds\n",  tResiduals);
+        fprintf(log_file,"Writing results took %f seconds\n",        tWriting);
+        fprintf(log_file,"Copying boundary cells took %f seconds\n", tBCells);
+
+
+        // end time measurement, close log file
+        fprintf(log_file,"\n:::: Iterations done! ::::\n");
+        fclose(log_file);
+
+        TimeMeasurementFile = fopen("Results/ParallelTimeMeasuerment.dat","w");
+        fprintf(TimeMeasurementFile,"tOverall %f\n",        tOverall);
+        fprintf(TimeMeasurementFile,"tIteration %f\n",      tIteration);
+        fprintf(TimeMeasurementFile,"tInitialization %f\n", tInitialization);
+        fprintf(TimeMeasurementFile,"tCollision %f\n",      tCollision);
+        fprintf(TimeMeasurementFile,"tUpdateF %f\n",        tUpdateF);
+        fprintf(TimeMeasurementFile,"tStreaming %f\n",      tStreaming);
+        fprintf(TimeMeasurementFile,"tBoundaries %f\n",     tBoundaries);
+        fprintf(TimeMeasurementFile,"tUpdateMacro %f\n",    tUpdateMacro);
+        fprintf(TimeMeasurementFile,"tResiduals %f\n",      tResiduals);
+        fprintf(TimeMeasurementFile,"tWriting %f\n",        tWriting);
+        fprintf(TimeMeasurementFile,"tBCells %f\n",         tBCells);
+        fprintf(TimeMeasurementFile,"THREADS %d\n",         THREADS);
+        fclose(TimeMeasurementFile);
+
+        // Write final data
+        switch(postproc_prog){
+            case 1: sprintf(FinalOutputFile, "Results/FinalData.csv"); break;
+            case 2: sprintf(FinalOutputFile, "Results/FinalData.dat"); break;
+        }
+        WriteResults(FinalOutputFile,  ppp);
+
+        // Write information for user
+        printf("\n\nLog was written to %s\n", logFile);
+        printf("Last autosave result can be found at %s\n", AutosaveOutputFile);
+        printf("Residuals were written to Results/residuals.dat\n");
+        printf("Profiling results were written to Results/ParallelTimeMeasuerment.dat\n");
+        printf("Final results were written to %s\n", FinalOutputFile);
+
+        WriteBCells(fnMemCopyRes, ppp);
+        puts("BCells were written!");
+    } // END OF THREAD ZERO
+
+
+}
+
+void alloc_cells() {//////////////////////////////////////////////////////
+    // Allocate structure for the cell properties (see ShellFunctions.h)
+    WCells = (shared_block(BLOCKSIZE)   CellProps*)upc_all_alloc(THREADS, BLOCKSIZE*sizeof(CellProps));
+    BCells = (shared_block(2*LAYER)     CellProps*)upc_all_alloc(THREADS,     LAYER*sizeof(CellProps));
+    Cells = calloc(BLOCKSIZE+2*LAYER,sizeof(CellProps));
+    //////////////////////////////////////////////////////
+
+}
+
+void calc_collision_freq(float Viscosity) {// Calculate collision frequency
+    Omega  = 1.0/(3.*Viscosity+0.5);
+    OmegaA = 8*(2-Omega)/(8-Omega);
+}
+
+void init_vars(int *postproc_prog) {
+    iter = 0;                               // variables for loops
+    sprintf(logFile,"Results/logFile.log"); // path of the .log file
+    AutosaveI = 1;                          // autosave i variable, will be incremented after every autosave
+    ppp      = postproc_prog;       // for convenience ppp points to postproc_prog
+
+    time_meas_vars_init();
+    allocate_vars();
+}
+
+void free_vars() {
+    upc_free(Delta);
+    upc_free(m);
+    upc_free(n);
+    //upc_free(MaxInletCoordY);
+    //upc_free(MinInletCoordY);
+    upc_free(NumInletNodes);
+    upc_free(NumNodes);
+    upc_free(NumConn);
+
+    free(Cells);
+    free(w);
+    free(cx);
+    free(cy);
+    free(cz);
+    free(c);
+    free(opp);
+}
+
+void print_init_info_to_log(float Uavg, float Vavg, float Wavg, float rho_ini, float Viscosity, int InletProfile,
+                            int CollisionModel, int CurvedBoundaries, int OutletProfile, int Iterations,
+                            int AutosaveAfter, int AutosaveEvery, int postproc_prog, int CalculateDragLift,
+                            float ConvergenceCritVeloc, float ConvergenceCritRho) {
+////////////////////////////////////////////////////
+/////////////// Print info to log //////////////////
+////////////////////////////////////////////////////
 
     if(MYTHREAD==0) // Print information to log file
     {
-        // Check whether we got back what we wanted :), write to log file!
+// Check whether we got back what we wanted :), write to log file!
         log_file = fopen(logFile, "w");  // open log file
-        ppp      = &postproc_prog;       // for convenience ppp points to postproc_prog
         fprintf(log_file,"This is the 3D lattice Boltzmann *.log file\n\n");
         fprintf(log_file,"\n:::: Imported variables from the *.ini file :::: \n");
         fprintf(log_file,">>> Uavg              : %3.6f\n", Uavg);
@@ -197,114 +506,87 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
         fprintf(log_file,">>> # of nodes in x (n) = %d\n", *n);
         fprintf(log_file,">>> # of nodes in y (m) = %d\n", *m);
         fprintf(log_file,">>> NumInletNodes       = %d\n", *NumInletNodes);
-        fprintf(log_file,">>> MaxInletCoordY      = %f\n", *MaxInletCoordY);
-        fprintf(log_file,">>> MinInletCoordY      = %f\n", *MinInletCoordY);
+//fprintf(log_file,">>> MaxInletCoordY      = %f\n", *MaxInletCoordY);
+//fprintf(log_file,">>> MinInletCoordY      = %f\n", *MinInletCoordY);
 
         fprintf(log_file,"\n:::: Parallel properties :::: \n");
         fprintf(log_file,">>> # of threads        = %d\n", THREADS);
         fprintf(log_file,">>> BlockSize           = %d\n", BLOCKSIZE);
 
-        // In case of no autosave
+// In case of no autosave
         sprintf(AutosaveOutputFile, "NOWHERE!");
 
     } // END OF THREAD ZERO
 
-    ////////////////////////////////////////////////////
-    ///////////////// INITIALIZE ///////////////////////
-    ////////////////////////////////////////////////////
+}
 
-    // Fill up D3Q19 variables
-    D3Q19Vars(w, cx, cy, cz, opp, c);
-
-
-    //////////////////////////////////////////////////////
-    // Allocate structure for the cell properties (see ShellFunctions.h)
-    Cells = calloc(BLOCKSIZE+2*LAYER,sizeof(CellProps));
-    //////////////////////////////////////////////////////
-
-    if(MYTHREAD==0)
-    {
-        fprintf(log_file,"\n:::: Initializing ::::\n");
-        printf("\n:::: Initializing ::::\n");
-    } // END OF THREAD ZERO
-
-    ////////////////////////////////////////////////////
-    ///////////////// INITIALIZE CELLS /////////////////
+void read_data(const char *NodeDataFile, const char *BCconnectorDataFile) {////////////////////////////////////////////////////
+    ///////////////////// Read data ////////////////////
     ////////////////////////////////////////////////////
 
-    upc_barrier;         // Synchronise
-    //loop = 0;            // This will measure that how much is done of initialization
-    tInstant1 = clock(); // Measure time of initialization
+    Nodes   = ReadNodes(NodeDataFile);          // Read Node data
+    BCconn  = ReadBCconn(BCconnectorDataFile);  // Read BCconn data
+    CompDataNode(Nodes);
+    //CompDataConn(BCconn);
 
-    CellIni( Cells,
-             Nodes,            // Nodes
-             BCconn,           // BCconn
-             Uavg,             // INPUT PARAMETER
-             Vavg,             // INPUT PARAMETER
-             Wavg,             // INPUT PARAMETER
-             InletProfile,     // INPUT PARAMETER
-             CollisionModel,   // INPUT PARAMETER
-             opp,              // Opposite direction
-             rho_ini);         // Initial density
+}
 
+void allocate_vars() {////////////////////////////////////////////////////
+    //////////////////// ALLOCATE //////////////////////
+    ////////////////////////////////////////////////////
 
+    allocate_residuals();
+    allocate_shared();
+    allocate_lattice_vars();
+    alloc_cells();
+}
 
-    //Things to print for each thread
-    //Point coordinates and values
-    //Cells contain, all the nodes, on the different threads.
-    upc_barrier;
-    //if(MYTHREAD == 0)
-        //out_cells_file = shared fopen("Results/outCells.dat","a");
+void allocate_shared() {////////////////////////////
+    // THESE ARE SHARED STUFF //
+    ////////////////////////////
 
-    upc_barrier;
-    print_cells_info(Cells);
-    upc_barrier;
-    print_boundary_type(Cells);
-    upc_barrier;
+    // allocate mesh properties  :: DEFINED IN ShellFunctions.h
+    Delta          = (shared double*)upc_alloc(1*sizeof(double));
+    m              = (shared int*)upc_alloc(1*sizeof(int));
+    n              = (shared int*)upc_alloc(1*sizeof(int));
+    o              = (shared int*)upc_alloc(1*sizeof(int));
+    NumNodes       = (shared int*)upc_alloc(1*sizeof(int));
+    NumConn        = (shared int*)upc_alloc(1*sizeof(int));
+    //MaxInletCoordY = (shared [] double*)upc_alloc(1*sizeof(double));--------------------------> DO I NEED THIS?
+    //MinInletCoordY = (shared [] double*)upc_alloc(1*sizeof(double));--------------------------> DO I NEED THIS?
+    NumInletNodes  = (shared int*)upc_alloc(1*sizeof(int));
+}
 
-    //For every boundary type, print which points correspond to them.
+void allocate_lattice_vars() {// D2Q9 Variables of the lattice
+    w  = Create1DArrayDouble(19); // weight values for the directions
+    c  = Create1DArrayInt(19);    //
+    cx  = Create1DArrayInt(19);    // x coordinate of the discrete lattice directions
+    cy  = Create1DArrayInt(19);    // y coordinate of the discrete lattice directions
+    cz  = Create1DArrayInt(19);    // z coordinate of the discrete lattice directions
+    opp = Create1DArrayInt(19);    // opposite vector
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    /* FALTA IMPRIMIR TODO LO QUE PASA EN ESTA FUNCIÓN A LO GRANDE, COMO SI NO HUBIESE UN MAÑANA */
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////
+}
 
-    tInstant2 = clock(); // Measure time of initialization
-    tInitialization = (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC;
+void allocate_residuals() {// allocate residuals
+    sumVel0   = Create1DArrayDouble(1);
+    sumVel1   = Create1DArrayDouble(1);
+    sumRho0   = Create1DArrayDouble(1);
+    sumRho1   = Create1DArrayDouble(1);
+    Residuals = Create1DArrayDouble(4);
+}
 
+void time_meas_vars_init() {// Time measurement variables
+    tInitialization  = 0.0; // Time measurement of Initialization
+    tIteration       = 0.0; // Time measurement of Iteration
+    tCollision       = 0.0; // Time measurement of Collision
+    tUpdateF         = 0.0; // Time measurement of UpdateF
+    tStreaming       = 0.0; // Time measurement of Streaming
+    tBoundaries      = 0.0; // Time measurement of Boundaries
+    tUpdateMacro     = 0.0; // Time measurement of Update Macroscopic vars
+    tResiduals       = 0.0; // Time measurement of calculating residuals
+    tWriting         = 0.0; // Time measurement of writing data
+    tBCells          = 0.0; // Time measurement of handling boundaries
 
-    //I will start from the end
-
-    tInstant1 = clock(); // Start measuring time
-    /*ComputeResiduals(Cells, Residuals,
-                     sumVel0, sumVel1,
-                     sumRho0, sumRho1,
-                     CalculateDragLift, &iter, &Iterations);*/
-    //ComputeResiduals(Cells, Residuals, sumVel0, sumVel1, sumRho0, sumRho1, CalculateDragLift, &iter, &Iterations);
-    tInstant2 = clock(); // End of time measuremet
-    tResiduals = tResiduals + (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC;
-
-
-
-    upc_barrier;         // Synchronise
-
-    upc_free(Delta);
-    upc_free(m);
-    upc_free(n);
-    upc_free(MaxInletCoordY);
-    upc_free(MinInletCoordY);
-    upc_free(NumInletNodes);
-    upc_free(NumNodes);
-    upc_free(NumConn);
-
-    free(Cells);
-    free(w);
-    free(cx);
-    free(cy);
-    free(cz);
-    free(c);
-    free(opp);
 }
 
 void print_cells_info(CellProps* Cells) {
@@ -361,13 +643,13 @@ void print_boundary_type(CellProps* Cells) {
             index_j = (index_n - index_i * NM* NL)/NM;
             index_k = (index_n - index_i * NM* NL - index_j * NM);
             printf("%7i |%3i |%3i |%3i || %5.5f | %5.5f | %5.5f \n",
-                    index_n,
-                    index_i,
-                    index_j,
-                    index_k,
-                    (Cells+LAYER)->CoordX,
-                    (Cells+LAYER)->CoordY,
-                    (Cells+LAYER)->CoordZ
+                   index_n,
+                   index_i,
+                   index_j,
+                   index_k,
+                   (Cells+LAYER)->CoordX,
+                   (Cells+LAYER)->CoordY,
+                   (Cells+LAYER)->CoordZ
             );
         }
 
@@ -393,22 +675,22 @@ void print_boundary_type(CellProps* Cells) {
     b_filename[2] = b3_filename;
     b_filename[3] = b4_filename;
     if (MYTHREAD == 0) {
-    printf(b_filename[0]);
-    printf("\n");
-    printf(b1_filename);
-    printf("\n");
-    printf(b_filename[1]);
-    printf("\n");
-    printf(b2_filename);
-    printf("\n");
-    printf(b_filename[2]);
-    printf("\n");
-    printf(b3_filename);
-    printf("\n");
-    printf(b_filename[3]);
-    printf("\n");
-    printf(b4_filename);
-    printf("\n");}
+        printf(b_filename[0]);
+        printf("\n");
+        printf(b1_filename);
+        printf("\n");
+        printf(b_filename[1]);
+        printf("\n");
+        printf(b2_filename);
+        printf("\n");
+        printf(b_filename[2]);
+        printf("\n");
+        printf(b3_filename);
+        printf("\n");
+        printf(b_filename[3]);
+        printf("\n");
+        printf(b4_filename);
+        printf("\n");}
 
     if (MYTHREAD == 0){
         for(int BT = 0; BT<4; BT++) {

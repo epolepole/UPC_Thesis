@@ -26,7 +26,6 @@ void ComputeResiduals(CellProps *Cells, double* Residuals,
     //double LsumRho1 = 0.0;
     double PUTtmp[4];
     double GETtmp[4*THREADS];
-    clock_t tInstant1, tInstant2; // Time measurement points: universal
 
     double L2n   = 0.0;  // L2 norm
     double L2n_w = 0.0;  // L2 norm weighted
@@ -38,16 +37,17 @@ void ComputeResiduals(CellProps *Cells, double* Residuals,
     //*sumRho1 = 0;
 
     // sum up velocity and density
-    for(i = (*n);  i < (LAYER+1)*(*n);  i++)
+    for(i = LAYER;  i < LAYER+BLOCKSIZE;  i++)
     {
 
         //LsumVel1 = LsumVel1 + sqrt( ((Cells+i)->U)*((Cells+i)->U)  +  ((Cells+i)->V)*((Cells+i)->V)  );
         //LsumRho1 = LsumRho1 + (Cells+i)->Rho;
 
-        for (k=0; k<9;k++)
-        { L2n = L2n + pow(((Cells+i)->F[k]-(Cells+i)->METAF[k]),2); }
+        for (k=0; k<19;k++)
+        { L2n = L2n + pow(((Cells+i)->F[k]-(Cells+i)->METAF[k]),2); } //Still no clue what is this
 
 
+        //For now checking on every external surface, if ComputeDragLift == 1
         if ((Cells+i)->BoundaryID == ComputeDragLift)  // BE AWARE!! check in the STAR-CD files the ID of the surface where you want to check the drag/lift.
         {
             ResDrag += (Cells+i)->DragF;
@@ -55,8 +55,10 @@ void ComputeResiduals(CellProps *Cells, double* Residuals,
         }
     }
 
+    //The same?
     PUTtmp[0] = L2n;
     PUTtmp[1] = L2n;
+
     PUTtmp[2] = ResDrag;
     PUTtmp[3] = ResLift;
 

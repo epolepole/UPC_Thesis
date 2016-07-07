@@ -22,7 +22,7 @@ void CellIni(CellProps *Cells,
              int*   opp,
              float  rho_ini);
 
-void BGKW(CellProps *Cells, int i, double* w, int* cx, int* cy, double Omega);
+void BGKW(CellProps *Cells, int i, double* w, int* cx, int* cy, int* cz, double Omega);
 
 void TRT(CellProps *Cells, int i, double* w, int* cx, int* cy, int* opp, double Omega, double OmegaA);
 
