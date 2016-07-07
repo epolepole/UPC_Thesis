@@ -1,0 +1,36 @@
+This is the 3D lattice Boltzmann *.log file
+
+
+:::: Imported variables from the *.ini file :::: 
+>>> Uavg              : 0.080000
+>>> Vavg              : 0.000000
+>>> Wavg              : 0.000000
+>>> Initial density   : 5.0
+>>> Viscosity         : 0.01000000
+>>> # of iterations   : 10
+>>> Autosave after    : 0
+>>> Autosave every    : 100
+>>> Convergence Veloc : -1.00000000
+>>> Convergence Rho   : -1.00000000
+>>> CollisionModel    : BGKW
+>>> InletProfile      : OFF
+>>> OutletProfile     : OFF
+>>> CurvedBoundaries  : OFF
+>>> Results format    : Paraview (*.csv)
+>>> Drag, lift was not calculated
+
+:::: Calculated variables from mesh :::: 
+>>> Grid spacing        = 0.000000
+>>> # of nodes in x (n) = -703844416
+>>> # of nodes in y (m) = -703844400
+>>> NumInletNodes       = -703844480
+
+:::: Parallel properties :::: 
+>>> # of threads        = 5
+>>> BlockSize           = 5400
+
+:::: Initializing ::::
+
+:::: Initialization done! ::::
+
+:::: Start Iterations ::::

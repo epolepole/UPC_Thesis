@@ -458,10 +458,13 @@ void CellIni(CellProps *Cells,
             if(index_Cell >= 30 && index_Cell <  41) {
                 printf("Z = 0, ");
                 printf("Index Cell: %i,  ", index_Cell);
+                printf("j: %i, ", j);
                 printf("Str Lattice: %i\n",(Cells + index_Cell)->StreamLattice[j]);
             }
             if(index_Cell >=LAYER + 30 && index_Cell < LAYER + 41) {
-                printf("Z = 1\n");
+                printf("Z = 1, ");
+                printf("Index Cell: %i,  ", index_Cell);
+                printf("j: %i, ", j);
                 printf("Str Lattice: %i\n",(Cells + index_Cell)->StreamLattice[j]);
             }
         }
