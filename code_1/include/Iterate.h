@@ -7,7 +7,7 @@
 
 #define init_measure_time tInstant1 = clock()
 #define end_measure_time(t_var) tInstant2 = clock();\
-                                t_var = (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC
+                                t_var = t_var + (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC
 
 #define func_between_time(func,t_container) \
     tInstant1 = clock(); // Start measuring time\
@@ -74,24 +74,65 @@ int*  opp;              // opposite vector
 int*    c;              // shift of lattice directions written in vector form
 
 
+//Init/Alloc/Free functions
 
-void putCellsToShared(CellProps *Cells);
+void init_vars(int *postproc_prog);
+void time_meas_vars_init();
 
-void getSharedToCells(CellProps *Cells);
+void alloc_cells();
+void allocate_vars();
+void allocate_residuals();
+void allocate_lattice_vars();
+void allocate_shared();
 
-void putCellsToWCells(CellProps *Cells);
 
-void CollisionStep(CellProps *Cells, double* w, int* cx, int* cy, int* opp,
-                   double Omega, double OmegaA, double **tm,
-                   double **stmiv, int CollisionModel);
+void free_vars();
+void free_mesh_data_matrices();
 
-void StreamingStep(CellProps *Cells, int* c);
 
-void HandleBoundariesStep(CellProps *Cells, int* cx, int* cy, int* c, int* opp, int OutletProfile, int CurvedBoundaries);
+//IO functions
+void read_data(const char *NodeDataFile, const char *BCconnectorDataFile);
 
-void UpdateMacroscopicStep(CellProps *Cells, int* cx, int* cy, int CalculateDragLift);
+void print_init_info_to_log(float Uavg, float Vavg, float Wavg, float rho_ini, float Viscosity, int InletProfile,
+                            int CollisionModel, int CurvedBoundaries, int OutletProfile, int Iterations,
+                            int AutosaveAfter, int AutosaveEvery, int postproc_prog, int CalculateDragLift,
+                            float ConvergenceCritVeloc, float ConvergenceCritRho);
 
-void CalculateDragLiftForcesStep(CellProps *Cells, shared int* m, shared int* n, int CalculateDragLift);
+
+
+
+void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog);
+void write_cells_to_results(int postproc_prog);
+void save_init_data(int postproc_prog);
+void export_data(int postproc_prog, const char *fnMemCopyRes);
+void print_cells_info(CellProps* Cells);
+void print_boundary_type(CellProps* Cells);
+void print_cell_line(FILE* file, const CellProps* Cell);
+
+
+void putCellsToShared();
+void getSharedToCells();
+void putCellsToWCells();
+
+
+
+//Step functions
+void CollisionStep(int CollisionModel);
+void StreamingStep();
+void HandleBoundariesStep(int OutletProfile, int CurvedBoundaries);
+void UpdateMacroscopicStep(int CalculateDragLift);
+void CalculateDragLiftForcesStep(int CalculateDragLift);
+
+
+
+//Other functions
+CellProps* cell_from_id(CellProps* Cells, int ID);
+void calc_collision_freq(float Viscosity);
+
+
+void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile, int *Iterations, int AutosaveAfter,
+                     int AutosaveEvery, int postproc_prog, int CalculateDragLift, float ConvergenceCritVeloc,
+                     float ConvergenceCritRho);
 
 void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
                float Uavg,         float Vavg,  float Wavg,
@@ -101,9 +142,6 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
                int AutosaveEvery,  int postproc_prog,  int CalculateDragLift,
                float ConvergenceCritVeloc, float ConvergenceCritRho);
 
-void print_cells_info(CellProps* Cells);
-void print_boundary_type(CellProps* Cells);
-void print_cell_line(FILE* file, const CellProps* Cell);
-CellProps* cell_from_id(CellProps* Cells, int ID);
+
 
 #endif

@@ -635,7 +635,7 @@ void D3Q19Vars(double* w, int* cx, int* cy, int* cz, int* opp, int* c)
 =============Function for the BGKW model============
 ==================================================*/
 
-void BGKW(CellProps *Cells, int i, double* w, int* cx, int* cy, double Omega)
+void BGKW(CellProps *Cells, int i, double* w, int* cx, int* cy, int* cz, double Omega)
 {
 
     double T1 = ((Cells+i)->U) * ((Cells+i)->U) + ((Cells+i)->V) * ((Cells+i)->V) + ((Cells+i)->W) * ((Cells+i)->W);
@@ -739,15 +739,15 @@ void UpdateF(CellProps *Cells, int i)
 ======Function to update the macroscopic var.=======
 ==================================================*/
 
-void UpdateMacroscopic(CellProps *Cells, int i, int* cx, int* cy, int CalculateDragLift)
+void UpdateMacroscopic(CellProps *Cells, int i, int* cx, int* cy, int* cz, int CalculateDragLift)
 {
-    double Ssum, Usum, Vsum;
+    double Ssum, Usum, Vsum, Wsum;
     int k;
 
     if ((Cells+i)->Fluid==1)
     {
         Ssum=0.0;
-        for (k=0; k<9; k++)
+        for (k=0; k<19; k++)
             Ssum = Ssum+(Cells+i)->F[k];
 
         (Cells+i)->Rho = Ssum;
@@ -756,13 +756,16 @@ void UpdateMacroscopic(CellProps *Cells, int i, int* cx, int* cy, int CalculateD
 
         Usum = 0.0;
         Vsum = 0.0;
-        for (k=0; k<9; k++)
+        Wsum = 0.0;
+        for (k=0; k<19; k++)
         {
             Usum = Usum + ((Cells+i)->F[k])*cx[k];
             Vsum = Vsum + ((Cells+i)->F[k])*cy[k];
+            Wsum = Wsum + ((Cells+i)->F[k])*cz[k];
         }
         (Cells+i)->U = Usum/((Cells+i)->Rho);
         (Cells+i)->V = Vsum/((Cells+i)->Rho);
+        (Cells+i)->W = Wsum/((Cells+i)->Rho);
     }
 
     if ((Cells+i)->BC_ID[1]==3) // for outlet on the right
@@ -773,8 +776,9 @@ void UpdateMacroscopic(CellProps *Cells, int i, int* cx, int* cy, int CalculateD
     //   DRAG/LIFT FORCE
     if (CalculateDragLift != 0 && (Cells+i)->BoundaryID==CalculateDragLift)
     {
-        (Cells+i)->DragF = ((Cells+i)->Rho)/3*(20-(Cells+i)->CoordX)/5;
-        (Cells+i)->LiftF = ((Cells+i)->Rho)/3*(20-(Cells+i)->CoordY)/5;
+        (Cells+i)->DragXF = ((Cells+i)->Rho)/3*(20-(Cells+i)->CoordX)/5;
+        (Cells+i)->DragYF = ((Cells+i)->Rho)/3*(20-(Cells+i)->CoordY)/5;
+        (Cells+i)->LiftF  = ((Cells+i)->Rho)/3*(20-(Cells+i)->CoordZ)/5;
     }
 
 }

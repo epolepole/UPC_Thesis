@@ -30,7 +30,7 @@ void MRT(CellProps *Cells, int i, double** tm, double** stmiv);
 
 void UpdateF(CellProps *Cells, int i);
 
-void UpdateMacroscopic(CellProps *Cells, int i, int* cx, int* cy, int CalculateDragLift);
+void UpdateMacroscopic(CellProps *Cells, int i, int* cx, int* cy, int* cz, int CalculateDragLift);
 
 void CalculateDragLiftForces(CellProps *Cells, int j, int i, int CalculateDragLift, shared int* n, shared int* m);
 

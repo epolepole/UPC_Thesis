@@ -20,12 +20,13 @@ void ComputeResiduals(CellProps *Cells, double* Residuals,
     // Create variables for residuals
     //double ResVel   = 0.0;
     //double ResRho   = 0.0;
-    double ResDrag  = 0.0;
+    double ResDragX  = 0.0;
+    double ResDragY  = 0.0;
     double ResLift  = 0.0;
     //double LsumVel1 = 0.0;
     //double LsumRho1 = 0.0;
-    double PUTtmp[4];
-    double GETtmp[4*THREADS];
+    double PUTtmp[5];
+    double GETtmp[5*THREADS];
 
     double L2n   = 0.0;  // L2 norm
     double L2n_w = 0.0;  // L2 norm weighted
@@ -44,13 +45,14 @@ void ComputeResiduals(CellProps *Cells, double* Residuals,
         //LsumRho1 = LsumRho1 + (Cells+i)->Rho;
 
         for (k=0; k<19;k++)
-        { L2n = L2n + pow(((Cells+i)->F[k]-(Cells+i)->METAF[k]),2); } //Still no clue what is this
+        { L2n = L2n + pow(((Cells+i)->F[k]-(Cells+i)->METAF[k]),2); }
 
 
         //For now checking on every external surface, if ComputeDragLift == 1
         if ((Cells+i)->BoundaryID == ComputeDragLift)  // BE AWARE!! check in the STAR-CD files the ID of the surface where you want to check the drag/lift.
         {
-            ResDrag += (Cells+i)->DragF;
+            ResDragX += (Cells+i)->DragXF;
+            ResDragY += (Cells+i)->DragYF;
             ResLift += (Cells+i)->LiftF;
         }
     }
@@ -59,19 +61,21 @@ void ComputeResiduals(CellProps *Cells, double* Residuals,
     PUTtmp[0] = L2n;
     PUTtmp[1] = L2n;
 
-    PUTtmp[2] = ResDrag;
-    PUTtmp[3] = ResLift;
+    PUTtmp[2] = ResDragX;
+    PUTtmp[3] = ResDragY;
+    PUTtmp[4] = ResLift;
 
     *sumVel1 = 0;
     //*sumRho1 = 0;
-    ResDrag  = 0;
+    ResDragX  = 0;
+    ResDragY  = 0;
     ResLift  = 0;
 
-    upc_memput( &sResiduals[0+4*MYTHREAD] , &PUTtmp[0],  4*sizeof(double) );
+    upc_memput( &sResiduals[0+5*MYTHREAD] , &PUTtmp[0],  5*sizeof(double) );
 //  tInstant1 = clock(); // Start measuring time
     upc_barrier;
 //  tInstant2 = clock(); // End of time measuremet
-    upc_memget( &GETtmp[0] , &sResiduals[0] , (THREADS*4)*sizeof(double) );
+    upc_memget( &GETtmp[0] , &sResiduals[0] , (THREADS*5)*sizeof(double) );
 //  *tSendRcv =  (tInstant2-tInstant1) ;
 
     //printf("iter %d TH%d Res Synced\n", iter, MYTHREAD);
@@ -82,22 +86,24 @@ void ComputeResiduals(CellProps *Cells, double* Residuals,
         for (i = 0; i < THREADS; i++)
         {
 
-            *sumVel1 = *sumVel1 + GETtmp[0+4*i];
+            *sumVel1 = *sumVel1 + GETtmp[0+5*i];
             //*sumRho1 = *sumRho1 + GETtmp[1+4*i];
-            ResDrag  = ResDrag  + GETtmp[2+4*i];
-            ResLift  = ResLift  + GETtmp[3+4*i];
+            ResDragX  = ResDragX  + GETtmp[2+5*i];
+            ResDragY  = ResDragY  + GETtmp[3+5*i];
+            ResLift  = ResLift  + GETtmp[4+5*i];
 
         }
 
         L2n = *sumVel1;
         // Calculate residuals
-        L2n_w = sqrt(L2n/((*m)*(*n)));
+        L2n_w = sqrt(L2n/(NN*NM*NL));
         L2n = sqrt(L2n);
 
         Residuals[0] = L2n;
         Residuals[1] = L2n_w;
-        Residuals[2] = ResDrag;
-        Residuals[3] = ResLift;
+        Residuals[2] = ResDragX;
+        Residuals[3] = ResDragY;
+        Residuals[4] = ResLift;
 
     }
 

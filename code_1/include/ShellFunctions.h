@@ -74,7 +74,8 @@ typedef struct
     MyReal Uo;
     MyReal Vo;
     MyReal Wo;
-    MyReal DragF;
+    MyReal DragXF;
+    MyReal DragYF;
     MyReal LiftF;
     MyReal F[19];
     MyReal Feq[19];
