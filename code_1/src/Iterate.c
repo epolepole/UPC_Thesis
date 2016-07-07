@@ -343,8 +343,8 @@ void StreamingStep(){
 
             if (((Cells+i)->StreamLattice[j]) == 1)
             {
-                printf("Thread: %i, i= %i, j=%i\n",MYTHREAD,i,j);
-                printf("(Cells + %i + %i)-> METAF[%i] = %f",i,c[j],(Cells + i + c[j])-> METAF[j]);
+                //printf("Thread: %i, i= %i, j=%i\n",MYTHREAD,i,j);
+                //printf("(Cells + %i + %i)-> METAF[%i] = %f",i,c[j],(Cells + i + c[j])-> METAF[j]);
                 (Cells +i)->F[j] = (Cells + i + c[j])-> METAF[j];
             }
         }
@@ -389,7 +389,7 @@ void HandleBoundariesStep(int OutletProfile, int CurvedBoundaries){
 
             // OPEN BOUNDARY
         case 2 :
-            if ((Cells +j*(*n)+i)->BC_ID[1]==3)
+            /*if ((Cells +j*(*n)+i)->BC_ID[1]==3)
             {
 
                 (Cells +j*(*n)+i)->F[1] = 2*( (Cells+(*n)*(j)+i-1)->F[1] ) - (Cells+(*n)*(j)+i-2)->F[1];
@@ -401,7 +401,7 @@ void HandleBoundariesStep(int OutletProfile, int CurvedBoundaries){
                 //Cells[j][i].setF(2*Cells[j][i-1].getF()[5]-Cells[j][i-2].getF()[5],5);
                 //Cells[j][i].setF(2*Cells[j][i-1].getF()[8]-Cells[j][i-2].getF()[8],8);
 
-            }
+            }*/
             /* !!!!  THIS IS NOT NECESSARY !!!!
             if ((Cells +j*(*n)+i)->BC_ID[2]==3)
             {
@@ -485,9 +485,6 @@ void allocate_shared() {////////////////////////////
 
     // allocate mesh properties  :: DEFINED IN ShellFunctions.h
     Delta          = (shared double*)upc_alloc(1*sizeof(double));
-    m              = (shared int*)upc_alloc(1*sizeof(int));
-    n              = (shared int*)upc_alloc(1*sizeof(int));
-    o              = (shared int*)upc_alloc(1*sizeof(int));
     NumNodes       = (shared int*)upc_alloc(1*sizeof(int));
     NumConn        = (shared int*)upc_alloc(1*sizeof(int));
     //MaxInletCoordY = (shared [] double*)upc_alloc(1*sizeof(double));--------------------------> DO I NEED THIS?
@@ -513,8 +510,6 @@ void allocate_residuals() {// allocate residuals
 
 void free_vars() {
     upc_free(Delta);
-    upc_free(m);
-    upc_free(n);
     //upc_free(MaxInletCoordY);
     //upc_free(MinInletCoordY);
     upc_free(NumInletNodes);
@@ -610,8 +605,9 @@ void print_init_info_to_log(float Uavg, float Vavg, float Wavg, float rho_ini, f
 
         fprintf(log_file,"\n:::: Calculated variables from mesh :::: \n");
         fprintf(log_file,">>> Grid spacing        = %f\n", *Delta);
-        fprintf(log_file,">>> # of nodes in x (n) = %d\n", *n);
-        fprintf(log_file,">>> # of nodes in y (m) = %d\n", *m);
+        fprintf(log_file,">>> # of nodes in x (n) = %d\n", NN);
+        fprintf(log_file,">>> # of nodes in y (m) = %d\n", NM);
+        fprintf(log_file,">>> # of nodes in z (l) = %d\n", NL);
         fprintf(log_file,">>> NumInletNodes       = %d\n", *NumInletNodes);
 //fprintf(log_file,">>> MaxInletCoordY      = %f\n", *MaxInletCoordY);
 //fprintf(log_file,">>> MinInletCoordY      = %f\n", *MinInletCoordY);

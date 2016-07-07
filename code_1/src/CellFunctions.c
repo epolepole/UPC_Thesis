@@ -452,21 +452,21 @@ void CellIni(CellProps *Cells,
             {
                 (Cells + index_Cell)->StreamLattice[opp[j]]= 0 ;
 
-                if (MYTHREAD == 0 && i == 30) {
+                /*if (MYTHREAD == 0 && i == 30) {
                     printf("opp[%i] = %i\n", j, opp[j]);
                     printf("Str(%i): %i\n",opp[j],(Cells + index_Cell)->StreamLattice[opp[j]]);
-                }
+                }*/
             }
 
             //x de 0 a 10
             //j = 2
             //z 0 o 1
-            if(MYTHREAD == 0 && i == 30) {
+            /*if(MYTHREAD == 0 && i == 30) {
                 printf("i: %i,  ", i);
                 printf("BC_ID(%i): %i, ",j,(Cells + index_Cell)->BC_ID[j]);
                 printf("Str(%i): %i ",j,(Cells + index_Cell)->StreamLattice[j]);
                 printf("Str(%i): %i\n",opp[j],(Cells + index_Cell)->StreamLattice[opp[j]]);
-            }
+            }*/
         }
 
 
