@@ -1,5 +1,5 @@
 #CMakeLists.txt
-set(CMAKE_C_COMPILER /usr/local/berkeley_upc/bin/upcc)
+#set(CMAKE_C_COMPILER /usr/local/berkeley_upc/bin/upcc)
 
 cmake_minimum_required (VERSION 2.6)
 project (thesis_upc)
@@ -37,10 +37,10 @@ set(CMAKE_C_FLAGS_DEBUG "-T ${THREADS} -g -D__SAVE_ITER__=1")
 set(CMAKE_C_FLAGS_RELEASE "-T ${THREADS} -D__SAVE_ITER__=1")
 
 
-if(APPLE)
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -network=mpi")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_DEBUG} -network=mpi")
-endif(APPLE)
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 
 include(CheckCSourceCompiles)
