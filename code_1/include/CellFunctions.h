@@ -5,7 +5,7 @@ The microscopic and macroscopic variables are refreshed based on the last two fu
 #define CELLFUNCTIONS_H
 
 #include "ShellFunctions.h"
-
+#include "BlockSizeDefiner.h"
 
 // D3Q19 Variables of the lattice
 double* w;              // weight values for the directions
@@ -43,5 +43,7 @@ void UpdateMacroscopic(CellProps *Cells, int i, int* cx, int* cy, int* cz, int C
 
 void CalculateDragLiftForces(CellProps *Cells, int j, int i, int CalculateDragLift, shared int* n, shared int* m);
 
+int getIndex(const int x, const int y, const int z);
+int getThread(int index);
 
 #endif

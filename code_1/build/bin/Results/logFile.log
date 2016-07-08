@@ -24,14 +24,28 @@ This is the 3D lattice Boltzmann *.log file
 >>> # of nodes in x (n) = 30
 >>> # of nodes in y (m) = 30
 >>> # of nodes in z (l) = 30
->>> NumInletNodes       = 317321136
+>>> NumInletNodes       = 1823006640
 
 :::: Parallel properties :::: 
->>> # of threads        = 10
->>> BlockSize           = 2700
+>>> # of threads        = 5
+>>> BlockSize           = 5400
 
 :::: Initializing ::::
 
 :::: Initialization done! ::::
 
 :::: Start Iterations ::::
+
+Overall calculations took 3.043127 seconds
+Main while loop took 1.811377 seconds
+Initialization took 0.917391 seconds
+Collision took 0.350147 seconds
+UpdateF took 0.183064 seconds
+Streaming took 0.507256 seconds
+Calculating Boundaries took 0.046055 seconds
+Update Macroscopic took 0.087369 seconds
+Calculating Residuals took 0.060570 seconds
+Writing results took 0.394954 seconds
+Copying boundary cells took 0.172523 seconds
+
+:::: Iterations done! ::::

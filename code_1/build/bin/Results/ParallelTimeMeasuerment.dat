@@ -1,0 +1,12 @@
+tOverall 3.043127
+tIteration 1.811377
+tInitialization 0.917391
+tCollision 0.350147
+tUpdateF 0.183064
+tStreaming 0.507256
+tBoundaries 0.046055
+tUpdateMacro 0.087369
+tResiduals 0.060570
+tWriting 0.394954
+tBCells 0.172523
+THREADS 5

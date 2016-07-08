@@ -13,8 +13,8 @@
       <sourceFolder url="file://$MODULE_DIR$/src/ShellFunctions.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/BoundaryConditions.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/CellFunctions.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/include" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />

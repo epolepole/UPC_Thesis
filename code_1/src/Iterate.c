@@ -378,8 +378,10 @@ void StreamingStep(){
 void HandleBoundariesStep(int OutletProfile, int CurvedBoundaries){
     int i, j, k;
 
+
     for (int i = LAYER; i < LAYER + BLOCKSIZE; ++i)
     {
+        //Check Boundary here instead of in every function
         // INLET
         InletBC(Cells, i);
 
@@ -490,7 +492,7 @@ void time_meas_vars_init() {// Time measurement variables
 void alloc_cells() {//////////////////////////////////////////////////////
     // Allocate structure for the cell properties (see ShellFunctions.h)
     WCells = (shared_block(BLOCKSIZE)   CellProps*)upc_all_alloc(THREADS, BLOCKSIZE*sizeof(CellProps));
-    BCells = (shared_block(2*LAYER)     CellProps*)upc_all_alloc(THREADS,     LAYER*sizeof(CellProps));
+    BCells = (shared_block(2*LAYER)     CellProps*)upc_all_alloc(THREADS, 2*LAYER*sizeof(CellProps));
     Cells = calloc(BLOCKSIZE+2*LAYER,sizeof(CellProps));
     //////////////////////////////////////////////////////
 
