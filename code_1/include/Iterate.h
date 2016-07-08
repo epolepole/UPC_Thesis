@@ -4,6 +4,7 @@
 #define ITERATE_H
 
 #include <stdio.h>
+#include <time.h>
 #include "ShellFunctions.h" // convenience
 
 #define init_measure_time tInstant1 = clock()
@@ -138,7 +139,6 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
                int OutletProfile,  int Iterations,     int AutosaveAfter,
                int AutosaveEvery,  int postproc_prog,  int CalculateDragLift,
                float ConvergenceCritVeloc, float ConvergenceCritRho);
-
 
 
 #endif

@@ -176,9 +176,9 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
     {
         //printf("T %i, Starting iteration %i\n",MYTHREAD,iter);
 //////////////// COLLISION ////////////////
-        init_measure_time;
         CollisionStep(CollisionModel); ////////////////////// !!!!!!!!!!!!!!!!! CX CY!
         end_measure_time(tCollision);
+
         //printf("T %i, Collision\n",MYTHREAD);
 
 ////////////// UPDATE DISTR ///////////////
@@ -226,6 +226,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         init_measure_time;
         ComputeResiduals(Cells, Residuals, sumVel0, sumVel1, sumRho0, sumRho1, CalculateDragLift, &iter, Iterations,c);
         end_measure_time(tResiduals);
+
         //printf("T %i, Residuals\n",MYTHREAD);
 
         if(MYTHREAD==0)
@@ -266,7 +267,9 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         auto_save(AutosaveAfter, AutosaveEvery, postproc_prog);
 
     }
+
     test_all(Cells,iter);
+
     //fclose(testing_file);
 //////////////////////////////////////////////////////
 ////////////// END OF MAIN WHILE CYCLE ///////////////
@@ -278,8 +281,8 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
 
 void putCellsToShared(){
 //                     DESTINATION                           SOURCE                            SIZE
-    upc_memput( &BCells[    2 * LAYER * MYTHREAD   ], &Cells[       LAYER       ], LAYER * sizeof(CellProps) ); // FIRST LAYER
-    upc_memput( &BCells[ LAYER * (2 * MYTHREAD + 1)], &Cells[ LAYER + BLOCKSIZE ], LAYER * sizeof(CellProps) ); // LAST LAYER
+    upc_memput( &BCells[    2 * LAYER * MYTHREAD   ], &Cells[   LAYER   ], LAYER * sizeof(CellProps) ); // FIRST LAYER
+    upc_memput( &BCells[ LAYER * (2 * MYTHREAD + 1)], &Cells[ BLOCKSIZE ], LAYER * sizeof(CellProps) ); // LAST LAYER
 }
 void getSharedToCells(){
 
@@ -490,7 +493,7 @@ void time_meas_vars_init() {// Time measurement variables
 void alloc_cells() {//////////////////////////////////////////////////////
     // Allocate structure for the cell properties (see ShellFunctions.h)
     WCells = (shared_block(BLOCKSIZE)   CellProps*)upc_all_alloc(THREADS, BLOCKSIZE*sizeof(CellProps));
-    BCells = (shared_block(2*LAYER)     CellProps*)upc_all_alloc(THREADS,     LAYER*sizeof(CellProps));
+    BCells = (shared_block(2*LAYER)     CellProps*)upc_all_alloc(THREADS,     2*LAYER*sizeof(CellProps));
     Cells = calloc(BLOCKSIZE+2*LAYER,sizeof(CellProps));
     //////////////////////////////////////////////////////
 
@@ -666,7 +669,8 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
         }
     }
 }
-void write_cells_to_results(int postproc_prog) {
+void 
+write_cells_to_results(int postproc_prog) {
 
 // Write boundary cells to Results to see how mesh was distributed
     if(MYTHREAD==0)
@@ -899,7 +903,6 @@ void print_cell_line(FILE* file, const CellProps* Cell) {
             Cell->CoordZ
     );
 }
-
 
 //Other functions
 CellProps* cell_from_id(CellProps* Cells, int ID){

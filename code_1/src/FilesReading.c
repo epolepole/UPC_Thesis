@@ -195,15 +195,15 @@ void CompDataNode(float **Nodes)
   {
     if(Nodes[i][0]==0 && Nodes[i][1]==0)
     {
-      DeltaP1=Nodes[i][2];
+      DeltaP1=Nodes[i][3];
     }
     if(Nodes[i][0]==1 && Nodes[i][1]==0)
     {
-      DeltaP2=Nodes[i][2];
+      DeltaP2=Nodes[i][3];
     }
   }
 
-  *Delta = (max(DeltaP1,DeltaP2)-min(DeltaP1,DeltaP2)); // grid spacing 
+  *Delta = (max(DeltaP1,DeltaP2)-min(DeltaP1,DeltaP2)); // grid spacing
 }
 
 

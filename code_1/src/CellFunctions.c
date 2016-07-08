@@ -167,9 +167,8 @@ void CellIni(CellProps *Cells,
         (Cells + index_Cell)->Fluid  = (int) Nod[i][6];
 
         // Which thread does it belongs to
-        //(Cells + index_Cell)->ThreadNumber = MYTHREAD;
-        // Implemented in iterate.c search: upc_forall(i = 0; i < 2*LAYER*THREADS; i++; &BCells[i]) { (BCells+i)->ThreadNumber = MYTHREAD; }
-
+        (Cells + index_Cell)->ThreadNumber = MYTHREAD;
+        
         // INITIALIZE VARIABLEs
         (Cells + index_Cell)->U   = 0;
         (Cells + index_Cell)->V   = 0;
@@ -494,7 +493,7 @@ void CellIni(CellProps *Cells,
         }
 
 
-        (Cells + index_Cell)->U = (Cells + index_Cell)->Uo; // ???????????????????????????????????
+        (Cells + index_Cell)->U = (Cells + index_Cell)->Uo;
         (Cells + index_Cell)->V = (Cells + index_Cell)->Vo;
         (Cells + index_Cell)->W = (Cells + index_Cell)->Wo;
 
@@ -531,7 +530,7 @@ void D3Q19Vars(double* w, int* cx, int* cy, int* cz, int* opp, int* c)
     for (i=1; i<7; i++ )
         w[i]=2./36.;
 
-    for (i=7; i<18; i++ )
+    for (i=7; i<19; i++ )
         w[i]=1./36.;
 
     cx[0]  =  0;

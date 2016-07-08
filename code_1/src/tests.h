@@ -13,10 +13,10 @@ FILE* tests_file;
 
 
 void init_tests();
-void test_all(CellProps* Cells,int* iter);
+void test_all(CellProps* Cells,int iter);
 void end_tests();
 void test_stream(int ID, CellProps* Cells, int iter);
-void test_collision(CellProps* Cells, int iter);
+void test_boundaries(CellProps* Cells, int iter);
 
 
 

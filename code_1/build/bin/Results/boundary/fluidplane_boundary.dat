@@ -2,22 +2,6 @@ Printing from thread 0
    ID   |  i |  j |  k ||    x    |    y    |    z
 Printing from thread 1
    ID   |  i |  j |  k ||    x    |    y    |    z
-Printing from thread 2
-   ID   |  i |  j |  k ||    x    |    y    |    z
-Printing from thread 3
-   ID   |  i |  j |  k ||    x    |    y    |    z
-Printing from thread 4
-   ID   |  i |  j |  k ||    x    |    y    |    z
-Printing from thread 5
-   ID   |  i |  j |  k ||    x    |    y    |    z
-Printing from thread 6
-   ID   |  i |  j |  k ||    x    |    y    |    z
-Printing from thread 7
-   ID   |  i |  j |  k ||    x    |    y    |    z
-Printing from thread 8
-   ID   |  i |  j |  k ||    x    |    y    |    z
-Printing from thread 9
-   ID   |  i |  j |  k ||    x    |    y    |    z
   26131 |  1 |  1 | 29 || 0.03448 | 0.03448 | 1.00000 
   26132 |  2 |  1 | 29 || 0.06897 | 0.03448 | 1.00000 
   26133 |  3 |  1 | 29 || 0.10345 | 0.03448 | 1.00000 

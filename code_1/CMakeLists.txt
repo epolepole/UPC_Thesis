@@ -1,17 +1,17 @@
 #CMakeLists.txt
-
+set(CMAKE_C_COMPILER /usr/local/berkeley_upc/bin/upcc)
 
 cmake_minimum_required (VERSION 2.6)
 project (thesis_upc)
 
 
-#set(UPC "")
+set(UPC "")
 
-if(DEFINED UPC)
-	set(CMAKE_C_COMPILER /usr/local/berkeley_upc/bin/upcc)
-else(DEFINED UPC)
-	set(CMAKE_C_COMPILER /usr/bin/gcc)
-endif(DEFINED UPC)
+#if(DEFINED UPC)
+#	set(CMAKE_C_COMPILER /usr/local/berkeley_upc/bin/upcc)
+#else(DEFINED UPC)
+#	set(CMAKE_C_COMPILER /usr/bin/gcc)
+#endif(DEFINED UPC)
 
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build/bin")
 set(CMAKE_BINARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/build")
@@ -31,8 +31,10 @@ endif(NOT DEFINED THREADS)
 
 message(STATUS "Compiling for ${THREADS} threads")
 
-set(CMAKE_C_FLAGS_DEBUG "-T ${THREADS} -g")
-set(CMAKE_C_FLAGS_RELEASE "-T ${THREADS}")
+#set(CMAKE_C_FLAGS_DEBUG "-T ${THREADS} -g")
+set(CMAKE_C_FLAGS_DEBUG "-T ${THREADS} -network=mpi -g")
+#set(CMAKE_C_FLAGS_RELEASE "-T ${THREADS}")
+set(CMAKE_C_FLAGS_RELEASE "-T ${THREADS} -network=mpi")
 
 
 include(CheckCSourceCompiles)

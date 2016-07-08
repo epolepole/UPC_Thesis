@@ -20,18 +20,32 @@ This is the 3D lattice Boltzmann *.log file
 >>> Drag, lift was not calculated
 
 :::: Calculated variables from mesh :::: 
->>> Grid spacing        = 0.000000
+>>> Grid spacing        = 0.034483
 >>> # of nodes in x (n) = 30
 >>> # of nodes in y (m) = 30
 >>> # of nodes in z (l) = 30
->>> NumInletNodes       = 317321136
+>>> NumInletNodes       = 200785840
 
 :::: Parallel properties :::: 
->>> # of threads        = 10
->>> BlockSize           = 2700
+>>> # of threads        = 2
+>>> BlockSize           = 13500
 
 :::: Initializing ::::
 
 :::: Initialization done! ::::
 
 :::: Start Iterations ::::
+
+Overall calculations took 4.952145 seconds
+Main while loop took 1.936523 seconds
+Initialization took 2.349251 seconds
+Collision took 3.288585 seconds
+UpdateF took 0.145858 seconds
+Streaming took 0.356741 seconds
+Calculating Boundaries took 0.075417 seconds
+Update Macroscopic took 0.204312 seconds
+Calculating Residuals took 0.218684 seconds
+Writing results took 0.426065 seconds
+Copying boundary cells took 0.143344 seconds
+
+:::: Iterations done! ::::

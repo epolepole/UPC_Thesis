@@ -15,7 +15,7 @@ void WriteResults(char* OutputFile, int* postproc_prog)
     switch(*postproc_prog)
     {
         case 1: // ParaView
-            fprintf(fp1, "x,y,u,v,vel_mag,rho,press,fluid,ThID\n");
+            fprintf(fp1, "x,y,z,u,v,w,vel_mag,rho,press,fluid,ThID\n");
             for(i = 0; i < NODES; i++)
             {
                 fprintf(fp1, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d\n",

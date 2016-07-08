@@ -224,175 +224,187 @@ void WallBC(CellProps *Cells, int i, int* opp)
     YMAX = 1;
     ZMAX = 1;
 
-    U = (Cells + i)->U; // |                             U = (Cells + i)->Uo;
-    V = (Cells + i)->V; // |---> Maybe I have to write:  V = (Cells + i)->Vo;
-    W = (Cells + i)->W; // |                             W = (Cells + i)->Wo;
+    //      Velocity of the wall depends                Velocity of the wall is read      Velocity of the      
+    //      on the velocity of the particles            from SetUpData.ini                wall is 0
+
+    //            U = (Cells + i)->U;          |          U = (Cells + i)->Uo;          |  U = 0;
+    //            V = (Cells + i)->V;          |          V = (Cells + i)->Vo;          |  V = 0;
+    //            W = (Cells + i)->W;          |          W = (Cells + i)->Wo;          |  W = 0;
+
+    U = 0;
+    V = 0;
+    W = 0;
+
 
     if ((Cells + i)->Boundary == 1) // WALL BOUNDARY
     {
-        if ((Cells + i)->Corner == 1) // CORNER -> WALL & INLET/OUTLET IN THE SAME NODE
-        {
-            printf("Corner is still being used somewhere. See WallBC in BoundaryConditions.c\n");
-        }
+      if ((Cells + i)->CoordZ == 0) // INLET PLANE xy, z=0
+      {
+          //Unknowns: Rho, f5, f11, f12, f15 and f16
+          /*
+          U = (Cells + i)->U;
+          V = (Cells + i)->V;
+          W = 0;
+          */
 
-        else // NOT A CORNER
-        {
-            if ((Cells + i)->CoordZ == 0) // INLET PLANE xy, z=0
-            {
-                //Unknowns: Rho, f5, f11, f12, f15 and f16
-                U = (Cells + i)->U;
-                V = (Cells + i)->V;
-                W = 0;
+          Rho = ((Cells + i)->F[0] + (Cells + i)->F[1] + (Cells + i)->F[2] + (Cells + i)->F[3] + (Cells + i)->F[4] +
+                 (Cells + i)->F[7] + (Cells + i)->F[8] + (Cells + i)->F[9] + (Cells + i)->F[10] +
+                 2 * ((Cells + i)->F[6] + (Cells + i)->F[13] + (Cells + i)->F[14] + (Cells + i)->F[17] +
+                      (Cells + i)->F[18])) / (1 - W);
 
-                Rho = ((Cells + i)->F[0] + (Cells + i)->F[1] + (Cells + i)->F[2] + (Cells + i)->F[3] + (Cells + i)->F[4] +
-                       (Cells + i)->F[7] + (Cells + i)->F[8] + (Cells + i)->F[9] + (Cells + i)->F[10] +
-                       2 * ((Cells + i)->F[6] + (Cells + i)->F[13] + (Cells + i)->F[14] + (Cells + i)->F[17] +
-                            (Cells + i)->F[18])) / (1 - W);
+          N1 = 0.5 * ((Cells + i)->F[1] + (Cells + i)->F[7] + (Cells + i)->F[9] - (Cells + i)->F[2] - (Cells + i)->F[8] -
+                      (Cells + i)->F[10]) - Rho * U / 3;
+          N2 = 0.5 * ((Cells + i)->F[3] + (Cells + i)->F[7] + (Cells + i)->F[8] - (Cells + i)->F[4] - (Cells + i)->F[9] -
+                      (Cells + i)->F[10]) - Rho * V / 3;
 
-                N1 = 0.5 * ((Cells + i)->F[1] + (Cells + i)->F[7] + (Cells + i)->F[9] - (Cells + i)->F[2] - (Cells + i)->F[8] -
-                            (Cells + i)->F[10]) - Rho * U / 3;
-                N2 = 0.5 * ((Cells + i)->F[3] + (Cells + i)->F[7] + (Cells + i)->F[8] - (Cells + i)->F[4] - (Cells + i)->F[9] -
-                            (Cells + i)->F[10]) - Rho * V / 3;
+          (Cells + i)->F[5] = (Cells + i)->F[6] + (Rho * W) / 3;
+          (Cells + i)->F[11] = (Cells + i)->F[14] + Rho / 6 * (W + U) - N1;
+          (Cells + i)->F[12] = (Cells + i)->F[13] + Rho / 6 * (W - U) + N1;
+          (Cells + i)->F[15] = (Cells + i)->F[18] + Rho / 6 * (W + U) - N2;
+          (Cells + i)->F[16] = (Cells + i)->F[17] + Rho / 6 * (W - U) + N2;
+      }
+      else if ((Cells + i)->CoordZ == ZMAX) // INLET PLANE xy, z=zmax
+      {
+          //Unknowns: Rho, f6, f13, f14, f17 and f18
+          /*
+          U = (Cells + i)->U;
+          V = (Cells + i)->V;
+          W = 0;
+          */
 
-                (Cells + i)->F[5] = (Cells + i)->F[6] + (Rho * W) / 3;
-                (Cells + i)->F[11] = (Cells + i)->F[14] + Rho / 6 * (W + U) - N1;
-                (Cells + i)->F[12] = (Cells + i)->F[13] + Rho / 6 * (W - U) + N1;
-                (Cells + i)->F[15] = (Cells + i)->F[18] + Rho / 6 * (W + U) - N2;
-                (Cells + i)->F[16] = (Cells + i)->F[17] + Rho / 6 * (W - U) + N2;
-            }
-            else if ((Cells + i)->CoordZ == ZMAX) // INLET PLANE xy, z=zmax
-            {
-                //Unknowns: Rho, f6, f13, f14, f17 and f18
-                U = (Cells + i)->U;
-                V = (Cells + i)->V;
-                W = 0;
+          Rho = ((Cells + i)->F[0] + (Cells + i)->F[1] + (Cells + i)->F[2] + (Cells + i)->F[3] + (Cells + i)->F[4] +
+                 (Cells + i)->F[7] + (Cells + i)->F[8] + (Cells + i)->F[9] + (Cells + i)->F[10] +
+                 2 * ((Cells + i)->F[5] + (Cells + i)->F[11] + (Cells + i)->F[12] + (Cells + i)->F[15] +
+                      (Cells + i)->F[16])) / (1 + W);
 
-                Rho = ((Cells + i)->F[0] + (Cells + i)->F[1] + (Cells + i)->F[2] + (Cells + i)->F[3] + (Cells + i)->F[4] +
-                       (Cells + i)->F[7] + (Cells + i)->F[8] + (Cells + i)->F[9] + (Cells + i)->F[10] +
-                       2 * ((Cells + i)->F[5] + (Cells + i)->F[11] + (Cells + i)->F[12] + (Cells + i)->F[15] +
-                            (Cells + i)->F[16])) / (1 + W);
+          N1 = 0.5 * ((Cells + i)->F[1] + (Cells + i)->F[7] + (Cells + i)->F[9] - (Cells + i)->F[2] - (Cells + i)->F[8] -
+                      (Cells + i)->F[10]) - Rho * U / 3;
+          N2 = 0.5 * ((Cells + i)->F[3] + (Cells + i)->F[7] + (Cells + i)->F[8] - (Cells + i)->F[4] - (Cells + i)->F[9] -
+                      (Cells + i)->F[10]) - Rho * V / 3;
 
-                N1 = 0.5 * ((Cells + i)->F[1] + (Cells + i)->F[7] + (Cells + i)->F[9] - (Cells + i)->F[2] - (Cells + i)->F[8] -
-                            (Cells + i)->F[10]) - Rho * U / 3;
-                N2 = 0.5 * ((Cells + i)->F[3] + (Cells + i)->F[7] + (Cells + i)->F[8] - (Cells + i)->F[4] - (Cells + i)->F[9] -
-                            (Cells + i)->F[10]) - Rho * V / 3;
+          (Cells + i)->F[6] = (Cells + i)->F[5] - (Rho * W) / 3;
+          (Cells + i)->F[13] = (Cells + i)->F[12] + Rho / 6 * (-W + U) - N1;
+          (Cells + i)->F[14] = (Cells + i)->F[11] + Rho / 6 * (-W - U) + N1;
+          (Cells + i)->F[17] = (Cells + i)->F[16] + Rho / 6 * (-W + U) - N2;
+          (Cells + i)->F[18] = (Cells + i)->F[15] + Rho / 6 * (-W - U) + N2;
 
-                (Cells + i)->F[6] = (Cells + i)->F[5] - (Rho * W) / 3;
-                (Cells + i)->F[13] = (Cells + i)->F[12] + Rho / 6 * (-W + U) - N1;
-                (Cells + i)->F[14] = (Cells + i)->F[11] + Rho / 6 * (-W - U) + N1;
-                (Cells + i)->F[17] = (Cells + i)->F[16] + Rho / 6 * (-W + U) - N2;
-                (Cells + i)->F[18] = (Cells + i)->F[15] + Rho / 6 * (-W - U) + N2;
+      }
 
-            }
+      else if ((Cells + i)->CoordX == 0) // INLET PLANE yz, x=0
+      {
+          //Unknowns: Rho, f1, f7, f9, f11 and f13
+          /*
+          U = 0;  
+          V = (Cells + i)->V; 
+          W = (Cells + i)->W; 
+          */
 
-            else if ((Cells + i)->CoordX == 0) // INLET PLANE yz, x=0
-            {
-                //Unknowns: Rho, f1, f7, f9, f11 and f13
-                U = 0; // |                             U = (Cells + i)->Uo;
-                V = (Cells + i)->V; // |---> Maybe I have to write:  V = (Cells + i)->Vo;
-                W = (Cells + i)->W; // |                             W = (Cells + i)->Wo;
+          Rho = ((Cells + i)->F[0] + (Cells + i)->F[3] + (Cells + i)->F[4] + (Cells + i)->F[5] + (Cells + i)->F[6] +
+                 (Cells + i)->F[15] + (Cells + i)->F[16] + (Cells + i)->F[17] + (Cells + i)->F[18] +
+                 2 *
+                 ((Cells + i)->F[2] + (Cells + i)->F[8] + (Cells + i)->F[10] + (Cells + i)->F[12] + (Cells + i)->F[14])) /
+                (1 + U);
 
-                Rho = ((Cells + i)->F[0] + (Cells + i)->F[3] + (Cells + i)->F[4] + (Cells + i)->F[5] + (Cells + i)->F[6] +
-                       (Cells + i)->F[15] + (Cells + i)->F[16] + (Cells + i)->F[17] + (Cells + i)->F[18] +
-                       2 *
-                       ((Cells + i)->F[2] + (Cells + i)->F[8] + (Cells + i)->F[10] + (Cells + i)->F[12] + (Cells + i)->F[14])) /
-                      (1 + U);
+          N1 = 0.5 *
+               ((Cells + i)->F[3] + (Cells + i)->F[15] + (Cells + i)->F[17] - (Cells + i)->F[4] - (Cells + i)->F[16] -
+                (Cells + i)->F[18]) - Rho * V / 3;
+          N2 = 0.5 *
+               ((Cells + i)->F[5] + (Cells + i)->F[15] + (Cells + i)->F[16] - (Cells + i)->F[6] - (Cells + i)->F[17] -
+                (Cells + i)->F[18]) - Rho * W / 3;
 
-                N1 = 0.5 *
-                     ((Cells + i)->F[3] + (Cells + i)->F[15] + (Cells + i)->F[17] - (Cells + i)->F[4] - (Cells + i)->F[16] -
-                      (Cells + i)->F[18]) - Rho * V / 3;
-                N2 = 0.5 *
-                     ((Cells + i)->F[5] + (Cells + i)->F[15] + (Cells + i)->F[16] - (Cells + i)->F[6] - (Cells + i)->F[17] -
-                      (Cells + i)->F[18]) - Rho * W / 3;
+          (Cells + i)->F[1] = (Cells + i)->F[2] + (Rho * U) / 3;
+          (Cells + i)->F[7] = (Cells + i)->F[10] + Rho / 6 * (U + V) - N1;
+          (Cells + i)->F[9] = (Cells + i)->F[8] + Rho / 6 * (U - V) + N1;
+          (Cells + i)->F[11] = (Cells + i)->F[14] + Rho / 6 * (U + W) - N2;
+          (Cells + i)->F[13] = (Cells + i)->F[12] + Rho / 6 * (U - W) + N2;
+      }
 
-                (Cells + i)->F[1] = (Cells + i)->F[2] + (Rho * U) / 3;
-                (Cells + i)->F[7] = (Cells + i)->F[10] + Rho / 6 * (U + V) - N1;
-                (Cells + i)->F[9] = (Cells + i)->F[8] + Rho / 6 * (U - V) + N1;
-                (Cells + i)->F[11] = (Cells + i)->F[14] + Rho / 6 * (U + W) - N2;
-                (Cells + i)->F[13] = (Cells + i)->F[12] + Rho / 6 * (U - W) + N2;
-            }
+      else if ((Cells + i)->CoordX == XMAX) // INLET PLANE yz, x=xmax
+      {
+          //Unknowns: Rho, f2, f8, f10, f12 and f14
+          /*
+          U = 0; 
+          V = (Cells + i)->V;
+          W = (Cells + i)->W;
+          */
 
-            else if ((Cells + i)->CoordX == XMAX) // INLET PLANE yz, x=xmax
-            {
-                //Unknowns: Rho, f2, f8, f10, f12 and f14
-                U = 0; // |                             U = (Cells + i)->Uo;
-                V = (Cells + i)->V; // |---> Maybe I have to write:  V = (Cells + i)->Vo;
-                W = (Cells + i)->W; // |                             W = (Cells + i)->Wo;
+          Rho = ((Cells + i)->F[0] + (Cells + i)->F[3] + (Cells + i)->F[4] + (Cells + i)->F[5] + (Cells + i)->F[6] +
+                 (Cells + i)->F[15] + (Cells + i)->F[16] + (Cells + i)->F[17] + (Cells + i)->F[18] +
+                 2 *
+                 ((Cells + i)->F[1] + (Cells + i)->F[7] + (Cells + i)->F[9] + (Cells + i)->F[11] + (Cells + i)->F[13])) /
+                (1 - U);
 
-                Rho = ((Cells + i)->F[0] + (Cells + i)->F[3] + (Cells + i)->F[4] + (Cells + i)->F[5] + (Cells + i)->F[6] +
-                       (Cells + i)->F[15] + (Cells + i)->F[16] + (Cells + i)->F[17] + (Cells + i)->F[18] +
-                       2 *
-                       ((Cells + i)->F[1] + (Cells + i)->F[7] + (Cells + i)->F[9] + (Cells + i)->F[11] + (Cells + i)->F[13])) /
-                      (1 - U);
+          N1 = 0.5 *
+               ((Cells + i)->F[3] + (Cells + i)->F[15] + (Cells + i)->F[17] - (Cells + i)->F[4] - (Cells + i)->F[16] -
+                (Cells + i)->F[18]) - Rho * V / 3;
+          N2 = 0.5 *
+               ((Cells + i)->F[5] + (Cells + i)->F[15] + (Cells + i)->F[16] - (Cells + i)->F[6] - (Cells + i)->F[17] -
+                (Cells + i)->F[18]) - Rho * W / 3;
 
-                N1 = 0.5 *
-                     ((Cells + i)->F[3] + (Cells + i)->F[15] + (Cells + i)->F[17] - (Cells + i)->F[4] - (Cells + i)->F[16] -
-                      (Cells + i)->F[18]) - Rho * V / 3;
-                N2 = 0.5 *
-                     ((Cells + i)->F[5] + (Cells + i)->F[15] + (Cells + i)->F[16] - (Cells + i)->F[6] - (Cells + i)->F[17] -
-                      (Cells + i)->F[18]) - Rho * W / 3;
-
-                (Cells + i)->F[2] = (Cells + i)->F[1] - (Rho * U) / 3;
-                (Cells + i)->F[8] = (Cells + i)->F[9] + Rho / 6 * (-U + V) - N1;
+          (Cells + i)->F[2] = (Cells + i)->F[1] - (Rho * U) / 3;
+          (Cells + i)->F[8] = (Cells + i)->F[9] + Rho / 6 * (-U + V) - N1;
                 (Cells + i)->F[10] = (Cells + i)->F[7] + Rho / 6 * (-U - V) + N1;
                 (Cells + i)->F[12] = (Cells + i)->F[13] + Rho / 6 * (-U + W) - N2;
                 (Cells + i)->F[14] = (Cells + i)->F[11] + Rho / 6 * (-U - W) + N2;
-            }
+      }
 
-            else if ((Cells + i)->CoordY == 0) // INLET PLANE xz, y=0
-            {
-                //Unknowns: Rho, f3, f7, f8, f15 and f17
-                U = (Cells + i)->U; // |                             U = (Cells + i)->Uo;
-                V = (Cells + i)->V; // |---> Maybe I have to write:  V = (Cells + i)->Vo;
-                W = 0; // |                             W = (Cells + i)->Wo;
+      else if ((Cells + i)->CoordY == 0) // INLET PLANE xz, y=0
+      {
+          //Unknowns: Rho, f3, f7, f8, f15 and f17
+          /*
+          U = (Cells + i)->U; 
+          V = (Cells + i)->V; 
+          W = 0;
+          */
+ 
+          Rho = ((Cells + i)->F[0] + (Cells + i)->F[1] + (Cells + i)->F[2] + (Cells + i)->F[5] + (Cells + i)->F[6] +
+                 (Cells + i)->F[11] + (Cells + i)->F[12] + (Cells + i)->F[13] + (Cells + i)->F[14] +
+                 2 *
+                 ((Cells + i)->F[4] + (Cells + i)->F[9] + (Cells + i)->F[10] + (Cells + i)->F[16] + (Cells + i)->F[18])) /
+                (1 - V);
+ 
+          N1 = 0.5 *
+               ((Cells + i)->F[1] + (Cells + i)->F[11] + (Cells + i)->F[13] - (Cells + i)->F[2] - (Cells + i)->F[12] -
+                (Cells + i)->F[14]) - Rho * U / 3;
+          N2 = 0.5 *
+               ((Cells + i)->F[5] + (Cells + i)->F[11] + (Cells + i)->F[12] - (Cells + i)->F[6] - (Cells + i)->F[13] -
+                (Cells + i)->F[14]) - Rho * W / 3;
+ 
+          (Cells + i)->F[3] = (Cells + i)->F[4] + (Rho * U) / 3;
+          (Cells + i)->F[7] = (Cells + i)->F[10] + Rho / 6 * (V + U) - N1;
+          (Cells + i)->F[8] = (Cells + i)->F[9] + Rho / 6 * (V - U) + N1;
+          (Cells + i)->F[15] = (Cells + i)->F[18] + Rho / 6 * (V + W) - N2;
+          (Cells + i)->F[17] = (Cells + i)->F[16] + Rho / 6 * (V - W) + N2;
+      }
 
-                Rho = ((Cells + i)->F[0] + (Cells + i)->F[1] + (Cells + i)->F[2] + (Cells + i)->F[5] + (Cells + i)->F[6] +
-                       (Cells + i)->F[11] + (Cells + i)->F[12] + (Cells + i)->F[13] + (Cells + i)->F[14] +
-                       2 *
-                       ((Cells + i)->F[4] + (Cells + i)->F[9] + (Cells + i)->F[10] + (Cells + i)->F[16] + (Cells + i)->F[18])) /
-                      (1 - V);
-
-                N1 = 0.5 *
-                     ((Cells + i)->F[1] + (Cells + i)->F[11] + (Cells + i)->F[13] - (Cells + i)->F[2] - (Cells + i)->F[12] -
-                      (Cells + i)->F[14]) - Rho * U / 3;
-                N2 = 0.5 *
-                     ((Cells + i)->F[5] + (Cells + i)->F[11] + (Cells + i)->F[12] - (Cells + i)->F[6] - (Cells + i)->F[13] -
-                      (Cells + i)->F[14]) - Rho * W / 3;
-
-                (Cells + i)->F[3] = (Cells + i)->F[4] + (Rho * U) / 3;
-                (Cells + i)->F[7] = (Cells + i)->F[10] + Rho / 6 * (V + U) - N1;
-                (Cells + i)->F[8] = (Cells + i)->F[9] + Rho / 6 * (V - U) + N1;
-                (Cells + i)->F[15] = (Cells + i)->F[18] + Rho / 6 * (V + W) - N2;
-                (Cells + i)->F[17] = (Cells + i)->F[16] + Rho / 6 * (V - W) + N2;
-            }
-
-            else if ((Cells + i)->CoordY == YMAX) // INLET PLANE xz, y=ymax
-            {
-                //Unknowns: Rho, f4, f9, f10, f16 and f18
-                U = (Cells + i)->U; // |                             U = (Cells + i)->Uo;
-                V = (Cells + i)->V; // |---> Maybe I have to write:  V = (Cells + i)->Vo;
-                W = 0; // |                             W = (Cells + i)->Wo;
-
-                Rho = ((Cells + i)->F[0] + (Cells + i)->F[1] + (Cells + i)->F[2] + (Cells + i)->F[5] + (Cells + i)->F[6] +
-                       (Cells + i)->F[11] + (Cells + i)->F[12] + (Cells + i)->F[13] + (Cells + i)->F[14] +
-                       2 *
-                       ((Cells + i)->F[3] + (Cells + i)->F[7] + (Cells + i)->F[8] + (Cells + i)->F[15] + (Cells + i)->F[17])) /
-                      (1 + V);
-
-                N1 = 0.5 *
-                     ((Cells + i)->F[1] + (Cells + i)->F[11] + (Cells + i)->F[13] - (Cells + i)->F[2] - (Cells + i)->F[12] -
-                      (Cells + i)->F[14]) - Rho * U / 3;
-                N2 = 0.5 *
-                     ((Cells + i)->F[5] + (Cells + i)->F[11] + (Cells + i)->F[12] - (Cells + i)->F[6] - (Cells + i)->F[13] -
-                      (Cells + i)->F[14]) - Rho * W / 3;
-
-                (Cells + i)->F[4] = (Cells + i)->F[3] - (Rho * U) / 3;
-                (Cells + i)->F[9] = (Cells + i)->F[8] + Rho / 6 * (-V + U) - N1;
-                (Cells + i)->F[10] = (Cells + i)->F[7] + Rho / 6 * (-V - U) + N1;
-                (Cells + i)->F[16] = (Cells + i)->F[17] + Rho / 6 * (-V + W) - N2;
-                (Cells + i)->F[18] = (Cells + i)->F[15] + Rho / 6 * (-V - W) + N2;
-            }
-        }
+      else if ((Cells + i)->CoordY == YMAX) // INLET PLANE xz, y=ymax
+      {
+          //Unknowns: Rho, f4, f9, f10, f16 and f18
+          /*
+          U = (Cells + i)->U;
+          V = (Cells + i)->V;
+          W = 0;
+          */
+ 
+          Rho = ((Cells + i)->F[0] + (Cells + i)->F[1] + (Cells + i)->F[2] + (Cells + i)->F[5] + (Cells + i)->F[6] +
+                 (Cells + i)->F[11] + (Cells + i)->F[12] + (Cells + i)->F[13] + (Cells + i)->F[14] +
+                 2 *
+                 ((Cells + i)->F[3] + (Cells + i)->F[7] + (Cells + i)->F[8] + (Cells + i)->F[15] + (Cells + i)->F[17])) /
+                (1 + V);
+ 
+          N1 = 0.5 *
+               ((Cells + i)->F[1] + (Cells + i)->F[11] + (Cells + i)->F[13] - (Cells + i)->F[2] - (Cells + i)->F[12] -
+                (Cells + i)->F[14]) - Rho * U / 3;
+          N2 = 0.5 *
+               ((Cells + i)->F[5] + (Cells + i)->F[11] + (Cells + i)->F[12] - (Cells + i)->F[6] - (Cells + i)->F[13] -
+                (Cells + i)->F[14]) - Rho * W / 3;
+ 
+          (Cells + i)->F[4] = (Cells + i)->F[3] - (Rho * U) / 3;
+          (Cells + i)->F[9] = (Cells + i)->F[8] + Rho / 6 * (-V + U) - N1;
+          (Cells + i)->F[10] = (Cells + i)->F[7] + Rho / 6 * (-V - U) + N1;
+          (Cells + i)->F[16] = (Cells + i)->F[17] + Rho / 6 * (-V + W) - N2;
+          (Cells + i)->F[18] = (Cells + i)->F[15] + Rho / 6 * (-V - W) + N2;
+      }
     }
 }
 
