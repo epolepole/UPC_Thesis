@@ -6,6 +6,15 @@ The microscopic and macroscopic variables are refreshed based on the last two fu
 
 #include "ShellFunctions.h"
 
+
+// D3Q19 Variables of the lattice
+double* w;              // weight values for the directions
+int*   cx;              // x coordinate of the discrete lattice directions
+int*   cy;              // y coordinate of the discrete lattice directions
+int*   cz;              // z coordinate of the discrete lattice directions
+int*  opp;              // opposite vector
+int*    c;              // shift of lattice directions written in vector form
+
 void D3Q19Vars(double* w, int* cx, int* cy, int* cz, int* opp, int* c);
 
 void MRTInitializer(double** tm, double** stmiv, double Omega);

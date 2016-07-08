@@ -69,13 +69,6 @@ double OmegaA;          // collision frequency from the viscosity
 double **tm;            // variable for the MRT collision model
 double **stmiv;         // variable for the MRT collision model
 
-// D3Q19 Variables of the lattice
-double* w;              // weight values for the directions
-int*   cx;              // x coordinate of the discrete lattice directions
-int*   cy;              // y coordinate of the discrete lattice directions
-int*   cz;              // z coordinate of the discrete lattice directions
-int*  opp;              // opposite vector
-int*    c;              // shift of lattice directions written in vector form
 
 
 //Init/Alloc/Free functions

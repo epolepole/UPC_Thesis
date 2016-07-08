@@ -12,7 +12,36 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7cb5bf53-186d-4ef3-819c-fd2ffae90c7b" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/CellFunctions.c" afterPath="$PROJECT_DIR$/src/CellFunctions.c" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/tests.c" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/tests.h" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/build/bin/Results/FinalData.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/build/bin/Results/ParallelTimeMeasuerment.dat" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/build/bin/Results/autosave_iter00200.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/build/bin/testingThings.txt" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/bin/LBMSolver" afterPath="$PROJECT_DIR$/build/bin/LBMSolver" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/code_1.iml" afterPath="$PROJECT_DIR$/.idea/code_1.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SetUpData.ini" afterPath="$PROJECT_DIR$/SetUpData.ini" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/bin/Results/MyBoundaryCells.csv" afterPath="$PROJECT_DIR$/build/bin/Results/MyBoundaryCells.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/bin/Results/autosave_iter00100.csv" afterPath="$PROJECT_DIR$/build/bin/Results/autosave_iter00100.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/bin/Results/boundary/corner_boundary.dat" afterPath="$PROJECT_DIR$/build/bin/Results/boundary/corner_boundary.dat" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/bin/Results/boundary/edge_boundary.dat" afterPath="$PROJECT_DIR$/build/bin/Results/boundary/edge_boundary.dat" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/bin/Results/boundary/fluidplane_boundary.dat" afterPath="$PROJECT_DIR$/build/bin/Results/boundary/fluidplane_boundary.dat" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/bin/Results/boundary/solidplane_boundary.dat" afterPath="$PROJECT_DIR$/build/bin/Results/boundary/solidplane_boundary.dat" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/bin/Results/logFile.log" afterPath="$PROJECT_DIR$/build/bin/Results/logFile.log" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/bin/Results/outCells/T_0.dat" afterPath="$PROJECT_DIR$/build/bin/Results/outCells/T_0.dat" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/bin/Results/outCells/T_1.dat" afterPath="$PROJECT_DIR$/build/bin/Results/outCells/T_1.dat" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/bin/Results/outCells/T_2.dat" afterPath="$PROJECT_DIR$/build/bin/Results/outCells/T_2.dat" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/bin/Results/outCells/T_3.dat" afterPath="$PROJECT_DIR$/build/bin/Results/outCells/T_3.dat" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/bin/Results/outCells/T_4.dat" afterPath="$PROJECT_DIR$/build/bin/Results/outCells/T_4.dat" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/bin/Results/residuals.dat" afterPath="$PROJECT_DIR$/build/bin/Results/residuals.dat" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/bin/SetUpData.ini" afterPath="$PROJECT_DIR$/build/bin/SetUpData.ini" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/include/CellFunctions.h" afterPath="$PROJECT_DIR$/include/CellFunctions.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/include/ComputeResiduals.h" afterPath="$PROJECT_DIR$/include/ComputeResiduals.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/include/Iterate.h" afterPath="$PROJECT_DIR$/include/Iterate.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ComputeResiduals.c" afterPath="$PROJECT_DIR$/src/ComputeResiduals.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Iterate.c" afterPath="$PROJECT_DIR$/src/Iterate.c" />
     </list>
     <ignored path="code_1.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -36,55 +65,56 @@
       <file leaf-file-name="Iterate.c" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Iterate.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="281">
-              <caret line="466" column="0" selection-start-line="466" selection-start-column="0" selection-end-line="466" selection-end-column="0" />
+            <state relative-caret-position="527">
+              <caret line="268" column="25" selection-start-line="268" selection-start-column="25" selection-end-line="268" selection-end-column="25" />
               <folding>
                 <element signature="e#0#52#0" expanded="true" />
                 <element signature="e#524#580#0" expanded="true" />
-                <element signature="e#9404#9783#0" expanded="false" />
-                <element signature="e#9784#10478#0" expanded="false" />
-                <element signature="e#10479#10767#0" expanded="false" />
-                <element signature="e#12102#12567#0" expanded="false" />
-                <element signature="e#12569#14552#0" expanded="false" />
-                <element signature="e#14553#14883#0" expanded="false" />
-                <element signature="e#15392#16176#0" expanded="false" />
-                <element signature="e#16178#16652#0" expanded="false" />
-                <element signature="e#16653#16941#0" expanded="false" />
-                <element signature="e#16942#17601#0" expanded="false" />
-                <element signature="e#17602#18086#0" expanded="false" />
-                <element signature="e#18087#18337#0" expanded="false" />
-                <element signature="e#18339#18621#0" expanded="false" />
-                <element signature="e#18622#18731#0" expanded="false" />
-                <element signature="e#18752#19184#0" expanded="false" />
-                <element signature="e#19187#23217#0" expanded="false" />
-                <element signature="e#23220#23916#0" expanded="false" />
-                <element signature="e#23917#24304#0" expanded="false" />
-                <element signature="e#24305#24646#0" expanded="false" />
-                <element signature="e#24647#27797#0" expanded="false" />
-                <element signature="e#27798#28683#0" expanded="false" />
-                <element signature="e#28684#32069#0" expanded="false" />
-                <element signature="e#32070#32569#0" expanded="false" />
-                <element signature="e#32572#32709#0" expanded="false" />
+                <element signature="e#9495#9874#0" expanded="false" />
+                <element signature="e#9875#10569#0" expanded="false" />
+                <element signature="e#10570#10858#0" expanded="false" />
+                <element signature="e#10859#12191#0" expanded="false" />
+                <element signature="e#12193#12658#0" expanded="false" />
+                <element signature="e#12660#14643#0" expanded="false" />
+                <element signature="e#14644#14974#0" expanded="false" />
+                <element signature="e#15483#16267#0" expanded="false" />
+                <element signature="e#16269#16743#0" expanded="false" />
+                <element signature="e#16744#17032#0" expanded="false" />
+                <element signature="e#18178#18428#0" expanded="false" />
+                <element signature="e#18430#18712#0" expanded="false" />
+                <element signature="e#18713#18822#0" expanded="false" />
+                <element signature="e#18843#19275#0" expanded="false" />
+                <element signature="e#19278#23308#0" expanded="false" />
+                <element signature="e#23311#24007#0" expanded="false" />
+                <element signature="e#24008#24395#0" expanded="false" />
+                <element signature="e#24396#24737#0" expanded="false" />
+                <element signature="e#24738#27888#0" expanded="false" />
+                <element signature="e#27889#28774#0" expanded="false" />
+                <element signature="e#28775#32160#0" expanded="false" />
+                <element signature="e#32161#32660#0" expanded="false" />
+                <element signature="e#32663#32800#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="testingThings.txt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/build/bin/testingThings.txt">
+      <file leaf-file-name="ComputeResiduals.c" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ComputeResiduals.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="23">
-              <caret line="1" column="3" selection-start-line="1" selection-start-column="3" selection-end-line="1" selection-end-column="5" />
-              <folding />
+            <state relative-caret-position="368">
+              <caret line="111" column="7" selection-start-line="111" selection-start-column="7" selection-end-line="111" selection-end-column="15" />
+              <folding>
+                <element signature="e#1#19#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SetUpData.ini" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/SetUpData.ini">
+      <file leaf-file-name="ComputeResiduals.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/include/ComputeResiduals.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="161">
-              <caret line="25" column="14" selection-start-line="25" selection-start-column="14" selection-end-line="25" selection-end-column="14" />
+            <state relative-caret-position="230">
+              <caret line="10" column="77" selection-start-line="10" selection-start-column="77" selection-end-line="10" selection-end-column="77" />
               <folding />
             </state>
           </provider>
@@ -93,35 +123,31 @@
       <file leaf-file-name="CellFunctions.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/include/CellFunctions.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="427">
+            <state relative-caret-position="345">
+              <caret line="15" column="77" selection-start-line="15" selection-start-column="77" selection-end-line="15" selection-end-column="77" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="tests.c" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/tests.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="437">
               <caret line="25" column="0" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="FilesWriting.c" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/FilesWriting.c">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="427">
-              <caret line="96" column="45" selection-start-line="96" selection-start-column="45" selection-end-line="96" selection-end-column="45" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BoundaryConditions.c" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/BoundaryConditions.c">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="358">
-              <caret line="423" column="7" selection-start-line="423" selection-start-column="7" selection-end-line="423" selection-end-column="7" />
               <folding>
-                <element signature="e#348#421#0" expanded="false" />
-                <element signature="e#9659#9732#0" expanded="false" />
-                <element signature="e#10898#10971#0" expanded="false" />
-                <element signature="e#11269#21469#0" expanded="false" />
-                <element signature="e#21472#21545#0" expanded="false" />
+                <element signature="e#44#61#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="tests.txt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/build/bin/Results/tests.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="23">
+              <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="3" selection-end-column="15" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -129,8 +155,8 @@
       <file leaf-file-name="Iterate.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/include/Iterate.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="759">
-              <caret line="33" column="11" selection-start-line="33" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
+            <state relative-caret-position="320">
+              <caret line="70" column="0" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
               <folding>
                 <element signature="e#79#97#0" expanded="true" />
               </folding>
@@ -138,35 +164,33 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ShellFunctions.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/include/ShellFunctions.h">
+      <file leaf-file-name="tests.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/tests.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2116">
-              <caret line="92" column="0" selection-start-line="92" selection-start-column="0" selection-end-line="92" selection-end-column="0" />
+            <state relative-caret-position="345">
+              <caret line="15" column="42" selection-start-line="15" selection-start-column="42" selection-end-line="15" selection-end-column="42" />
               <folding>
-                <element signature="e#1333#1838#0" expanded="false" />
+                <element signature="e#99#126#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CellFunctions.c" pinned="false" current-in-tab="true">
+      <file leaf-file-name="CellFunctions.c" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/CellFunctions.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="493">
-              <caret line="778" column="23" selection-start-line="778" selection-start-column="23" selection-end-line="778" selection-end-column="23" />
-              <folding>
-                <element signature="e#1#75#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="3457">
+              <caret line="768" column="28" selection-start-line="768" selection-start-column="28" selection-end-line="768" selection-end-column="28" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FilesReading.c" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/FilesReading.c">
+      <file leaf-file-name="SetUpData.ini" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/SetUpData.ini">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4715">
-              <caret line="205" column="5" selection-start-line="205" selection-start-column="3" selection-end-line="205" selection-end-column="8" />
+            <state relative-caret-position="101">
+              <caret line="9" column="3" selection-start-line="9" selection-start-column="3" selection-end-line="9" selection-end-column="3" />
               <folding />
             </state>
           </provider>
@@ -183,15 +207,12 @@
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/include/FilesReading.h" />
         <option value="$PROJECT_DIR$/src/FilesReading.c" />
-        <option value="$PROJECT_DIR$/include/ComputeResiduals.h" />
         <option value="$PROJECT_DIR$/clean.sh" />
         <option value="$PROJECT_DIR$/go.sh" />
         <option value="$PROJECT_DIR$/src/ShellFunctions.c" />
         <option value="$PROJECT_DIR$/build/bin/Results/outCells.dat" />
         <option value="$PROJECT_DIR$/build/bin/Results/boundary/solidplane_boundary.dat" />
         <option value="$PROJECT_DIR$/build/bin/Results/boundary/corner_boundary.dat" />
-        <option value="$PROJECT_DIR$/include/CellFunctions.h" />
-        <option value="$PROJECT_DIR$/src/ComputeResiduals.c" />
         <option value="$PROJECT_DIR$/include/BoundaryConditions.h" />
         <option value="$PROJECT_DIR$/rebuild.sh" />
         <option value="$PROJECT_DIR$/src/main.c" />
@@ -203,11 +224,18 @@
         <option value="$PROJECT_DIR$/include/ShellFunctions.h" />
         <option value="$PROJECT_DIR$/src/FilesWriting.c" />
         <option value="$PROJECT_DIR$/src/BoundaryConditions.c" />
-        <option value="$PROJECT_DIR$/SetUpData.ini" />
-        <option value="$PROJECT_DIR$/include/Iterate.h" />
         <option value="$PROJECT_DIR$/build/bin/testingThings.txt" />
-        <option value="$PROJECT_DIR$/src/Iterate.c" />
         <option value="$PROJECT_DIR$/src/CellFunctions.c" />
+        <option value="$PROJECT_DIR$/build/bin/SetUpData.ini" />
+        <option value="$PROJECT_DIR$/include/ComputeResiduals.h" />
+        <option value="$PROJECT_DIR$/build/bin/Results/tests.txt" />
+        <option value="$PROJECT_DIR$/include/Iterate.h" />
+        <option value="$PROJECT_DIR$/include/CellFunctions.h" />
+        <option value="$PROJECT_DIR$/src/tests.h" />
+        <option value="$PROJECT_DIR$/src/tests.c" />
+        <option value="$PROJECT_DIR$/src/ComputeResiduals.c" />
+        <option value="$PROJECT_DIR$/src/Iterate.c" />
+        <option value="$PROJECT_DIR$/SetUpData.ini" />
       </list>
     </option>
   </component>
@@ -291,20 +319,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="Mesh" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code_1" />
-              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="code_1" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="include" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -338,6 +352,28 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="bin" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="code_1" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="code_1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="build" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bin" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Results" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -566,23 +602,23 @@
     <frame x="1280" y="24" width="1920" height="1003" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19293621" sideWeight="0.49589685" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20664206" sideWeight="0.49589685" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1594203" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.0490524" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3449074" sideWeight="0.509375" order="1" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.03638368" sideWeight="0.490625" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20837927" sideWeight="0.490625" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32887402" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30152872" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32998884" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1444386" sideWeight="0.5041032" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -598,34 +634,11 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/Iterate.c</url>
-          <line>463</line>
-          <option name="timeStamp" value="6" />
-        </line-breakpoint>
-      </breakpoints>
-      <option name="time" value="7" />
+      <option name="time" value="8" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/ShellFunctions.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="115">
-          <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/build/src/CMakeFiles/LBMSolver.dir/C.includecache">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
-          <caret line="87" column="0" selection-start-line="87" selection-start-column="0" selection-end-line="87" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/build/bin/Results/outCells.dat" />
-    <entry file="file://$PROJECT_DIR$/build/bin/Results/outCells_4.dat" />
     <entry file="file://$PROJECT_DIR$/build/bin/Results/outCells_3.dat" />
     <entry file="file://$PROJECT_DIR$/build/bin/Results/outCells_2.dat" />
     <entry file="file://$PROJECT_DIR$/build/bin/Results/outCells_1.dat" />
@@ -655,27 +668,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ComputeResiduals.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2392">
-          <caret line="104" column="31" selection-start-line="104" selection-start-column="31" selection-end-line="104" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/include/ComputeResiduals.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="207">
-          <caret line="9" column="55" selection-start-line="9" selection-start-column="55" selection-end-line="9" selection-end-column="55" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/build/bin/SetUpData.ini">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="230">
-          <caret line="10" column="3" selection-start-line="10" selection-start-column="3" selection-end-line="10" selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/include/BoundaryConditions.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="391">
@@ -696,6 +688,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-380">
           <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="15" selection-end-column="60" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -710,13 +703,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="184">
           <caret line="8" column="22" selection-start-line="8" selection-start-column="22" selection-end-line="8" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="644">
-          <caret line="81" column="0" selection-start-line="81" selection-start-column="0" selection-end-line="81" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -802,6 +788,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="646">
           <caret line="694" column="11" selection-start-line="694" selection-start-column="11" selection-end-line="694" selection-end-column="11" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -841,90 +828,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/include/ShellFunctions.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2116">
-          <caret line="92" column="0" selection-start-line="92" selection-start-column="0" selection-end-line="92" selection-end-column="0" />
-          <folding>
-            <element signature="e#1333#1838#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/include/Iterate.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="759">
-          <caret line="33" column="11" selection-start-line="33" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
-          <folding>
-            <element signature="e#79#97#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/build/bin/testingThings.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/SetUpData.ini">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="161">
-          <caret line="25" column="14" selection-start-line="25" selection-start-column="14" selection-end-line="25" selection-end-column="14" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/build/bin/testingThings.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="23">
-          <caret line="1" column="3" selection-start-line="1" selection-start-column="3" selection-end-line="1" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/include/CellFunctions.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="427">
-          <caret line="25" column="0" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Iterate.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="281">
-          <caret line="466" column="0" selection-start-line="466" selection-start-column="0" selection-end-line="466" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#52#0" expanded="true" />
-            <element signature="e#524#580#0" expanded="true" />
-            <element signature="e#9404#9783#0" expanded="false" />
-            <element signature="e#9784#10478#0" expanded="false" />
-            <element signature="e#10479#10767#0" expanded="false" />
-            <element signature="e#12102#12567#0" expanded="false" />
-            <element signature="e#12569#14552#0" expanded="false" />
-            <element signature="e#14553#14883#0" expanded="false" />
-            <element signature="e#15392#16176#0" expanded="false" />
-            <element signature="e#16178#16652#0" expanded="false" />
-            <element signature="e#16653#16941#0" expanded="false" />
-            <element signature="e#16942#17601#0" expanded="false" />
-            <element signature="e#17602#18086#0" expanded="false" />
-            <element signature="e#18087#18337#0" expanded="false" />
-            <element signature="e#18339#18621#0" expanded="false" />
-            <element signature="e#18622#18731#0" expanded="false" />
-            <element signature="e#18752#19184#0" expanded="false" />
-            <element signature="e#19187#23217#0" expanded="false" />
-            <element signature="e#23220#23916#0" expanded="false" />
-            <element signature="e#23917#24304#0" expanded="false" />
-            <element signature="e#24305#24646#0" expanded="false" />
-            <element signature="e#24647#27797#0" expanded="false" />
-            <element signature="e#27798#28683#0" expanded="false" />
-            <element signature="e#28684#32069#0" expanded="false" />
-            <element signature="e#32070#32569#0" expanded="false" />
-            <element signature="e#32572#32709#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -950,12 +858,156 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="485">
+          <caret line="81" column="0" selection-start-line="81" selection-start-column="0" selection-end-line="81" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/ShellFunctions.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="281">
+          <caret line="83" column="1" selection-start-line="83" selection-start-column="1" selection-end-line="83" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/bin/Results/testingThings.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/bin/testingThings.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="23">
+          <caret line="1" column="3" selection-start-line="1" selection-start-column="3" selection-end-line="1" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/bin/SetUpData.ini">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="207">
+          <caret line="9" column="1" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/CellFunctions.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="493">
-          <caret line="778" column="23" selection-start-line="778" selection-start-column="23" selection-end-line="778" selection-end-column="23" />
+        <state relative-caret-position="3457">
+          <caret line="768" column="28" selection-start-line="768" selection-start-column="28" selection-end-line="768" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/CellFunctions.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="15" column="77" selection-start-line="15" selection-start-column="77" selection-end-line="15" selection-end-column="77" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/Iterate.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="320">
+          <caret line="70" column="0" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
           <folding>
-            <element signature="e#1#75#0" expanded="true" />
+            <element signature="e#79#97#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/ComputeResiduals.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="230">
+          <caret line="10" column="77" selection-start-line="10" selection-start-column="77" selection-end-line="10" selection-end-column="77" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ComputeResiduals.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="368">
+          <caret line="111" column="7" selection-start-line="111" selection-start-column="7" selection-end-line="111" selection-end-column="15" />
+          <folding>
+            <element signature="e#1#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tests.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="15" column="42" selection-start-line="15" selection-start-column="42" selection-end-line="15" selection-end-column="42" />
+          <folding>
+            <element signature="e#99#126#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Iterate.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="268" column="25" selection-start-line="268" selection-start-column="25" selection-end-line="268" selection-end-column="25" />
+          <folding>
+            <element signature="e#0#52#0" expanded="true" />
+            <element signature="e#524#580#0" expanded="true" />
+            <element signature="e#9495#9874#0" expanded="false" />
+            <element signature="e#9875#10569#0" expanded="false" />
+            <element signature="e#10570#10858#0" expanded="false" />
+            <element signature="e#10859#12191#0" expanded="false" />
+            <element signature="e#12193#12658#0" expanded="false" />
+            <element signature="e#12660#14643#0" expanded="false" />
+            <element signature="e#14644#14974#0" expanded="false" />
+            <element signature="e#15483#16267#0" expanded="false" />
+            <element signature="e#16269#16743#0" expanded="false" />
+            <element signature="e#16744#17032#0" expanded="false" />
+            <element signature="e#18178#18428#0" expanded="false" />
+            <element signature="e#18430#18712#0" expanded="false" />
+            <element signature="e#18713#18822#0" expanded="false" />
+            <element signature="e#18843#19275#0" expanded="false" />
+            <element signature="e#19278#23308#0" expanded="false" />
+            <element signature="e#23311#24007#0" expanded="false" />
+            <element signature="e#24008#24395#0" expanded="false" />
+            <element signature="e#24396#24737#0" expanded="false" />
+            <element signature="e#24738#27888#0" expanded="false" />
+            <element signature="e#27889#28774#0" expanded="false" />
+            <element signature="e#28775#32160#0" expanded="false" />
+            <element signature="e#32161#32660#0" expanded="false" />
+            <element signature="e#32663#32800#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/bin/Results/tests.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="23">
+          <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="3" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SetUpData.ini">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="101">
+          <caret line="9" column="3" selection-start-line="9" selection-start-column="3" selection-end-line="9" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tests.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="437">
+          <caret line="25" column="0" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
+          <folding>
+            <element signature="e#44#61#0" expanded="true" />
           </folding>
         </state>
       </provider>

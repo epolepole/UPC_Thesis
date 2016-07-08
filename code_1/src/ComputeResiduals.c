@@ -5,12 +5,13 @@
 #include <upc.h>                 // Required for UPC
 
 #include "ComputeResiduals.h"
+#include "tests.h"
 
 
 void ComputeResiduals(CellProps *Cells, double* Residuals,
                       double* sumVel0, double* sumVel1,
                       double* sumRho0, double* sumRho1,
-                      int ComputeDragLift, int* iter, int* Iterations)
+                      int ComputeDragLift, int* iter, int* Iterations, int* c)
 {
 
     // Update variables
@@ -107,9 +108,12 @@ void ComputeResiduals(CellProps *Cells, double* Residuals,
 
     }
 
+    upc_barrier;
     if(L2n!=L2n) // if density residuals are NaN
     {
         printf("\nDIVERGENCE!\n");
+        test_all(Cells,iter);
+        upc_barrier;
         exit(1); // ERROR!
         *iter  = *Iterations+1;
         Residuals[0] = 1;
@@ -119,6 +123,7 @@ void ComputeResiduals(CellProps *Cells, double* Residuals,
 
         //upc_global_exit(1);
         //exit(1); // ERROR!
+        end_tests();
     }
 }
 

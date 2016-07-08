@@ -14,6 +14,7 @@
 
 #include "Iterate.h"            // Iteration takes place
 #include "FilesReading.h"       // For reading files
+#include "tests.h"
 
 
 ////////////////////////////////////////////////////
@@ -37,7 +38,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
         tStart = clock(); // BEGIN OF OVERALL TIME MEASUREMENT
 
 
-
+    init_tests();
     init_vars(&postproc_prog);
 
     read_data(NodeDataFile, BCconnectorDataFile);
@@ -156,6 +157,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
 
     upc_barrier;         // Synchronise
 
+    end_tests();
     export_data(postproc_prog);
 
     upc_barrier;         // Synchronise
@@ -167,8 +169,8 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
 void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile, int *Iterations, int AutosaveAfter,
                      int AutosaveEvery, int postproc_prog, int CalculateDragLift, float ConvergenceCritVeloc,
                      float ConvergenceCritRho) {
-    testing_file = fopen(testingFileName,"w");
-    fprintf(testing_file,"  ID  j  METAF[j]  F[j]\n");
+    //testing_file = fopen(testingFileName,"w");
+    //fprintf(testing_file,"  ID  j  METAF[j]  F[j]\n");
     while (Residuals[0] > ConvergenceCritVeloc && Residuals[1] > ConvergenceCritRho && iter < (*Iterations))
         //while (false)
     {
@@ -222,7 +224,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
 
 ////////////// Residuals ///////////////
         init_measure_time;
-        ComputeResiduals(Cells, Residuals, sumVel0, sumVel1, sumRho0, sumRho1, CalculateDragLift, &iter, Iterations);
+        ComputeResiduals(Cells, Residuals, sumVel0, sumVel1, sumRho0, sumRho1, CalculateDragLift, &iter, Iterations,c);
         end_measure_time(tResiduals);
         //printf("T %i, Residuals\n",MYTHREAD);
 
@@ -233,7 +235,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
 
 
         //Thread, coords,
-        if(MYTHREAD == 0 && iter<3) {
+        /*if(MYTHREAD == 0 && iter<3) {
             for (i = 2*LAYER + NN; i < 2*LAYER+ NN + 10; i++) {
                 for (j = 0; j < 19; j++) {
                     fprintf(testing_file, "%5i %2i %7.5f %7.5f\n", (Cells + i)->ID, j, (Cells + i)->METAF[j],
@@ -250,7 +252,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
                     fprintf(testing_file, "%5i %2i %7.5f %7.5f\n", (Cells + i)->ID, j, (Cells + i)->METAF[j],
                             (Cells + i)->F[j]);
                 }
-        }
+        }*/
 
 
         if(iter%100==0 && MYTHREAD==0){
@@ -264,7 +266,8 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         auto_save(AutosaveAfter, AutosaveEvery, postproc_prog);
 
     }
-    fclose(testing_file);
+    test_all(Cells,iter);
+    //fclose(testing_file);
 //////////////////////////////////////////////////////
 ////////////// END OF MAIN WHILE CYCLE ///////////////
 //////////////////////////////////////////////////////
