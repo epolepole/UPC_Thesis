@@ -17,7 +17,8 @@ int main(int argc, char* argv[])
   // Name of folder to which we write the files
   char MainWorkDir[] = "Results";
   char OutputCellsDir[] = "Results/outCells";
-  char BoundaryFile[] = "Results/boundary";
+  char BoundaryDir[] = "Results/boundary";
+  char IterDir[] = "Results/iterations";
 
   if(MYTHREAD==0)
   {
@@ -28,7 +29,8 @@ int main(int argc, char* argv[])
     // Create the working directory, continue if it already exist!
     CreateDirectory(MainWorkDir);
     CreateDirectory(OutputCellsDir);
-    CreateDirectory(BoundaryFile);
+    CreateDirectory(BoundaryDir);
+    CreateDirectory(IterDir);
   }
   ///////////////////// Declare Simulation Variables //////////////////////
   

@@ -11,6 +11,13 @@
 #define end_measure_time(t_var) tInstant2 = clock();\
                                 t_var = t_var + (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC
 
+#if __SAVE_ITER__ == 1
+#define SAVE_ITERATION save_iteration(postproc_prog)
+#else //__PRINT_ITER__
+#define SAVE_ITERATION
+#endif //__PRINT_ITER__
+
+
 #define func_between_time(func,t_container) \
     tInstant1 = clock(); // Start measuring time\
     func;\
@@ -28,6 +35,7 @@ FILE* TimeMeasurementFile;              // file for time measurement results
 FILE* testing_file;              // file for time measurement results
 char IterOutputFile[50];                // write results to this file after the iterations
 char AutosaveOutputFile[50];            // autosave filename
+char IterationOutputFile[50];            // autosave filename
 char OutputFile[50];                    // initial data will be written to this file
 char FinalOutputFile[50];               // final data will be written to this file
 char fnMemCopyRes[50];
@@ -100,6 +108,7 @@ void print_init_info_to_log(float Uavg, float Vavg, float Wavg, float rho_ini, f
 
 
 void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog);
+void save_iteration(int postproc_prog);
 void write_cells_to_results(int postproc_prog);
 void save_init_data(int postproc_prog);
 void export_data(int postproc_prog);
@@ -140,5 +149,6 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
                int AutosaveEvery,  int postproc_prog,  int CalculateDragLift,
                float ConvergenceCritVeloc, float ConvergenceCritRho);
 
+void print_Cell(char*,CellProps*,int);
 
 #endif

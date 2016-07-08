@@ -176,6 +176,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
     {
         //printf("T %i, Starting iteration %i\n",MYTHREAD,iter);
 //////////////// COLLISION ////////////////
+        init_measure_time;
         CollisionStep(CollisionModel); ////////////////////// !!!!!!!!!!!!!!!!! CX CY!
         end_measure_time(tCollision);
 
@@ -265,6 +266,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
 
 ////////////// Autosave ///////////////
         auto_save(AutosaveAfter, AutosaveEvery, postproc_prog);
+        SAVE_ITERATION;
 
     }
 
@@ -281,7 +283,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
 
 void putCellsToShared(){
 //                     DESTINATION                           SOURCE                            SIZE
-    upc_memput( &BCells[    2 * LAYER * MYTHREAD   ], &Cells[   LAYER   ], LAYER * sizeof(CellProps) ); // FIRST LAYER
+    upc_memput( &BCells[    2 * LAYER * MYTHREAD   ], &Cells[       LAYER       ], LAYER * sizeof(CellProps) ); // FIRST LAYER
     upc_memput( &BCells[ LAYER * (2 * MYTHREAD + 1)], &Cells[ BLOCKSIZE ], LAYER * sizeof(CellProps) ); // LAST LAYER
 }
 void getSharedToCells(){
@@ -381,8 +383,10 @@ void StreamingStep(){
 void HandleBoundariesStep(int OutletProfile, int CurvedBoundaries){
     int i, j, k;
 
+
     for (int i = LAYER; i < LAYER + BLOCKSIZE; ++i)
     {
+        //Check Boundary here instead of in every function
         // INLET
         InletBC(Cells, i);
 
@@ -669,8 +673,19 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
         }
     }
 }
-void 
-write_cells_to_results(int postproc_prog) {
+void save_iteration(int postproc_prog) {
+
+    init_measure_time;
+    switch(postproc_prog) {
+        case 1: sprintf(IterationOutputFile, "Results/iterations/iter.csv.%i", iter); break;
+        case 2: sprintf(IterationOutputFile, "Results/iterations/iter.dat.%i", iter); break; }
+    putCellsToWCells(); // Put information to WCells and write (Write Cells)
+    if (MYTHREAD==0) // AUTOSAVE
+        WriteResults(IterationOutputFile, ppp);
+    end_measure_time(tWriting);
+
+}
+void write_cells_to_results(int postproc_prog) {
 
 // Write boundary cells to Results to see how mesh was distributed
     if(MYTHREAD==0)
@@ -903,6 +918,7 @@ void print_cell_line(FILE* file, const CellProps* Cell) {
             Cell->CoordZ
     );
 }
+
 
 //Other functions
 CellProps* cell_from_id(CellProps* Cells, int ID){

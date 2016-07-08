@@ -26,45 +26,37 @@ void test_stream(int ID,CellProps* Cells,int iter) {
     double temp = 0;
     E = 0;
     L2 = 0;
-
-    upc_barrier;
-    if (MYTHREAD == 0) 
-    {
-        //printf(tests_file);
-        //printf("\n");
+	upc_barrier;
+    if (MYTHREAD == 0) {
         tests_file = fopen(tests_file_name, "w");
         fprintf(tests_file, "****Streaming Test****\n\n");
         fprintf(tests_file, "Iteration %i\n", iter);
         fprintf(tests_file, "    ID = %i:\n", ID);
         fclose(tests_file);
-        printf("****Streaming Test****\n\n");
-        /*printf("Iteration %i\n", iter);
-        printf("    ID = %i:\n", ID);*/
     }
     upc_barrier;
 
-    for(int T = 0; T<THREADS;T++) 
-    {
-        if(MYTHREAD == T) 
-        {
+    for(int T = 0; T<THREADS;T++) {
+        if(MYTHREAD == T) {
             tests_file = fopen(tests_file_name, "a");
             fprintf(tests_file,"        Thread %i\n",T);
-            printf("        Thread %i\n",T);
-            for (int j = 0; j<19; j++) 
-            {
-                temp = pow(Cells[ID +c[j]].METAF[j]-Cells[ID].F[j],2);
+            //printf("        Thread %i\n",T);
+            for (int j = 0; j<19; j++) {
+                temp = pow(Cells[LAYER + ID +c[j]].METAF[j]-Cells[LAYER + ID].F[j],2);
+                E = E+ temp;
+                fprintf(tests_file,"        F[%i] = %f\n", j, temp);
                 fprintf(tests_file,"        Error[%i] = %f\n", j, temp);
-            }
+                            }
+            fclose(tests_file);
         }
         upc_barrier;
     }
-
-    fclose(tests_file);
 }
 
 void test_boundaries(CellProps* Cells,int iter) {
 
     int ID;
+    int T;
     double temp;
     if (MYTHREAD == 0) {
         tests_file = fopen(tests_file_name, "a");
@@ -73,16 +65,11 @@ void test_boundaries(CellProps* Cells,int iter) {
         fclose(tests_file);
     }
 
-    ID = (15 + 0 * NN + 10 * LAYER);
-    if(MYTHREAD == 0) {
-        tests_file = fopen(tests_file_name, "a");
-        fprintf(tests_file, "    ID = %i:\n", ID);
-        fclose(tests_file);
-    }
-
+    
     for(int T = 0; T<THREADS;T++) {
         if(MYTHREAD == T) {
             tests_file = fopen(tests_file_name, "a");
+        fprintf(tests_file, "    ID = %i:\n", ID);
             fprintf(tests_file,"        Thread %i\n",T);
             int j [5] = {4,9,10,16,18};
             for (int k = 0; k<5;k ++) {
@@ -93,4 +80,7 @@ void test_boundaries(CellProps* Cells,int iter) {
         }
         upc_barrier;
     }
+
+void test_collision(CellProps* Cells,int iter) {
+
 }

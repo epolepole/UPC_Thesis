@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 tOverall 4.952145
 tIteration 1.936523
 tInitialization 2.349251
@@ -10,3 +11,17 @@ tResiduals 0.218684
 tWriting 0.426065
 tBCells 0.143344
 THREADS 2
+=======
+tOverall 4.413294
+tIteration 3.095897
+tInitialization 0.828448
+tCollision 0.011611
+tUpdateF 0.004592
+tStreaming 0.039443
+tBoundaries 0.006413
+tUpdateMacro 0.012449
+tResiduals 0.013474
+tWriting 2.992162
+tBCells 0.011954
+THREADS 5
+>>>>>>> iteration_export

@@ -157,6 +157,8 @@ void CellIni(CellProps *Cells,
 
         // FIND ID of the actual cell
         (Cells + index_Cell)->ID = i;
+        (Cells + index_Cell)->ThreadNumber = MYTHREAD;
+
 
         // FIND X, Y and Z of the actual cell
         (Cells + index_Cell)->CoordX = Nod[i][3];
@@ -639,7 +641,8 @@ void D3Q19Vars(double* w, int* cx, int* cy, int* cz, int* opp, int* c)
     c[17] =    -1*NN +1*LAYER; //         (j-1)   (k+1)
     c[18] =       NN +1*LAYER; //         (j+1)   (k+1)
 
-} // End of function
+}
+// End of function
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
@@ -799,4 +802,12 @@ void UpdateMacroscopic(CellProps *Cells, int i, int* cx, int* cy, int* cz, int C
         (Cells+i)->LiftF  = ((Cells+i)->Rho)/3*(20-(Cells+i)->CoordZ)/5;
     }
 
+}
+
+int getIndex(const int x, const int y, const int z) {
+    return x + y * NN + (z + MYTHREAD * LAYERS_PER_THREAD) * LAYER + LAYER;
+}
+
+int getThread(int index) {
+    return index/BLOCKSIZE;
 }
