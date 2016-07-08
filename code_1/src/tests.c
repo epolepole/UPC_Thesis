@@ -65,22 +65,22 @@ void test_boundaries(CellProps* Cells,int iter) {
         fclose(tests_file);
     }
 
-    
-    for(int T = 0; T<THREADS;T++) {
-        if(MYTHREAD == T) {
+
+    for (int T = 0; T < THREADS; T++) {
+        if (MYTHREAD == T) {
             tests_file = fopen(tests_file_name, "a");
-        fprintf(tests_file, "    ID = %i:\n", ID);
-            fprintf(tests_file,"        Thread %i\n",T);
-            int j [5] = {4,9,10,16,18};
-            for (int k = 0; k<5;k ++) {
-                temp = pow(Cells[LAYER + ID].F[j[k]]-Cells[LAYER + ID].F[opp[k]],2);
-                fprintf(tests_file,"        Error[%i] = %f\n", j[k], temp);
+            fprintf(tests_file, "    ID = %i:\n", ID);
+            fprintf(tests_file, "        Thread %i\n", T);
+            int j[5] = {4, 9, 10, 16, 18};
+            for (int k = 0; k < 5; k++) {
+                temp = pow(Cells[LAYER + ID].F[j[k]] - Cells[LAYER + ID].F[opp[k]], 2);
+                fprintf(tests_file, "        Error[%i] = %f\n", j[k], temp);
             }
             fclose(tests_file);
         }
         upc_barrier;
     }
+}
 
 void test_collision(CellProps* Cells,int iter) {
-
 }

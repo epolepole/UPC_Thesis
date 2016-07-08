@@ -9,7 +9,7 @@ project (thesis_upc)
 
 if(DEFINED UPC)
 	set(CMAKE_C_COMPILER /usr/local/berkeley_upc/bin/upcc)
-message(STATUS "Using Berkeley UPC)
+	message(STATUS "Using Berkeley UPC")
 else(DEFINED UPC)
 	#set(CMAKE_C_COMPILER /usr/bin/gcc)
 	message(STATUS "Using default compiler")
