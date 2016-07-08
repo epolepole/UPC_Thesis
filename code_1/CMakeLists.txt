@@ -33,8 +33,8 @@ message(STATUS "Compiling for ${THREADS} threads")
 
 
 
-set(CMAKE_C_FLAGS_DEBUG "-T ${THREADS} -g")
-set(CMAKE_C_FLAGS_RELEASE "-T ${THREADS}")
+set(CMAKE_C_FLAGS_DEBUG "-T ${THREADS} -g -D__SAVE_ITER__=1")
+set(CMAKE_C_FLAGS_RELEASE "-T ${THREADS} -D__SAVE_ITER__=1")
 
 
 include(CheckCSourceCompiles)

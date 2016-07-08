@@ -157,6 +157,8 @@ void CellIni(CellProps *Cells,
 
         // FIND ID of the actual cell
         (Cells + index_Cell)->ID = i;
+        (Cells + index_Cell)->ThreadNumber = MYTHREAD;
+
 
         // FIND X, Y and Z of the actual cell
         (Cells + index_Cell)->CoordX = Nod[i][3];

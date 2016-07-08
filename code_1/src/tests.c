@@ -37,13 +37,13 @@ void test_stream(int ID,CellProps* Cells,int iter) {
         if(MYTHREAD == T) {
             tests_file = fopen(tests_file_name, "a");
             fprintf(tests_file,"        Thread %i\n",T);
-            printf("        Thread %i\n",T);
+            //printf("        Thread %i\n",T);
             for (int j = 0; j<19; j++) {
                 temp = pow(Cells[LAYER + ID +c[j]].METAF[j]-Cells[LAYER + ID].F[j],2);
                 E = E+ temp;
                 fprintf(tests_file,"        F[%i] = %f\n", j, temp);
                 fprintf(tests_file,"        Error[%i] = %f\n", j, temp);
-                printf("        Error[%i] = %f\n", j, temp);
+                //printf("        Error[%i] = %f\n", j, temp);
             }
             fclose(tests_file);
         }

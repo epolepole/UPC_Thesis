@@ -7,7 +7,7 @@ This is the 3D lattice Boltzmann *.log file
 >>> Wavg              : 0.000000
 >>> Initial density   : 5.0
 >>> Viscosity         : 0.01000000
->>> # of iterations   : 100
+>>> # of iterations   : 10
 >>> Autosave after    : 0
 >>> Autosave every    : 100
 >>> Convergence Veloc : -1.00000000
@@ -24,7 +24,7 @@ This is the 3D lattice Boltzmann *.log file
 >>> # of nodes in x (n) = 30
 >>> # of nodes in y (m) = 30
 >>> # of nodes in z (l) = 30
->>> NumInletNodes       = 1823006640
+>>> NumInletNodes       = -928084048
 
 :::: Parallel properties :::: 
 >>> # of threads        = 5
@@ -36,16 +36,16 @@ This is the 3D lattice Boltzmann *.log file
 
 :::: Start Iterations ::::
 
-Overall calculations took 3.043127 seconds
-Main while loop took 1.811377 seconds
-Initialization took 0.917391 seconds
-Collision took 0.350147 seconds
-UpdateF took 0.183064 seconds
-Streaming took 0.507256 seconds
-Calculating Boundaries took 0.046055 seconds
-Update Macroscopic took 0.087369 seconds
-Calculating Residuals took 0.060570 seconds
-Writing results took 0.394954 seconds
-Copying boundary cells took 0.172523 seconds
+Overall calculations took 4.413294 seconds
+Main while loop took 3.095897 seconds
+Initialization took 0.828448 seconds
+Collision took 0.011611 seconds
+UpdateF took 0.004592 seconds
+Streaming took 0.039443 seconds
+Calculating Boundaries took 0.006413 seconds
+Update Macroscopic took 0.012449 seconds
+Calculating Residuals took 0.013474 seconds
+Writing results took 2.992162 seconds
+Copying boundary cells took 0.011954 seconds
 
 :::: Iterations done! ::::

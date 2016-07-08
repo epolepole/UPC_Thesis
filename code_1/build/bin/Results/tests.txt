@@ -1,6 +1,6 @@
 ****Streaming Test****
 
-Iteration 100
+Iteration 10
     ID = 10365:
         Thread 0
         F[0] = 0.000000
@@ -199,4 +199,4 @@ Iteration 100
         Error[18] = 0.000000
 ****Boundary Test****
 
-Iteration 100
+Iteration 10

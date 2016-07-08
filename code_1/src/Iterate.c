@@ -264,6 +264,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
 
 ////////////// Autosave ///////////////
         auto_save(AutosaveAfter, AutosaveEvery, postproc_prog);
+        SAVE_ITERATION;
 
     }
     test_all(Cells,iter);
@@ -667,6 +668,18 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
             end_measure_time(tWriting);
         }
     }
+}
+void save_iteration(int postproc_prog) {
+
+    init_measure_time;
+    switch(postproc_prog) {
+        case 1: sprintf(IterationOutputFile, "Results/iterations/iter.csv.%i", iter); break;
+        case 2: sprintf(IterationOutputFile, "Results/iterations/iter.dat.%i", iter); break; }
+    putCellsToWCells(); // Put information to WCells and write (Write Cells)
+    if (MYTHREAD==0) // AUTOSAVE
+        WriteResults(IterationOutputFile, ppp);
+    end_measure_time(tWriting);
+
 }
 void write_cells_to_results(int postproc_prog) {
 
