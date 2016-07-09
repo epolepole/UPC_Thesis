@@ -52,7 +52,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     ////////////////////////////////////////////////////
 
     // Fill up D3Q19 variables
-    D3Q19Vars(w, cx, cy, cz, opp, c);
+    D3Q19Vars();
     calc_collision_freq(Viscosity);
 
 
@@ -93,7 +93,8 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
              opp,              // Opposite direction
              rho_ini);         // Initial density
     end_measure_time(tCellsInitialization);
-
+    main_thread
+    printf("Cell intialization completed\n");
     upc_barrier;
 
     print_cells_info(Cells);
@@ -185,8 +186,9 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
 ////////////// UPDATE DISTR ///////////////
         init_measure_time;
         for(i = LAYER;  i < LAYER + BLOCKSIZE;  i++)
-            UpdateF(Cells, i);
+        UpdateF(Cells, i);
         end_measure_time(tUpdateF);
+        SAVE_ITERATION;
         //printf("T %i, UpdateF\n",MYTHREAD);
 
 // PUT THREAD-BOUNDARY CELLS TO SHARED
@@ -204,11 +206,23 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         //printf("T %i, getShared to cells\n",MYTHREAD);
 
         upc_barrier;         // Synchronise
-
+        if(MYTHREAD == THREADS) {
+            printf("Before streaming\n");
+            for (j = 0; j < 19; j++)
+                printf("    ID %i: F[%i] = %.3f , ",getIndex(14, 14, 29), j, (Cells + getIndex(15, 15, 30))->F[j]);
+            printf("\n");
+        }
 ////////////// STREAMING ///////////////
         init_measure_time;
         StreamingStep();
         end_measure_time(tStreaming);
+        SAVE_ITERATION;
+        if(MYTHREAD == 0) {
+            for (j = 0; j < 19; j++);
+            printf("After streaming\n");
+            printf("    F[%i] = %f , ", j, (Cells + getIndex(15, 15, 30))->F[j]);
+            printf("\n");
+        }
         //printf("T %i, Streaming\n",MYTHREAD);
 
 ////////////// BOUNDARIES ///////////////
@@ -216,6 +230,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         HandleBoundariesStep(OutletProfile, CurvedBoundaries);
         end_measure_time(tBoundaries);
         //printf("T %i, Boundaries\n",MYTHREAD);
+        SAVE_ITERATION;
 
 // UPDATE VELOCITY AND DENSITY
         init_measure_time;
@@ -266,7 +281,6 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
 
 ////////////// Autosave ///////////////
         auto_save(AutosaveAfter, AutosaveEvery, postproc_prog);
-        SAVE_ITERATION;
 
     }
 
@@ -284,7 +298,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
 void putCellsToShared(){
 //                     DESTINATION                           SOURCE                            SIZE
     upc_memput( &BCells[    2 * LAYER * MYTHREAD   ], &Cells[       LAYER       ], LAYER * sizeof(CellProps) ); // FIRST LAYER
-    upc_memput( &BCells[ LAYER * (2 * MYTHREAD + 1)], &Cells[ BLOCKSIZE ], LAYER * sizeof(CellProps) ); // LAST LAYER
+    upc_memput( &BCells[ LAYER * (2 * MYTHREAD + 1)], &Cells[     BLOCKSIZE     ], LAYER * sizeof(CellProps) ); // LAST LAYER
 }
 void getSharedToCells(){
 
@@ -459,7 +473,7 @@ void UpdateMacroscopicStep(int CalculateDragLift){
     for(i = LAYER;  i < (LAYER+BLOCKSIZE);  i++)
     {
         if ((Cells+i)->Fluid == 1)
-            UpdateMacroscopic(Cells, i, cx, cy, cz, CalculateDragLift);
+            UpdateMacroscopic(Cells, i, CalculateDragLift);
     }
 }
 
@@ -470,6 +484,7 @@ void UpdateMacroscopicStep(int CalculateDragLift){
 //Init/Alloc/free functions
 void init_vars(int *postproc_prog) {
     iter = 0;                               // variables for loops
+    iter_counter = 0; //
     sprintf(logFile,"Results/logFile.log"); // path of the .log file
     sprintf(testingFileName,"Results/testingThings.txt");
     AutosaveI = 1;                          // autosave i variable, will be incremented after every autosave
@@ -666,7 +681,7 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
             switch(postproc_prog) {
                 case 1: sprintf(AutosaveOutputFile, "Results/autosave_iter%05d.csv", iter); break;
                 case 2: sprintf(AutosaveOutputFile, "Results/autosave_iter%05d.dat", iter); break; }
-            putCellsToWCells(Cells); // Put information to WCells and write (Write Cells)
+            putCellsToWCells(); // Put information to WCells and write (Write Cells)
             if (MYTHREAD==0) // AUTOSAVE
                 WriteResults(AutosaveOutputFile, ppp);
             end_measure_time(tWriting);
@@ -675,15 +690,16 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
 }
 void save_iteration(int postproc_prog) {
 
+    UpdateMacroscopicStep(0);
     init_measure_time;
     switch(postproc_prog) {
-        case 1: sprintf(IterationOutputFile, "Results/iterations/iter.csv.%i", iter); break;
-        case 2: sprintf(IterationOutputFile, "Results/iterations/iter.dat.%i", iter); break; }
+        case 1: sprintf(IterationOutputFile, "Results/iterations/iter.csv.%i", iter_counter); break;
+        case 2: sprintf(IterationOutputFile, "Results/iterations/iter.dat.%i", iter_counter); break; }
     putCellsToWCells(); // Put information to WCells and write (Write Cells)
     if (MYTHREAD==0) // AUTOSAVE
         WriteResults(IterationOutputFile, ppp);
     end_measure_time(tWriting);
-
+    iter_counter++;
 }
 void write_cells_to_results(int postproc_prog) {
 
@@ -778,7 +794,7 @@ void print_cells_info(CellProps* Cells) {
         {
             printf("Going to Thread %i\n",MYTHREAD);
             fprintf(out_cells_file,"Printing from thread %i\n",MYTHREAD);
-            fprintf(out_cells_file,"   ID   |  i |  j |  k ||    x    |    y    |    z\n");
+            fprintf(out_cells_file,"   ID   |  i |  j |  k ||    x    |    y    |    z   | s14 |\n");
             for(int cell_to_print = LAYER; cell_to_print< BLOCKSIZE+LAYER; cell_to_print++) {
                 print_cell_line(out_cells_file,Cells+cell_to_print);
             }
@@ -884,7 +900,7 @@ void print_boundary_type(CellProps* Cells) {
             for(int BT = 0; BT<4; BT++) {
                 FILE* b_file = fopen(b_filename[BT],"a");
                 fprintf(b_file,"Printing from thread %i\n",MYTHREAD);
-                fprintf(b_file,"   ID   |  i |  j |  k ||    x    |    y    |    z\n");
+                fprintf(b_file,"   ID   |  i |  j |  k ||    x    |    y    |    z   | s14 |\n");
                 for(int c=0;c<count_B[BT];c++){
                     print_cell_line(b_file,cell_from_id(Cells,N_B[BT][c]));
                 }
@@ -908,14 +924,15 @@ void print_cell_line(FILE* file, const CellProps* Cell) {
     index_k = index_n/(NM*NN);
     index_j = (index_n - index_k * NM* NN)/NM;
     index_i = (index_n - index_k * NM* NN - index_j * NM);
-    fprintf(file,"%7i |%3i |%3i |%3i || %5.5f | %5.5f | %5.5f \n",
+    fprintf(file,"%7i |%3i |%3i |%3i || %5.5f | %5.5f | %5.5f ||%3i \n",
             index_n,
             index_i,
             index_j,
             index_k,
             Cell->CoordX,
             Cell->CoordY,
-            Cell->CoordZ
+            Cell->CoordZ,
+            Cell->StreamLattice[14]
     );
 }
 

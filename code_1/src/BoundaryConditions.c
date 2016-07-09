@@ -27,6 +27,9 @@ void InletBC(CellProps *Cells, int i)
 
     if ((Cells + i)->Boundary == 2) // INLET BOUNDARY
     {
+
+        //printf("Cell %i is inlet\n",i + BLOCKSIZE * MYTHREAD - LAYER);
+        //printf("U(%f,%f,%f)\n",U,V,W);
         if ((Cells + i)->Corner == 1) // CORNER
         {
             printf("Something went wrong. See InletBC in BoundaryConditions.c\n");
@@ -73,7 +76,7 @@ void InletBC(CellProps *Cells, int i)
                 (Cells + i)->F[14] = (Cells + i)->F[11] + Rho / 6 * (-W - U) + N1;
                 (Cells + i)->F[17] = (Cells + i)->F[16] + Rho / 6 * (-W + U) - N2;
                 (Cells + i)->F[18] = (Cells + i)->F[15] + Rho / 6 * (-W - U) + N2;
-
+                //printf("Always ZMAX\n");
             }
 
             else if ((Cells + i)->CoordX == 0) // INLET PLANE yz, x=0

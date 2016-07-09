@@ -15,7 +15,8 @@ int*   cz;              // z coordinate of the discrete lattice directions
 int*  opp;              // opposite vector
 int*    c;              // shift of lattice directions written in vector form
 
-void D3Q19Vars(double* w, int* cx, int* cy, int* cz, int* opp, int* c);
+//void D3Q19Vars(double* w, int* cx, int* cy, int* cz, int* opp, int* c);
+void D3Q19Vars();
 
 void MRTInitializer(double** tm, double** stmiv, double Omega);
 
@@ -39,7 +40,7 @@ void MRT(CellProps *Cells, int i, double** tm, double** stmiv);
 
 void UpdateF(CellProps *Cells, int i);
 
-void UpdateMacroscopic(CellProps *Cells, int i, int* cx, int* cy, int* cz, int CalculateDragLift);
+void UpdateMacroscopic(CellProps *Cells, int i, int CalculateDragLift);
 
 void CalculateDragLiftForces(CellProps *Cells, int j, int i, int CalculateDragLift, shared int* n, shared int* m);
 

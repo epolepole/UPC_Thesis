@@ -13,7 +13,7 @@ scalar-vector-matrix allocation and this header includes the multifunctional
 #if __UPC__ == 0
 
 
-#define MYTHREAD  0
+#define MYTHREAD  (int) rand()*8
 #define THREADS  8
 
 #define shared_block(var)
