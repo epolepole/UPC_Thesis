@@ -7,4 +7,6 @@ void WriteResults(char* OutputFile, int* postproc_prog);
 
 void WriteBCells(char* OutputFile, int* postproc_prog);
 
+void WriteResults2(char* OutputFile);
+
 #endif

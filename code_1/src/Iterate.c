@@ -203,8 +203,16 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         init_measure_time;
         getSharedToCells();
         end_measure_time(tBCells);
-        //printf("T %i, getShared to cells\n",MYTHREAD);
 
+        //print_cells_info(Cells);
+
+        //sprintf(IterationOutputFile, "Results/outCells/GetShared%05d.csv", iter);
+        sprintf(IterationOutputFile, "Results/outCells/GetShared_%i.csv", iter);
+        putCellsToWCells2();
+        if (MYTHREAD==0) // AUTOSAVE
+        WriteResults2(IterationOutputFile);
+
+        //printf("T %i, getShared to cells\n",MYTHREAD);
         upc_barrier;         // Synchronise
 
 ////////////// STREAMING ///////////////
@@ -239,6 +247,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
             fprintf(resid_file,"%d %5.4e %5.4e %5.4e %f %f\n", iter, (iter+1.0)*(*Delta), Residuals[0], Residuals[1], Residuals[2], Residuals[3]);
 
         iter++; // update loop variable
+        printf("Iteration: %i\n", iter);
 
 
         //Thread, coords,
@@ -288,7 +297,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
 void putCellsToShared(){
 //                     DESTINATION                           SOURCE                            SIZE
     upc_memput( &BCells[    2 * LAYER * MYTHREAD   ], &Cells[       LAYER       ], LAYER * sizeof(CellProps) ); // FIRST LAYER
-    upc_memput( &BCells[ LAYER * (2 * MYTHREAD + 1)], &Cells[ BLOCKSIZE ], LAYER * sizeof(CellProps) ); // LAST LAYER
+    upc_memput( &BCells[ LAYER * (2 * MYTHREAD + 1)], &Cells[     BLOCKSIZE     ], LAYER * sizeof(CellProps) ); // LAST LAYER
 }
 void getSharedToCells(){
 
@@ -310,8 +319,11 @@ void getSharedToCells(){
 void putCellsToWCells(){
     //printf("Put Cells to W cells things\n");
     upc_memput( &WCells[MYTHREAD * BLOCKSIZE], &Cells[LAYER], BLOCKSIZE * sizeof(CellProps));
+}
 
-//upc_memput( &WCells[(1 -(2*MYTHREAD+2) + ( MYTHREAD*(MLIM+2)+1 ))*(*n)], &Cells[(*n)], MLIM*(*n)*sizeof(CellProps) );
+void putCellsToWCells2(){
+    //printf("Put Cells to W cells things\n");
+    upc_memput( &WCells2[MYTHREAD * (BLOCKSIZE + 2*LAYER)], &Cells[0], (2 * LAYER + BLOCKSIZE) * sizeof(CellProps));
 }
 void CollisionStep(int CollisionModel){
 
@@ -397,7 +409,6 @@ void HandleBoundariesStep(int OutletProfile, int CurvedBoundaries){
 
     for (int i = LAYER; i < LAYER + BLOCKSIZE; ++i)
     {
-        //Check Boundary here instead of in every function
         // INLET
         InletBC(Cells, i);
 
@@ -469,8 +480,8 @@ void UpdateMacroscopicStep(int CalculateDragLift){
     //for(i = NN;  i < (LAYER+1)*NN;  i++)
     for(i = LAYER;  i < (LAYER+BLOCKSIZE);  i++)
     {
-        if ((Cells+i)->Fluid == 1)
-            UpdateMacroscopic(Cells, i, CalculateDragLift);
+        //if ((Cells+i)->Fluid == 1)
+        UpdateMacroscopic(Cells, i, CalculateDragLift);
     }
 }
 
@@ -509,6 +520,7 @@ void time_meas_vars_init() {// Time measurement variables
 void alloc_cells() {//////////////////////////////////////////////////////
     // Allocate structure for the cell properties (see ShellFunctions.h)
     WCells = (shared_block(BLOCKSIZE)   CellProps*)upc_all_alloc(THREADS, BLOCKSIZE*sizeof(CellProps));
+    WCells2 = (shared_block(BLOCKSIZE + 2 * LAYER)   CellProps*)upc_all_alloc(THREADS, (BLOCKSIZE+2*LAYER)*sizeof(CellProps)); ////////////////////////// REMEMBER TO DELETE
     BCells = (shared_block(2*LAYER)     CellProps*)upc_all_alloc(THREADS,     2*LAYER*sizeof(CellProps));
     Cells = calloc(BLOCKSIZE+2*LAYER,sizeof(CellProps));
     //////////////////////////////////////////////////////
@@ -693,7 +705,7 @@ void save_iteration(int postproc_prog) {
         case 1: sprintf(IterationOutputFile, "Results/iterations/iter.csv.%i", iter_counter); break;
         case 2: sprintf(IterationOutputFile, "Results/iterations/iter.dat.%i", iter_counter); break; }
     putCellsToWCells(); // Put information to WCells and write (Write Cells)
-    int n_id = 6271;
+    /*int n_id = 6271;
     i = n_id + LAYER - MYTHREAD*BLOCKSIZE;
     if(MYTHREAD == 1)
         printf("We are on iteration the controll cell %i\n",(Cells +i)->ID);
@@ -701,7 +713,7 @@ void save_iteration(int postproc_prog) {
         printf("        F was %f\n", (Cells + i)->F[9]);
         printf("        F was %f\n", (WCells + n_id)->F[9]);
 
-    }
+    }*/
         if (MYTHREAD==0) // AUTOSAVE
         WriteResults(IterationOutputFile, ppp);
     end_measure_time(tWriting);

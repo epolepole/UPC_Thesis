@@ -15,11 +15,11 @@ void WriteResults(char* OutputFile, int* postproc_prog)
     switch(*postproc_prog)
     {
         case 1: // ParaView
-            fprintf(fp1, "X Column,Y Column,Z Column,u,v,w,vel_mag,"\
+            //fprintf(fp1, "X Column,Y Column,Z Column,u,v,w,vel_mag,"\
                     "f00,f01,f02,f03,f04,f05,f06,f07,f08,f09,f10,f11,f12,f13,f14,f15,f16,f17,f18,"\
                     "f_m00,f_m01,f_m02,f_m03,f_m04,f_m05,f_m06,f_m07,f_m08,f_m09,f_m10,f_m11,f_m12,f_m13,f_m14,f_m15,f_m16,f_m17,f_m18,"\
                     "rho,press,fluid,ThID\n");
-            for(i = 0; i < NODES; i++)
+            /*for(i = 0; i < NODES; i++)
             {
                 fprintf(fp1, "%f, %f, %f, %f, %f, %f, %f,",
                         (WCells+i)->CoordX, // x
@@ -39,7 +39,27 @@ void WriteResults(char* OutputFile, int* postproc_prog)
                         (WCells+i)->Rho,    // density
                         ((WCells+i)->Rho)/3,  // pressure
                         (WCells+i)->Fluid, // fluid or solid
-                        (WCells+i)->ThreadNumber);
+                        (WCells+i)->ThreadNumber);  */      
+
+            fprintf(fp1, "X Column,Y Column,Z Column,u,v,w,vel_mag,"\
+                         "f00,f01,f02,f03,f04,f05,f06,f07,f08,f09,f10,f11,f12,f13,f14,f15,f16,f17,f18,"\
+                         "rho\n");
+
+            for(i = 0; i < NODES; i++)
+            {
+                fprintf(fp1, "%f, %f, %f, %f, %f, %f, %f,",
+                        (WCells+i)->CoordX, // x
+                        (WCells+i)->CoordY, // y
+                        (WCells+i)->CoordZ, // z
+                        (WCells+i)->U,      // u
+                        (WCells+i)->V,      // v
+                        (WCells+i)->W,      // w
+                        sqrt(pow((WCells+i)->U,2)+pow((WCells+i)->V,2)+pow((WCells+i)->W,2)));
+                for (int j = 0; j<19; j++) {
+                    fprintf(fp1," %f,",(WCells+i)->F[j]);
+                }
+                
+                fprintf(fp1," %f\n", (WCells+i)->Rho);    // density
             }
 
             fclose(fp1);
@@ -125,3 +145,36 @@ void WriteBCells(char* OutputFile, int* postproc_prog)
             break;
     }
 }
+
+void WriteResults2(char* OutputFile)
+{
+    int i,index;                     // Loop variable
+    index = (BLOCKSIZE + 2 * LAYER) * THREADS;
+    FILE * fp1;                 // file pointer to output file
+    fp1=fopen(OutputFile, "w"); // open file
+    //upc_barrier;
+
+    fprintf(fp1, "X Column,Y Column,Z Column,u,v,w,vel_mag,"\
+                 "f00,f01,f02,f03,f04,f05,f06,f07,f08,f09,f10,f11,f12,f13,f14,f15,f16,f17,f18,"\
+                 "rho\n");
+
+    for(i = 0; i < index; i++)
+    {
+        fprintf(fp1, "%f, %f, %f, %f, %f, %f, %f,",
+                (WCells+i)->CoordX, // x
+                (WCells+i)->CoordY, // y
+                (WCells+i)->CoordZ, // z
+                (WCells+i)->U,      // u
+                (WCells+i)->V,      // v
+                (WCells+i)->W,      // w
+                sqrt(pow((WCells+i)->U,2)+pow((WCells+i)->V,2)+pow((WCells+i)->W,2)));
+        for (int j = 0; j<19; j++) 
+        {
+            fprintf(fp1," %f,",(WCells+i)->F[j]);
+        }
+        
+        fprintf(fp1," %f\n", (WCells+i)->Rho);    // density
+    }
+    fclose(fp1);
+}
+

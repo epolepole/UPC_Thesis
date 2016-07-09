@@ -768,8 +768,8 @@ void UpdateMacroscopic(CellProps *Cells, int i, int CalculateDragLift)
     double Ssum, Usum, Vsum, Wsum;
     int k;
 
-    if ((Cells+i)->Fluid==1)
-    {
+    //if ((Cells+i)->Fluid==1)
+    //{
         Ssum=0.0;
         for (k=0; k<19; k++)
             Ssum = Ssum+(Cells+i)->F[k];
@@ -790,7 +790,7 @@ void UpdateMacroscopic(CellProps *Cells, int i, int CalculateDragLift)
         (Cells+i)->U = Usum/((Cells+i)->Rho);
         (Cells+i)->V = Vsum/((Cells+i)->Rho);
         (Cells+i)->W = Wsum/((Cells+i)->Rho);
-    }
+    //}
 
     /*if ((Cells+i)->BC_ID[1]==3) // for outlet on the right
     {
