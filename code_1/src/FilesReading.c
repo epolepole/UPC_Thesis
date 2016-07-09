@@ -268,7 +268,7 @@ void ReadIniData(char* IniFileName, float* Uavg, float* Vavg, float* Wavg, float
   f_init = fopen(IniFileName,"r");           // open the file
   fscanf(f_init,"%f", Uavg);                 // U velocity to initialize
   fscanf(f_init,"%f", Vavg);                 // V velocity to initialize
-  fscanf(f_init,"%f", Wavg);                 // V velocity to initialize
+  fscanf(f_init,"%f", Wavg);                 // W velocity to initialize
   fscanf(f_init,"%f", rho_ini);              // Rho velocity to initialize
   fscanf(f_init,"%f", Viscosity);            // Viscosity
   fscanf(f_init,"%d", InletProfile);         // inlet profile (yes/no)

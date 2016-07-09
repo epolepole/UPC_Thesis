@@ -237,6 +237,7 @@ void CellIni(CellProps *Cells,
             }
         }
 
+
         //////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////
@@ -486,7 +487,7 @@ void CellIni(CellProps *Cells,
                 //(Cells + index_Cell)->Wo = ?????????
                 break;
             case 2:
-                (Cells + index_Cell)->Uo = Uavg;
+                (Cells + index_Cell)->Uo = Uavg;              
                 (Cells + index_Cell)->Vo = Vavg;
                 (Cells + index_Cell)->Wo = Wavg;
                 break;
@@ -506,7 +507,8 @@ void CellIni(CellProps *Cells,
 ========Creating constant lattice parameters========
 ==================================================*/
 
-void D3Q19Vars(double* w, int* cx, int* cy, int* cz, int* opp, int* c)
+//void D3Q19Vars(double* w, int* cx, int* cy, int* cz, int* opp, int* c)
+void D3Q19Vars()
 {
     // Fill up variables with constants
     //  ID lattice
@@ -641,6 +643,8 @@ void D3Q19Vars(double* w, int* cx, int* cy, int* cz, int* opp, int* c)
     c[18] =       NN +1*LAYER; //         (j+1)   (k+1)
 
 }
+
+
 // End of function
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -759,7 +763,7 @@ void UpdateF(CellProps *Cells, int i)
 ======Function to update the macroscopic var.=======
 ==================================================*/
 
-void UpdateMacroscopic(CellProps *Cells, int i, int* cx, int* cy, int* cz, int CalculateDragLift)
+void UpdateMacroscopic(CellProps *Cells, int i, int CalculateDragLift)
 {
     double Ssum, Usum, Vsum, Wsum;
     int k;
@@ -804,7 +808,7 @@ void UpdateMacroscopic(CellProps *Cells, int i, int* cx, int* cy, int* cz, int C
 }
 
 int getIndex(const int x, const int y, const int z) {
-    return x + y * NN + (z + MYTHREAD * LAYERS_PER_THREAD) * LAYER + LAYER;
+    return x + y * NN + (z + MYTHREAD * LAYERS_PER_THREAD) * LAYER;
 }
 
 int getThread(int index) {

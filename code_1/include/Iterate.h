@@ -43,6 +43,7 @@ char testingFileName[50];
 char logFile[50];                       // path of the .log file
 int  AutosaveI;                         // autosave i variable, will be incremented after every autosave
 int* ppp;                               // pointer of the postproc_prog variable
+int iter_counter;
 
 CellProps *Cells;                       // Struct for Cells
 
