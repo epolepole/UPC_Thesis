@@ -157,7 +157,7 @@ void CellIni(CellProps *Cells,
 
         // FIND ID of the actual cell
         (Cells + index_Cell)->ID = i;
-        (Cells + index_Cell)->ThreadNumber = MYTHREAD;
+
 
 
         // FIND X, Y and Z of the actual cell
@@ -236,7 +236,6 @@ void CellIni(CellProps *Cells,
                 }
             }
         }
-
 
         //////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////
@@ -563,8 +562,8 @@ void D3Q19Vars(double* w, int* cx, int* cy, int* cz, int* opp, int* c)
     cy[5]  =  0;
     cy[6]  =  0;
     cy[7]  =  1;
-    cy[8]  = -1;
-    cy[9]  =  1;
+    cy[8]  =  1;
+    cy[9]  = -1;
     cy[10] = -1;
     cy[11] =  0;
     cy[12] =  0;
@@ -789,10 +788,10 @@ void UpdateMacroscopic(CellProps *Cells, int i, int* cx, int* cy, int* cz, int C
         (Cells+i)->W = Wsum/((Cells+i)->Rho);
     }
 
-    if ((Cells+i)->BC_ID[1]==3) // for outlet on the right
+    /*if ((Cells+i)->BC_ID[1]==3) // for outlet on the right
     {
         (Cells+i)->V=0.0;
-    }
+    }*/
 
     //   DRAG/LIFT FORCE
     if (CalculateDragLift != 0 && (Cells+i)->BoundaryID==CalculateDragLift)

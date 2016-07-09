@@ -93,6 +93,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
              opp,              // Opposite direction
              rho_ini);         // Initial density
     end_measure_time(tCellsInitialization);
+    printf("CellIni done\n");
 
     upc_barrier;
 

@@ -2,7 +2,7 @@
 #set(CMAKE_C_COMPILER /usr/local/berkeley_upc/bin/upcc)
 
 cmake_minimum_required (VERSION 2.6)
-project (thesis_upc)
+
 
 
 #set(UPC "")
@@ -14,6 +14,8 @@ else(DEFINED UPC)
 	#set(CMAKE_C_COMPILER /usr/bin/gcc)
 	message(STATUS "Using default compiler")
 endif(DEFINED UPC)
+
+project (thesis_upc)
 
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build/bin")
 set(CMAKE_BINARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/build")
@@ -39,7 +41,7 @@ set(CMAKE_C_FLAGS_RELEASE "-T ${THREADS} -D__SAVE_ITER__=1")
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -network=mpi")
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_DEBUG} -network=mpi")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -network=mpi")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 
