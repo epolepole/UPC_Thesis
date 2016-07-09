@@ -15,7 +15,10 @@ void WriteResults(char* OutputFile, int* postproc_prog)
     switch(*postproc_prog)
     {
         case 1: // ParaView
-            fprintf(fp1, "x,y,z,u,v,w,vel_mag,f00,f01,f02,f03,f04,f05,f06,f07,f08,f09,f10,f11,f12,f13,f14,f15,f16,f17,f18,rho,press,fluid,ThID\n");
+            fprintf(fp1, "X Column,Y Column,Z Column,u,v,w,vel_mag,"\
+                    "f00,f01,f02,f03,f04,f05,f06,f07,f08,f09,f10,f11,f12,f13,f14,f15,f16,f17,f18,"\
+                    "f_m00,f_m01,f_m02,f_m03,f_m04,f_m05,f_m06,f_m07,f_m08,f_m09,f_m10,f_m11,f_m12,f_m13,f_m14,f_m15,f_m16,f_m17,f_m18,"\
+                    "rho,press,fluid,ThID\n");
             for(i = 0; i < NODES; i++)
             {
                 fprintf(fp1, "%f, %f, %f, %f, %f, %f, %f,",
@@ -28,6 +31,9 @@ void WriteResults(char* OutputFile, int* postproc_prog)
                         sqrt(pow((WCells+i)->U,2)+pow((WCells+i)->V,2)+pow((WCells+i)->W,2)));
                 for (int j = 0; j<19; j++) {
                     fprintf(fp1," %f,",(WCells+i)->F[j]);
+                }
+                for (int j = 0; j<19; j++) {
+                    fprintf(fp1," %f,",(WCells+i)->METAF[j]);
                 }
                 fprintf(fp1," %f, %f, %d, %d\n",
                         (WCells+i)->Rho,    // density

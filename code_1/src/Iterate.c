@@ -94,7 +94,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
              rho_ini);         // Initial density
     end_measure_time(tCellsInitialization);
     main_thread
-    printf("Cell intialization completed\n");
+        printf("Cell intialization completed\n");
     upc_barrier;
 
     print_cells_info(Cells);
@@ -211,8 +211,9 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         init_measure_time;
         StreamingStep();
         end_measure_time(tStreaming);
-	SAVE_ITERATION;
+        SAVE_ITERATION;
         //printf("T %i, Streaming\n",MYTHREAD);
+        upc_barrier;
 
 ////////////// BOUNDARIES ///////////////
         init_measure_time;
@@ -365,16 +366,23 @@ void CollisionStep(int CollisionModel){
     */
 
 }
-
 void StreamingStep(){
     int i, j;
     for(i = LAYER;  i < BLOCKSIZE + LAYER;  ++i)
     {
+        int n_id = 6271;
+        if(MYTHREAD == 1 && (Cells+i)->ID == n_id)
+            printf("We are on the controll cell %i\n",n_id);
         for(j = 0; j <19; j++)
         {
-
+            if(MYTHREAD == 1 && (Cells+i)->ID ==n_id && j == 9) {
+                printf("    Streaming from %i\n", j);
+                printf("        F was %f\n",(Cells +i)->F[j]);
+                printf("        F will be %f\n",(Cells + i + c[j])-> METAF[j]);
+            }
             if (((Cells+i)->StreamLattice[j]) == 1)
             {
+
                 //printf("Thread: %i, i= %i, j=%i\n",MYTHREAD,i,j);
                 //printf("(Cells + %i + %i)-> METAF[%i] = %f",i,c[j],(Cells + i + c[j])-> METAF[j]);
                 (Cells +i)->F[j] = (Cells + i + c[j])-> METAF[j];
@@ -685,9 +693,20 @@ void save_iteration(int postproc_prog) {
         case 1: sprintf(IterationOutputFile, "Results/iterations/iter.csv.%i", iter_counter); break;
         case 2: sprintf(IterationOutputFile, "Results/iterations/iter.dat.%i", iter_counter); break; }
     putCellsToWCells(); // Put information to WCells and write (Write Cells)
-    if (MYTHREAD==0) // AUTOSAVE
+    int n_id = 6271;
+    i = n_id + LAYER - MYTHREAD*BLOCKSIZE;
+    if(MYTHREAD == 1)
+        printf("We are on iteration the controll cell %i\n",(Cells +i)->ID);
+    if(MYTHREAD == 1) {
+        printf("        F was %f\n", (Cells + i)->F[9]);
+        printf("        F was %f\n", (WCells + n_id)->F[9]);
+
+    }
+        if (MYTHREAD==0) // AUTOSAVE
         WriteResults(IterationOutputFile, ppp);
     end_measure_time(tWriting);
+
+
     iter_counter++;
 }
 void write_cells_to_results(int postproc_prog) {
