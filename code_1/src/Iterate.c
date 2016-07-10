@@ -204,13 +204,11 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         getSharedToCells();
         end_measure_time(tBCells);
 
-        //print_cells_info(Cells);
-
-        //sprintf(IterationOutputFile, "Results/outCells/GetShared%05d.csv", iter);
-        sprintf(IterationOutputFile, "Results/outCells/GetShared_%i.csv", iter);
+        /*sprintf(IterationOutputFile, "Results/outCells/GetShared_%i.csv", iter);
         putCellsToWCells2();
+        upc_barrier;
         if (MYTHREAD==0) // AUTOSAVE
-        WriteResults2(IterationOutputFile);
+        WriteResults2(IterationOutputFile);*/
 
         //printf("T %i, getShared to cells\n",MYTHREAD);
         upc_barrier;         // Synchronise
@@ -382,23 +380,30 @@ void StreamingStep(){
     int i, j;
     for(i = LAYER;  i < BLOCKSIZE + LAYER;  ++i)
     {
-        int n_id = 6271;
-        if(MYTHREAD == 1 && (Cells+i)->ID == n_id)
-            printf("We are on the controll cell %i\n",n_id);
+        //int n_id = 6271;
+        //if(MYTHREAD == 1 && (Cells+i)->ID == n_id)
+            //printf("We are on the controll cell %i\n",n_id);
         for(j = 0; j <19; j++)
         {
-            if(MYTHREAD == 1 && (Cells+i)->ID ==n_id && j == 9) {
+            /*if(MYTHREAD == 1 && (Cells+i)->ID ==n_id && j == 9) {
                 printf("    Streaming from %i\n", j);
                 printf("        F was %f\n",(Cells +i)->F[j]);
                 printf("        F will be %f\n",(Cells + i + c[j])-> METAF[j]);
-            }
+            }*/
             if (((Cells+i)->StreamLattice[j]) == 1)
             {
-
                 //printf("Thread: %i, i= %i, j=%i\n",MYTHREAD,i,j);
                 //printf("(Cells + %i + %i)-> METAF[%i] = %f",i,c[j],(Cells + i + c[j])-> METAF[j]);
                 (Cells +i)->F[j] = (Cells + i + c[j])-> METAF[j];
+                /*if (i == 5 + 2*NN + LAYER)
+                {
+                    printf("ID Cell: %i\tLattice: %i\tID Cell2: %i\n",Cells[i].ID,j,Cells[i + c[j]].ID);
+                }*/
             }
+            /*else
+            {
+                printf("Cell ID: %i\tLattice: %i\n", Cells[i].ID,j);
+            }*/
         }
     }
 }

@@ -172,9 +172,9 @@ void CellIni(CellProps *Cells,
         (Cells + index_Cell)->ThreadNumber = MYTHREAD;
         
         // INITIALIZE VARIABLEs
-        (Cells + index_Cell)->U   = 0;
-        (Cells + index_Cell)->V   = 0;
-        (Cells + index_Cell)->W   = 0;
+        (Cells + index_Cell)->U   = Uavg;
+        (Cells + index_Cell)->V   = Vavg;
+        (Cells + index_Cell)->W   = Wavg;
         (Cells + index_Cell)->Rho = rho_ini;
 
         // REMEMBER BCCONNECTOR FILE
@@ -214,7 +214,7 @@ void CellIni(CellProps *Cells,
 
             //When current cell is on the con iteration
             if (
-                    ( (int)Con[j][0] == (int)Nod[i][0] )\
+                   ( (int)Con[j][0] == (int)Nod[i][0] )\
                 && ( (int)Con[j][1] == (int)Nod[i][1] )\
                 && ( (int)Con[j][2] == (int)Nod[i][2] ) )
             {

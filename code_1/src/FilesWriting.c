@@ -149,7 +149,7 @@ void WriteBCells(char* OutputFile, int* postproc_prog)
 void WriteResults2(char* OutputFile)
 {
     int i,index;                     // Loop variable
-    index = (BLOCKSIZE + 2 * LAYER) * THREADS;
+    index = 2*(2*LAYER + BLOCKSIZE);
     FILE * fp1;                 // file pointer to output file
     fp1=fopen(OutputFile, "w"); // open file
     //upc_barrier;
@@ -161,19 +161,19 @@ void WriteResults2(char* OutputFile)
     for(i = 0; i < index; i++)
     {
         fprintf(fp1, "%f, %f, %f, %f, %f, %f, %f,",
-                (WCells+i)->CoordX, // x
-                (WCells+i)->CoordY, // y
-                (WCells+i)->CoordZ, // z
-                (WCells+i)->U,      // u
-                (WCells+i)->V,      // v
-                (WCells+i)->W,      // w
-                sqrt(pow((WCells+i)->U,2)+pow((WCells+i)->V,2)+pow((WCells+i)->W,2)));
+                (WCells2+i)->CoordX, // x
+                (WCells2+i)->CoordY, // y
+                (WCells2+i)->CoordZ, // z
+                (WCells2+i)->U,      // u
+                (WCells2+i)->V,      // v
+                (WCells2+i)->W,      // w
+                sqrt(pow((WCells2+i)->U,2)+pow((WCells2+i)->V,2)+pow((WCells2+i)->W,2)));
         for (int j = 0; j<19; j++) 
         {
-            fprintf(fp1," %f,",(WCells+i)->F[j]);
+            fprintf(fp1," %f,",(WCells2+i)->F[j]);
         }
         
-        fprintf(fp1," %f\n", (WCells+i)->Rho);    // density
+        fprintf(fp1," %f\n", (WCells2+i)->Rho);    // density
     }
     fclose(fp1);
 }
