@@ -236,7 +236,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
 
 ////////////// Residuals ///////////////
         init_measure_time;
-        ComputeResiduals(Cells, Residuals, sumVel0, sumVel1, sumRho0, sumRho1, CalculateDragLift, &iter, Iterations,c);
+        ComputeResiduals(Cells, Residuals, sumVel0, sumVel1, sumRho0, sumRho1, CalculateDragLift, &iter, Iterations);
         end_measure_time(tResiduals);
 
         //printf("T %i, Residuals\n",MYTHREAD);
