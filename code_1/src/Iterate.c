@@ -273,6 +273,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
             printf("Iterations: %05d/%05d || ", iter, (*Iterations));
             printf("Residuals: l2norm  %e; L2_norm_weighted  %e\n", Residuals[0], Residuals[1]);
         }
+        
         SAVE_ITERATION;
 
         //printf("Doing step :%i\n", iter);
