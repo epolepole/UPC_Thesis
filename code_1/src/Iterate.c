@@ -188,7 +188,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         for(i = LAYER;  i < LAYER + BLOCKSIZE;  i++)
             UpdateF(Cells, i);
         end_measure_time(tUpdateF);
-        SAVE_ITERATION; //COLLISION ITER
+        //SAVE_ITERATION; //COLLISION ITER
         //printf("T %i, UpdateF\n",MYTHREAD);
 
 // PUT THREAD-BOUNDARY CELLS TO SHARED
@@ -217,7 +217,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         init_measure_time;
         StreamingStep();
         end_measure_time(tStreaming);
-        SAVE_ITERATION;    //STREAMING 1 + iter
+        //SAVE_ITERATION;    //STREAMING 1 + iter
         //printf("T %i, Streaming\n",MYTHREAD);
         upc_barrier;
 
@@ -226,7 +226,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         HandleBoundariesStep(OutletProfile, CurvedBoundaries);
         end_measure_time(tBoundaries);
         //printf("T %i, Boundaries\n",MYTHREAD);
-        SAVE_ITERATION;   //Boundaries 2 + Iter
+        //SAVE_ITERATION;   //Boundaries 2 + Iter
 
 // UPDATE VELOCITY AND DENSITY
         init_measure_time;
@@ -273,7 +273,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
             printf("Iterations: %05d/%05d || ", iter, (*Iterations));
             printf("Residuals: l2norm  %e; L2_norm_weighted  %e\n", Residuals[0], Residuals[1]);
         }
-        //SAVE_ITERATION;
+        SAVE_ITERATION;
 
         //printf("Doing step :%i\n", iter);
 

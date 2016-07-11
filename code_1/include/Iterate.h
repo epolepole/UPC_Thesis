@@ -13,9 +13,9 @@
 
 #if __SAVE_ITER__ == 0
 #define SAVE_ITERATION
-#else //__PRINT_ITER__
+#else //__SAVE_ITER__
 #define SAVE_ITERATION save_iteration(postproc_prog)
-#endif //__PRINT_ITER__
+#endif //__SAVE_ITER__
 
 
 #define func_between_time(func,t_container) \
