@@ -41,7 +41,7 @@ void WriteResults(char* OutputFile, int* postproc_prog)
                         (WCells+i)->Fluid, // fluid or solid
                         (WCells+i)->ThreadNumber);  */      
 
-            fprintf(fp1, "X Column,Y Column,Z Column,u,v,w,vel_mag,"\
+            fprintf(fp1, "Points:0,Points:1,Points:2,u,v,w,vel_mag,"\
                          "f00,f01,f02,f03,f04,f05,f06,f07,f08,f09,f10,f11,f12,f13,f14,f15,f16,f17,f18,"\
                          "rho\n");
 
