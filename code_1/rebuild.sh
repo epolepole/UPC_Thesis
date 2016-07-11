@@ -14,11 +14,16 @@ fi
 
 
 if [ $1 == "R" ] ; then
-    cmake .. -DUPC=1 -DTHREADS=$threads -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=Release -D__SAVE_ITER__=1
+    cmake .. -DUPC=1 -DTHREADS=$threads -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=Release -D__SAVE_ITER__=0
     make
 else
-    cmake .. -DUPC=1 -DTHREADS=$threads -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_BUILD_TYPE=Debug -D__SAVE_ITER__=1
-    make verbose=1
+    if [ $1 == "I" ] ; then
+        cmake .. -DUPC=1 -DTHREADS=$threads -DCMAKE_VERBOSE_MAKEFILE=OFF -DCMAKE_BUILD_TYPE=Release -D__SAVE_ITER__=1
+        make
+    else
+        cmake .. -DUPC=1 -DTHREADS=$threads -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_BUILD_TYPE=Debug -D__SAVE_ITER__=1
+        make verbose=1
+    fi
 fi
 
 cd ../

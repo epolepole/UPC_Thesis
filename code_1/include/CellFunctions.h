@@ -14,6 +14,8 @@ int*   cy;              // y coordinate of the discrete lattice directions
 int*   cz;              // z coordinate of the discrete lattice directions
 int*  opp;              // opposite vector
 int*    c;              // shift of lattice directions written in vector form
+int** norm;
+int** j_wall_unknown;
 
 //void D3Q19Vars(double* w, int* cx, int* cy, int* cz, int* opp, int* c);
 void D3Q19Vars();
@@ -32,7 +34,7 @@ void CellIni(CellProps *Cells,
              int*   opp,
              float  rho_ini);
 
-void BGKW(CellProps *Cells, int i, double* w, int* cx, int* cy, int* cz, double Omega);
+void BGKW(int i, double Omega);
 
 void TRT(CellProps *Cells, int i, double* w, int* cx, int* cy, int* opp, double Omega, double OmegaA);
 

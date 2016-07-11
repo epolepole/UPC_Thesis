@@ -2,6 +2,7 @@
 #include <math.h>                   // for sin,cos,pow... compile with -lm
 #include <stdio.h>
 #include <ShellFunctions.h>
+#include <Iterate.h>
 
 #include "CellFunctions.h"
 #include "ShellFunctions.h" // convenience
@@ -170,7 +171,7 @@ void CellIni(CellProps *Cells,
 
         // Which thread does it belongs to
         (Cells + index_Cell)->ThreadNumber = MYTHREAD;
-        
+
         // INITIALIZE VARIABLEs
         (Cells + index_Cell)->U   = Uavg;
         (Cells + index_Cell)->V   = Vavg;
@@ -214,7 +215,7 @@ void CellIni(CellProps *Cells,
 
             //When current cell is on the con iteration
             if (
-                   ( (int)Con[j][0] == (int)Nod[i][0] )\
+                    ( (int)Con[j][0] == (int)Nod[i][0] )\
                 && ( (int)Con[j][1] == (int)Nod[i][1] )\
                 && ( (int)Con[j][2] == (int)Nod[i][2] ) )
             {
@@ -487,7 +488,7 @@ void CellIni(CellProps *Cells,
                 //(Cells + index_Cell)->Wo = ?????????
                 break;
             case 2:
-                (Cells + index_Cell)->Uo = Uavg;              
+                (Cells + index_Cell)->Uo = Uavg;
                 (Cells + index_Cell)->Vo = Vavg;
                 (Cells + index_Cell)->Wo = Wavg;
                 break;
@@ -495,9 +496,20 @@ void CellIni(CellProps *Cells,
         }
 
 
-        (Cells + index_Cell)->U = (Cells + index_Cell)->Uo;
-        (Cells + index_Cell)->V = (Cells + index_Cell)->Vo;
-        (Cells + index_Cell)->W = (Cells + index_Cell)->Wo;
+        //(Cells + index_Cell)->U = (Cells + index_Cell)->Uo;
+        //(Cells + index_Cell)->V = (Cells + index_Cell)->Vo;
+        //(Cells + index_Cell)->W = (Cells + index_Cell)->Wo;
+        if((Cells + index_Cell)->CoordZ==1) {
+
+            (Cells + index_Cell)->U = (Cells + index_Cell)->Uo;
+            (Cells + index_Cell)->V = (Cells + index_Cell)->Vo;
+            (Cells + index_Cell)->W = (Cells + index_Cell)->Wo;
+        }
+        else {
+            (Cells + index_Cell)->U = 0;
+            (Cells + index_Cell)->V = 0;
+            (Cells + index_Cell)->W = 0;
+        }
 
     } // END OF for LOOP
 } // END OF FUNCTION
@@ -642,6 +654,72 @@ void D3Q19Vars()
     c[17] =    -1*NN +1*LAYER; //         (j-1)   (k+1)
     c[18] =       NN +1*LAYER; //         (j+1)   (k+1)
 
+
+
+    norm[0][0] = -1;
+    norm[0][1] = 0;
+    norm[0][2] = 0;
+
+    norm[1][0] = 1;
+    norm[1][1] = 0;
+    norm[1][2] = 0;
+
+
+    norm[2][0] = 0;
+    norm[2][1] = -1;
+    norm[2][2] = 0;
+
+    norm[3][0] = 0;
+    norm[3][1] = 1;
+    norm[3][2] = 0;
+
+
+    norm[4][0] = 0;
+    norm[4][1] = 0;
+    norm[4][2] = -1;
+
+    norm[5][0] = 0;
+    norm[5][1] = 0;
+    norm[5][2] = 1;
+
+
+    j_wall_unknown[0][0] = 1;
+    j_wall_unknown[0][1] = 7;
+    j_wall_unknown[0][2] = 9;
+    j_wall_unknown[0][3] = 11;
+    j_wall_unknown[0][4] = 13;
+
+    j_wall_unknown[1][0] = 2;
+    j_wall_unknown[1][1] = 8;
+    j_wall_unknown[1][2] = 10;
+    j_wall_unknown[1][3] = 12;
+    j_wall_unknown[1][4] = 14;
+
+    j_wall_unknown[2][0] = 3;
+    j_wall_unknown[2][1] = 7;
+    j_wall_unknown[2][2] = 8;
+    j_wall_unknown[2][3] = 15;
+    j_wall_unknown[2][4] = 17;
+
+    j_wall_unknown[3][0] = 4;
+    j_wall_unknown[3][1] = 9;
+    j_wall_unknown[3][2] = 10;
+    j_wall_unknown[3][3] = 16;
+    j_wall_unknown[3][4] = 18;
+
+    j_wall_unknown[4][0] = 5;
+    j_wall_unknown[4][1] = 11;
+    j_wall_unknown[4][2] = 12;
+    j_wall_unknown[4][3] = 15;
+    j_wall_unknown[4][4] = 16;
+
+    j_wall_unknown[5][0] = 6;
+    j_wall_unknown[5][1] = 13;
+    j_wall_unknown[5][2] = 14;
+    j_wall_unknown[5][3] = 17;
+    j_wall_unknown[5][4] = 18;
+
+
 }
 
 
@@ -659,7 +737,7 @@ void D3Q19Vars()
 =============Function for the BGKW model============
 ==================================================*/
 
-void BGKW(CellProps *Cells, int i, double* w, int* cx, int* cy, int* cz, double Omega)
+void BGKW(int i, double Omega)
 {
 
     double T1 = ((Cells+i)->U) * ((Cells+i)->U) + ((Cells+i)->V) * ((Cells+i)->V) + ((Cells+i)->W) * ((Cells+i)->W);
@@ -770,26 +848,26 @@ void UpdateMacroscopic(CellProps *Cells, int i, int CalculateDragLift)
 
     //if ((Cells+i)->Fluid==1)
     //{
-        Ssum=0.0;
-        for (k=0; k<19; k++)
-            Ssum = Ssum+(Cells+i)->F[k];
+    Ssum=0.0;
+    for (k=0; k<19; k++)
+        Ssum = Ssum+(Cells+i)->F[k];
 
-        (Cells+i)->Rho = Ssum;
+    (Cells+i)->Rho = Ssum;
 
-        //printf("Rho[%d][%d] = %f\n", j, i, Ssum);
+    //printf("Rho[%d][%d] = %f\n", j, i, Ssum);
 
-        Usum = 0.0;
-        Vsum = 0.0;
-        Wsum = 0.0;
-        for (k=0; k<19; k++)
-        {
-            Usum = Usum + ((Cells+i)->F[k])*cx[k];
-            Vsum = Vsum + ((Cells+i)->F[k])*cy[k];
-            Wsum = Wsum + ((Cells+i)->F[k])*cz[k];
-        }
-        (Cells+i)->U = Usum/((Cells+i)->Rho);
-        (Cells+i)->V = Vsum/((Cells+i)->Rho);
-        (Cells+i)->W = Wsum/((Cells+i)->Rho);
+    Usum = 0.0;
+    Vsum = 0.0;
+    Wsum = 0.0;
+    for (k=0; k<19; k++)
+    {
+        Usum = Usum + ((Cells+i)->F[k])*cx[k];
+        Vsum = Vsum + ((Cells+i)->F[k])*cy[k];
+        Wsum = Wsum + ((Cells+i)->F[k])*cz[k];
+    }
+    (Cells+i)->U = Usum/((Cells+i)->Rho);
+    (Cells+i)->V = Vsum/((Cells+i)->Rho);
+    (Cells+i)->W = Wsum/((Cells+i)->Rho);
     //}
 
     /*if ((Cells+i)->BC_ID[1]==3) // for outlet on the right

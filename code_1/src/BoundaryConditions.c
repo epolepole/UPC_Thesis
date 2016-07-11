@@ -1,8 +1,8 @@
 #include <stdio.h>                  // printf();
 #include <stdlib.h>                 // for malloc();
-#include <stdbool.h>                // for bool type variables!
-#include <math.h>                   // for sin,cos,pow... compile with -lm
-#include <upc_relaxed.h>            // Required for UPC 
+#include <CellFunctions.h>
+#include <math.h>
+#include <ShellFunctions.h>
 
 #include "BoundaryConditions.h" // convenience
 
@@ -233,7 +233,7 @@ void WallBC(CellProps *Cells, int i, int* opp)
     YMAX = 1;
     ZMAX = 1;
 
-    //      Velocity of the wall depends                Velocity of the wall is read      Velocity of the      
+    //      Velocity of the wall depends                Velocity of the wall is read      Velocity of the
     //      on the velocity of the particles            from SetUpData.ini                wall is 0
 
     //            U = (Cells + i)->U;          |          U = (Cells + i)->Uo;          |  U = 0;
@@ -247,142 +247,142 @@ void WallBC(CellProps *Cells, int i, int* opp)
 
     if ((Cells + i)->Boundary == 1) // WALL BOUNDARY
     {
-          if ((Cells + i)->CoordZ == 0) // INLET PLANE xy, z=0
-            {
-                //Unknowns: Rho, f5, f11, f12, f15 and f16
+        if ((Cells + i)->CoordZ == 0) // INLET PLANE xy, z=0
+        {
+            //Unknowns: Rho, f5, f11, f12, f15 and f16
 
-                Rho = ((Cells + i)->F[0] + (Cells + i)->F[1] + (Cells + i)->F[2] + (Cells + i)->F[3] + (Cells + i)->F[4] +
-                       (Cells + i)->F[7] + (Cells + i)->F[8] + (Cells + i)->F[9] + (Cells + i)->F[10] +
-                       2 * ((Cells + i)->F[6] + (Cells + i)->F[13] + (Cells + i)->F[14] + (Cells + i)->F[17] +
-                            (Cells + i)->F[18])) / (1 - W);
+            Rho = ((Cells + i)->F[0] + (Cells + i)->F[1] + (Cells + i)->F[2] + (Cells + i)->F[3] + (Cells + i)->F[4] +
+                   (Cells + i)->F[7] + (Cells + i)->F[8] + (Cells + i)->F[9] + (Cells + i)->F[10] +
+                   2 * ((Cells + i)->F[6] + (Cells + i)->F[13] + (Cells + i)->F[14] + (Cells + i)->F[17] +
+                        (Cells + i)->F[18])) / (1 - W);
 
-                N1 = 0.5 * ((Cells + i)->F[1] + (Cells + i)->F[7] + (Cells + i)->F[9] - (Cells + i)->F[2] - (Cells + i)->F[8] -
-                            (Cells + i)->F[10]) - Rho * U / 3;
-                N2 = 0.5 * ((Cells + i)->F[3] + (Cells + i)->F[7] + (Cells + i)->F[8] - (Cells + i)->F[4] - (Cells + i)->F[9] -
-                            (Cells + i)->F[10]) - Rho * V / 3;
+            N1 = 0.5 * ((Cells + i)->F[1] + (Cells + i)->F[7] + (Cells + i)->F[9] - (Cells + i)->F[2] - (Cells + i)->F[8] -
+                        (Cells + i)->F[10]) - Rho * U / 3;
+            N2 = 0.5 * ((Cells + i)->F[3] + (Cells + i)->F[7] + (Cells + i)->F[8] - (Cells + i)->F[4] - (Cells + i)->F[9] -
+                        (Cells + i)->F[10]) - Rho * V / 3;
 
-                (Cells + i)->F[5] = (Cells + i)->F[6] + (Rho * W) / 3;
-                (Cells + i)->F[11] = (Cells + i)->F[14] + Rho / 6 * (W + U) - N1;
-                (Cells + i)->F[12] = (Cells + i)->F[13] + Rho / 6 * (W - U) + N1;
-                (Cells + i)->F[15] = (Cells + i)->F[18] + Rho / 6 * (W + V) - N2;
-                (Cells + i)->F[16] = (Cells + i)->F[17] + Rho / 6 * (W - V) + N2;
-            }
-            else if ((Cells + i)->CoordZ == ZMAX) // INLET PLANE xy, z=zmax
-            {
-                //Unknowns: Rho, f6, f13, f14, f17 and f18
+            (Cells + i)->F[5] = (Cells + i)->F[6] + (Rho * W) / 3;
+            (Cells + i)->F[11] = (Cells + i)->F[14] + Rho / 6 * (W + U) - N1;
+            (Cells + i)->F[12] = (Cells + i)->F[13] + Rho / 6 * (W - U) + N1;
+            (Cells + i)->F[15] = (Cells + i)->F[18] + Rho / 6 * (W + V) - N2;
+            (Cells + i)->F[16] = (Cells + i)->F[17] + Rho / 6 * (W - V) + N2;
+        }
+        else if ((Cells + i)->CoordZ == ZMAX) // INLET PLANE xy, z=zmax
+        {
+            //Unknowns: Rho, f6, f13, f14, f17 and f18
 
-                Rho = ((Cells + i)->F[0] + (Cells + i)->F[1] + (Cells + i)->F[2] + (Cells + i)->F[3] + (Cells + i)->F[4] +
-                       (Cells + i)->F[7] + (Cells + i)->F[8] + (Cells + i)->F[9] + (Cells + i)->F[10] +
-                       2 * ((Cells + i)->F[5] + (Cells + i)->F[11] + (Cells + i)->F[12] + (Cells + i)->F[15] +
-                            (Cells + i)->F[16])) / (1 + W);
+            Rho = ((Cells + i)->F[0] + (Cells + i)->F[1] + (Cells + i)->F[2] + (Cells + i)->F[3] + (Cells + i)->F[4] +
+                   (Cells + i)->F[7] + (Cells + i)->F[8] + (Cells + i)->F[9] + (Cells + i)->F[10] +
+                   2 * ((Cells + i)->F[5] + (Cells + i)->F[11] + (Cells + i)->F[12] + (Cells + i)->F[15] +
+                        (Cells + i)->F[16])) / (1 + W);
 
-                N1 = 0.5 * ((Cells + i)->F[1] + (Cells + i)->F[7] + (Cells + i)->F[9] - (Cells + i)->F[2] - (Cells + i)->F[8] -
-                            (Cells + i)->F[10]) - Rho * U / 3;
-                N2 = 0.5 * ((Cells + i)->F[3] + (Cells + i)->F[7] + (Cells + i)->F[8] - (Cells + i)->F[4] - (Cells + i)->F[9] -
-                            (Cells + i)->F[10]) - Rho * V / 3;
+            N1 = 0.5 * ((Cells + i)->F[1] + (Cells + i)->F[7] + (Cells + i)->F[9] - (Cells + i)->F[2] - (Cells + i)->F[8] -
+                        (Cells + i)->F[10]) - Rho * U / 3;
+            N2 = 0.5 * ((Cells + i)->F[3] + (Cells + i)->F[7] + (Cells + i)->F[8] - (Cells + i)->F[4] - (Cells + i)->F[9] -
+                        (Cells + i)->F[10]) - Rho * V / 3;
 
-                (Cells + i)->F[6]  = (Cells + i)->F[5]  - (Rho * W) / 3;
-                (Cells + i)->F[13] = (Cells + i)->F[12] + Rho / 6 * (-W + U) - N1;
-                (Cells + i)->F[14] = (Cells + i)->F[11] + Rho / 6 * (-W - U) + N1;
-                (Cells + i)->F[17] = (Cells + i)->F[16] + Rho / 6 * (-W + V) - N2;
-                (Cells + i)->F[18] = (Cells + i)->F[15] + Rho / 6 * (-W - V) + N2;
-            }
+            (Cells + i)->F[6]  = (Cells + i)->F[5]  - (Rho * W) / 3;
+            (Cells + i)->F[13] = (Cells + i)->F[12] + Rho / 6 * (-W + U) - N1;
+            (Cells + i)->F[14] = (Cells + i)->F[11] + Rho / 6 * (-W - U) + N1;
+            (Cells + i)->F[17] = (Cells + i)->F[16] + Rho / 6 * (-W + V) - N2;
+            (Cells + i)->F[18] = (Cells + i)->F[15] + Rho / 6 * (-W - V) + N2;
+        }
 
-            else if ((Cells + i)->CoordX == 0) // INLET PLANE yz, x=0
-            {
-                //Unknowns: Rho, f1, f7, f9, f11 and f13
+        else if ((Cells + i)->CoordX == 0) // INLET PLANE yz, x=0
+        {
+            //Unknowns: Rho, f1, f7, f9, f11 and f13
 
-                Rho = ((Cells + i)->F[0] + (Cells + i)->F[3] + (Cells + i)->F[4] + (Cells + i)->F[5] + (Cells + i)->F[6] +
-                       (Cells + i)->F[15] + (Cells + i)->F[16] + (Cells + i)->F[17] + (Cells + i)->F[18] +
-                       2 *
-                       ((Cells + i)->F[2] + (Cells + i)->F[8] + (Cells + i)->F[10] + (Cells + i)->F[12] + (Cells + i)->F[14])) /
-                      (1 + U);
+            Rho = ((Cells + i)->F[0] + (Cells + i)->F[3] + (Cells + i)->F[4] + (Cells + i)->F[5] + (Cells + i)->F[6] +
+                   (Cells + i)->F[15] + (Cells + i)->F[16] + (Cells + i)->F[17] + (Cells + i)->F[18] +
+                   2 *
+                   ((Cells + i)->F[2] + (Cells + i)->F[8] + (Cells + i)->F[10] + (Cells + i)->F[12] + (Cells + i)->F[14])) /
+                  (1 + U);
 
-                N1 = 0.5 *
-                     ((Cells + i)->F[3] + (Cells + i)->F[15] + (Cells + i)->F[17] - (Cells + i)->F[4] - (Cells + i)->F[16] -
-                      (Cells + i)->F[18]) - Rho * V / 3;
-                N2 = 0.5 *
-                     ((Cells + i)->F[5] + (Cells + i)->F[15] + (Cells + i)->F[16] - (Cells + i)->F[6] - (Cells + i)->F[17] -
-                      (Cells + i)->F[18]) - Rho * W / 3;
+            N1 = 0.5 *
+                 ((Cells + i)->F[3] + (Cells + i)->F[15] + (Cells + i)->F[17] - (Cells + i)->F[4] - (Cells + i)->F[16] -
+                  (Cells + i)->F[18]) - Rho * V / 3;
+            N2 = 0.5 *
+                 ((Cells + i)->F[5] + (Cells + i)->F[15] + (Cells + i)->F[16] - (Cells + i)->F[6] - (Cells + i)->F[17] -
+                  (Cells + i)->F[18]) - Rho * W / 3;
 
-                (Cells + i)->F[1]  = (Cells + i)->F[2]  + (Rho * U) / 3;
-                (Cells + i)->F[7]  = (Cells + i)->F[10] + Rho / 6 * (U + V) - N1;
-                (Cells + i)->F[9]  = (Cells + i)->F[8]  + Rho / 6 * (U - V) + N1;
-                (Cells + i)->F[11] = (Cells + i)->F[14] + Rho / 6 * (U + W) - N2;
-                (Cells + i)->F[13] = (Cells + i)->F[12] + Rho / 6 * (U - W) + N2;
-            }
+            (Cells + i)->F[1]  = (Cells + i)->F[2]  + (Rho * U) / 3;
+            (Cells + i)->F[7]  = (Cells + i)->F[10] + Rho / 6 * (U + V) - N1;
+            (Cells + i)->F[9]  = (Cells + i)->F[8]  + Rho / 6 * (U - V) + N1;
+            (Cells + i)->F[11] = (Cells + i)->F[14] + Rho / 6 * (U + W) - N2;
+            (Cells + i)->F[13] = (Cells + i)->F[12] + Rho / 6 * (U - W) + N2;
+        }
 
-            else if ((Cells + i)->CoordX == XMAX) // INLET PLANE yz, x=xmax
-            {
-                //Unknowns: Rho, f2, f8, f10, f12 and f14
+        else if ((Cells + i)->CoordX == XMAX) // INLET PLANE yz, x=xmax
+        {
+            //Unknowns: Rho, f2, f8, f10, f12 and f14
 
-                Rho = ((Cells + i)->F[0] + (Cells + i)->F[3] + (Cells + i)->F[4] + (Cells + i)->F[5] + (Cells + i)->F[6] +
-                       (Cells + i)->F[15] + (Cells + i)->F[16] + (Cells + i)->F[17] + (Cells + i)->F[18] +
-                       2 *
-                       ((Cells + i)->F[1] + (Cells + i)->F[7] + (Cells + i)->F[9] + (Cells + i)->F[11] + (Cells + i)->F[13])) /
-                      (1 - U);
+            Rho = ((Cells + i)->F[0] + (Cells + i)->F[3] + (Cells + i)->F[4] + (Cells + i)->F[5] + (Cells + i)->F[6] +
+                   (Cells + i)->F[15] + (Cells + i)->F[16] + (Cells + i)->F[17] + (Cells + i)->F[18] +
+                   2 *
+                   ((Cells + i)->F[1] + (Cells + i)->F[7] + (Cells + i)->F[9] + (Cells + i)->F[11] + (Cells + i)->F[13])) /
+                  (1 - U);
 
-                N1 = 0.5 *
-                     ((Cells + i)->F[3] + (Cells + i)->F[15] + (Cells + i)->F[17] - (Cells + i)->F[4] - (Cells + i)->F[16] -
-                      (Cells + i)->F[18]) - Rho * V / 3;
-                N2 = 0.5 *
-                     ((Cells + i)->F[5] + (Cells + i)->F[15] + (Cells + i)->F[16] - (Cells + i)->F[6] - (Cells + i)->F[17] -
-                      (Cells + i)->F[18]) - Rho * W / 3;
+            N1 = 0.5 *
+                 ((Cells + i)->F[3] + (Cells + i)->F[15] + (Cells + i)->F[17] - (Cells + i)->F[4] - (Cells + i)->F[16] -
+                  (Cells + i)->F[18]) - Rho * V / 3;
+            N2 = 0.5 *
+                 ((Cells + i)->F[5] + (Cells + i)->F[15] + (Cells + i)->F[16] - (Cells + i)->F[6] - (Cells + i)->F[17] -
+                  (Cells + i)->F[18]) - Rho * W / 3;
 
-                (Cells + i)->F[2]  = (Cells + i)->F[1]  - (Rho * U) / 3;
-                (Cells + i)->F[8]  = (Cells + i)->F[9]  + Rho / 6 * (-U + V) - N1;
-                (Cells + i)->F[10] = (Cells + i)->F[7]  + Rho / 6 * (-U - V) + N1;
-                (Cells + i)->F[12] = (Cells + i)->F[13] + Rho / 6 * (-U + W) - N2;
-                (Cells + i)->F[14] = (Cells + i)->F[11] + Rho / 6 * (-U - W) + N2;
-            }
+            (Cells + i)->F[2]  = (Cells + i)->F[1]  - (Rho * U) / 3;
+            (Cells + i)->F[8]  = (Cells + i)->F[9]  + Rho / 6 * (-U + V) - N1;
+            (Cells + i)->F[10] = (Cells + i)->F[7]  + Rho / 6 * (-U - V) + N1;
+            (Cells + i)->F[12] = (Cells + i)->F[13] + Rho / 6 * (-U + W) - N2;
+            (Cells + i)->F[14] = (Cells + i)->F[11] + Rho / 6 * (-U - W) + N2;
+        }
 
-            else if ((Cells + i)->CoordY == 0) // INLET PLANE xz, y=0
-            {
-                //Unknowns: Rho, f3, f7, f8, f15 and f17
+        else if ((Cells + i)->CoordY == 0) // INLET PLANE xz, y=0
+        {
+            //Unknowns: Rho, f3, f7, f8, f15 and f17
 
-                Rho = ((Cells + i)->F[0] + (Cells + i)->F[1] + (Cells + i)->F[2] + (Cells + i)->F[5] + (Cells + i)->F[6] +
-                       (Cells + i)->F[11] + (Cells + i)->F[12] + (Cells + i)->F[13] + (Cells + i)->F[14] +
-                       2 *
-                       ((Cells + i)->F[4] + (Cells + i)->F[9] + (Cells + i)->F[10] + (Cells + i)->F[16] + (Cells + i)->F[18])) /
-                      (1 - V);
+            Rho = ((Cells + i)->F[0] + (Cells + i)->F[1] + (Cells + i)->F[2] + (Cells + i)->F[5] + (Cells + i)->F[6] +
+                   (Cells + i)->F[11] + (Cells + i)->F[12] + (Cells + i)->F[13] + (Cells + i)->F[14] +
+                   2 *
+                   ((Cells + i)->F[4] + (Cells + i)->F[9] + (Cells + i)->F[10] + (Cells + i)->F[16] + (Cells + i)->F[18])) /
+                  (1 - V);
 
-                N1 = 0.5 *
-                     ((Cells + i)->F[1] + (Cells + i)->F[11] + (Cells + i)->F[13] - (Cells + i)->F[2] - (Cells + i)->F[12] -
-                      (Cells + i)->F[14]) - Rho * U / 3;
-                N2 = 0.5 *
-                     ((Cells + i)->F[5] + (Cells + i)->F[11] + (Cells + i)->F[12] - (Cells + i)->F[6] - (Cells + i)->F[13] -
-                      (Cells + i)->F[14]) - Rho * W / 3;
+            N1 = 0.5 *
+                 ((Cells + i)->F[1] + (Cells + i)->F[11] + (Cells + i)->F[13] - (Cells + i)->F[2] - (Cells + i)->F[12] -
+                  (Cells + i)->F[14]) - Rho * U / 3;
+            N2 = 0.5 *
+                 ((Cells + i)->F[5] + (Cells + i)->F[11] + (Cells + i)->F[12] - (Cells + i)->F[6] - (Cells + i)->F[13] -
+                  (Cells + i)->F[14]) - Rho * W / 3;
 
-                (Cells + i)->F[3]  = (Cells + i)->F[4]  + (Rho * V) / 3;
-                (Cells + i)->F[7]  = (Cells + i)->F[10] + Rho / 6 * (V + U) - N1;
-                (Cells + i)->F[8]  = (Cells + i)->F[9]  + Rho / 6 * (V - U) + N1;
-                (Cells + i)->F[15] = (Cells + i)->F[18] + Rho / 6 * (V + W) - N2;
-                (Cells + i)->F[17] = (Cells + i)->F[16] + Rho / 6 * (V - W) + N2;
-            }
+            (Cells + i)->F[3]  = (Cells + i)->F[4]  + (Rho * V) / 3;
+            (Cells + i)->F[7]  = (Cells + i)->F[10] + Rho / 6 * (V + U) - N1;
+            (Cells + i)->F[8]  = (Cells + i)->F[9]  + Rho / 6 * (V - U) + N1;
+            (Cells + i)->F[15] = (Cells + i)->F[18] + Rho / 6 * (V + W) - N2;
+            (Cells + i)->F[17] = (Cells + i)->F[16] + Rho / 6 * (V - W) + N2;
+        }
 
-            else if ((Cells + i)->CoordY == YMAX) // INLET PLANE xz, y=ymax
-            {
-                //Unknowns: Rho, f4, f9, f10, f16 and f18
+        else if ((Cells + i)->CoordY == YMAX) // INLET PLANE xz, y=ymax
+        {
+            //Unknowns: Rho, f4, f9, f10, f16 and f18
 
-                Rho = ((Cells + i)->F[0] + (Cells + i)->F[1] + (Cells + i)->F[2] + (Cells + i)->F[5] + (Cells + i)->F[6] +
-                       (Cells + i)->F[11] + (Cells + i)->F[12] + (Cells + i)->F[13] + (Cells + i)->F[14] +
-                       2 *
-                       ((Cells + i)->F[3] + (Cells + i)->F[7] + (Cells + i)->F[8] + (Cells + i)->F[15] + (Cells + i)->F[17])) /
-                      (1 + V);
+            Rho = ((Cells + i)->F[0] + (Cells + i)->F[1] + (Cells + i)->F[2] + (Cells + i)->F[5] + (Cells + i)->F[6] +
+                   (Cells + i)->F[11] + (Cells + i)->F[12] + (Cells + i)->F[13] + (Cells + i)->F[14] +
+                   2 *
+                   ((Cells + i)->F[3] + (Cells + i)->F[7] + (Cells + i)->F[8] + (Cells + i)->F[15] + (Cells + i)->F[17])) /
+                  (1 + V);
 
-                N1 = 0.5 *
-                     ((Cells + i)->F[1] + (Cells + i)->F[11] + (Cells + i)->F[13] - (Cells + i)->F[2] - (Cells + i)->F[12] -
-                      (Cells + i)->F[14]) - Rho * U / 3;
-                N2 = 0.5 *
-                     ((Cells + i)->F[5] + (Cells + i)->F[11] + (Cells + i)->F[12] - (Cells + i)->F[6] - (Cells + i)->F[13] -
-                      (Cells + i)->F[14]) - Rho * W / 3;
+            N1 = 0.5 *
+                 ((Cells + i)->F[1] + (Cells + i)->F[11] + (Cells + i)->F[13] - (Cells + i)->F[2] - (Cells + i)->F[12] -
+                  (Cells + i)->F[14]) - Rho * U / 3;
+            N2 = 0.5 *
+                 ((Cells + i)->F[5] + (Cells + i)->F[11] + (Cells + i)->F[12] - (Cells + i)->F[6] - (Cells + i)->F[13] -
+                  (Cells + i)->F[14]) - Rho * W / 3;
 
-                (Cells + i)->F[4]  = (Cells + i)->F[3]  - (Rho * V) / 3;
-                (Cells + i)->F[9]  = (Cells + i)->F[8]  + Rho / 6 * (-V + U) - N1;
-                (Cells + i)->F[10] = (Cells + i)->F[7]  + Rho / 6 * (-V - U) + N1;
-                (Cells + i)->F[16] = (Cells + i)->F[17] + Rho / 6 * (-V + W) - N2;
-                (Cells + i)->F[18] = (Cells + i)->F[15] + Rho / 6 * (-V - W) + N2;
-         }
+            (Cells + i)->F[4]  = (Cells + i)->F[3]  - (Rho * V) / 3;
+            (Cells + i)->F[9]  = (Cells + i)->F[8]  + Rho / 6 * (-V + U) - N1;
+            (Cells + i)->F[10] = (Cells + i)->F[7]  + Rho / 6 * (-V - U) + N1;
+            (Cells + i)->F[16] = (Cells + i)->F[17] + Rho / 6 * (-V + W) - N2;
+            (Cells + i)->F[18] = (Cells + i)->F[15] + Rho / 6 * (-V - W) + N2;
+        }
     }
 }
 
@@ -437,10 +437,10 @@ void EdgeBC(CellProps *Cells, int i)
 
             N = 0.25 * ((Cells + i)->F[3] - (Cells + i)->F[4]);
 
-            (Cells + i)->F[7]  = (Cells + i)->F[10] + N;
-            (Cells + i)->F[9]  = (Cells + i)->F[8]  - N;
-            (Cells + i)->F[15] = (Cells + i)->F[18] + N;
-            (Cells + i)->F[16] = (Cells + i)->F[17] - N;
+            (Cells + i)->F[7]  = (Cells + i)->F[10] - N;
+            (Cells + i)->F[9]  = (Cells + i)->F[8]  + N;
+            (Cells + i)->F[15] = (Cells + i)->F[18] - N;
+            (Cells + i)->F[16] = (Cells + i)->F[17] + N;
 
             for (int j = 1; j < 12; ++j)
             {
@@ -470,10 +470,10 @@ void EdgeBC(CellProps *Cells, int i)
 
             N = 0.25 * ((Cells + i)->F[3] - (Cells + i)->F[4]);
 
-            (Cells + i)->F[8]  = (Cells + i)->F[9]  + N;
-            (Cells + i)->F[10] = (Cells + i)->F[7]  - N;
-            (Cells + i)->F[15] = (Cells + i)->F[18] + N;
-            (Cells + i)->F[16] = (Cells + i)->F[17] - N;
+            (Cells + i)->F[8]  = (Cells + i)->F[9]  - N;
+            (Cells + i)->F[10] = (Cells + i)->F[7]  + N;
+            (Cells + i)->F[15] = (Cells + i)->F[18] - N;
+            (Cells + i)->F[16] = (Cells + i)->F[17] + N;
 
             for (int j = 1; j < 11; ++j)
             {
@@ -508,10 +508,10 @@ void EdgeBC(CellProps *Cells, int i)
 
             N = 0.25 * ((Cells + i)->F[1] - (Cells + i)->F[2]);
 
-            (Cells + i)->F[7]  = (Cells + i)->F[10] + N;
-            (Cells + i)->F[8]  = (Cells + i)->F[9]  - N;
-            (Cells + i)->F[11] = (Cells + i)->F[14] + N;
-            (Cells + i)->F[12] = (Cells + i)->F[13] - N;
+            (Cells + i)->F[7]  = (Cells + i)->F[10] - N;
+            (Cells + i)->F[8]  = (Cells + i)->F[9]  + N;
+            (Cells + i)->F[11] = (Cells + i)->F[14] - N;
+            (Cells + i)->F[12] = (Cells + i)->F[13] + N;
 
             for (int j = 1; j < 16; ++j)
             {
@@ -538,10 +538,10 @@ void EdgeBC(CellProps *Cells, int i)
 
             N = 0.25 * ((Cells + i)->F[1] - (Cells + i)->F[2]);
 
-            (Cells + i)->F[9]  = (Cells + i)->F[8]  + N;
-            (Cells + i)->F[10] = (Cells + i)->F[7]  - N;
-            (Cells + i)->F[11] = (Cells + i)->F[14] + N;
-            (Cells + i)->F[12] = (Cells + i)->F[13] - N;
+            (Cells + i)->F[9]  = (Cells + i)->F[8]  - N;
+            (Cells + i)->F[10] = (Cells + i)->F[7]  + N;
+            (Cells + i)->F[11] = (Cells + i)->F[14] - N;
+            (Cells + i)->F[12] = (Cells + i)->F[13] + N;
 
             for (int j = 1; j < 15; ++j)
             {
@@ -572,10 +572,10 @@ void EdgeBC(CellProps *Cells, int i)
 
             N = 0.25 * ((Cells + i)->F[3] - (Cells + i)->F[4]);
 
-            (Cells + i)->F[7]  = (Cells + i)->F[10] + N;
-            (Cells + i)->F[9]  = (Cells + i)->F[8]  - N;
-            (Cells + i)->F[17] = (Cells + i)->F[16] + N;
-            (Cells + i)->F[18] = (Cells + i)->F[15] - N;
+            (Cells + i)->F[7]  = (Cells + i)->F[10] - N;
+            (Cells + i)->F[9]  = (Cells + i)->F[8]  + N;
+            (Cells + i)->F[17] = (Cells + i)->F[16] - N;
+            (Cells + i)->F[18] = (Cells + i)->F[15] + N;
 
             for (int j = 1; j < 11; ++j)
             {
@@ -610,10 +610,10 @@ void EdgeBC(CellProps *Cells, int i)
 
             N = 0.25 * ((Cells + i)->F[3] - (Cells + i)->F[4]);
 
-            (Cells + i)->F[8]  = (Cells + i)->F[9]  + N;
-            (Cells + i)->F[10] = (Cells + i)->F[7]  - N;
-            (Cells + i)->F[17] = (Cells + i)->F[16] + N;
-            (Cells + i)->F[18] = (Cells + i)->F[15] - N;
+            (Cells + i)->F[8]  = (Cells + i)->F[9]  - N;
+            (Cells + i)->F[10] = (Cells + i)->F[7]  + N;
+            (Cells + i)->F[17] = (Cells + i)->F[16] - N;
+            (Cells + i)->F[18] = (Cells + i)->F[15] + N;
 
             for (int j = 1; j < 12; ++j)
             {
@@ -643,10 +643,10 @@ void EdgeBC(CellProps *Cells, int i)
 
             N = 0.25 * ((Cells + i)->F[1] - (Cells + i)->F[2]);
 
-            (Cells + i)->F[7]  = (Cells + i)->F[10] + N;
-            (Cells + i)->F[8]  = (Cells + i)->F[9]  - N;
-            (Cells + i)->F[13] = (Cells + i)->F[12] + N;
-            (Cells + i)->F[14] = (Cells + i)->F[11] - N;
+            (Cells + i)->F[7]  = (Cells + i)->F[10] - N;
+            (Cells + i)->F[8]  = (Cells + i)->F[9]  + N;
+            (Cells + i)->F[13] = (Cells + i)->F[12] - N;
+            (Cells + i)->F[14] = (Cells + i)->F[11] + N;
 
             for (int j = 1; j < 15; ++j)
             {
@@ -676,10 +676,10 @@ void EdgeBC(CellProps *Cells, int i)
 
             N = 0.25 * ((Cells + i)->F[1] - (Cells + i)->F[2]);
 
-            (Cells + i)->F[9]  = (Cells + i)->F[8]  + N;
-            (Cells + i)->F[10] = (Cells + i)->F[7]  - N;
-            (Cells + i)->F[13] = (Cells + i)->F[12] + N;
-            (Cells + i)->F[14] = (Cells + i)->F[11] - N;
+            (Cells + i)->F[9]  = (Cells + i)->F[8]  - N;
+            (Cells + i)->F[10] = (Cells + i)->F[7]  + N;
+            (Cells + i)->F[13] = (Cells + i)->F[12] - N;
+            (Cells + i)->F[14] = (Cells + i)->F[11] + N;
 
             for (int j = 1; j < 16; ++j)
             {
@@ -706,10 +706,10 @@ void EdgeBC(CellProps *Cells, int i)
 
             N = 0.25 * ((Cells + i)->F[5] - (Cells + i)->F[6]);
 
-            (Cells + i)->F[11] = (Cells + i)->F[14] + N;
-            (Cells + i)->F[13] = (Cells + i)->F[12] - N;
-            (Cells + i)->F[15] = (Cells + i)->F[18] + N;
-            (Cells + i)->F[17] = (Cells + i)->F[16] - N;
+            (Cells + i)->F[11] = (Cells + i)->F[14] - N;
+            (Cells + i)->F[13] = (Cells + i)->F[12] + N;
+            (Cells + i)->F[15] = (Cells + i)->F[18] - N;
+            (Cells + i)->F[17] = (Cells + i)->F[16] + N;
 
             for (int j = 1; j < 8; ++j)
             {
@@ -739,10 +739,10 @@ void EdgeBC(CellProps *Cells, int i)
 
             N = 0.25 * ((Cells + i)->F[5] - (Cells + i)->F[6]);
 
-            (Cells + i)->F[12] = (Cells + i)->F[13] + N;
-            (Cells + i)->F[14] = (Cells + i)->F[11] - N;
-            (Cells + i)->F[15] = (Cells + i)->F[18] + N;
-            (Cells + i)->F[17] = (Cells + i)->F[16] - N;
+            (Cells + i)->F[12] = (Cells + i)->F[13] - N;
+            (Cells + i)->F[14] = (Cells + i)->F[11] + N;
+            (Cells + i)->F[15] = (Cells + i)->F[18] - N;
+            (Cells + i)->F[17] = (Cells + i)->F[16] + N;
 
             for (int j = 1; j < 7; ++j)
             {
@@ -777,10 +777,10 @@ void EdgeBC(CellProps *Cells, int i)
 
             N = 0.25 * ((Cells + i)->F[5] - (Cells + i)->F[6]);
 
-            (Cells + i)->F[11] = (Cells + i)->F[14] + N;
-            (Cells + i)->F[13] = (Cells + i)->F[12] - N;
-            (Cells + i)->F[16] = (Cells + i)->F[17] + N;
-            (Cells + i)->F[18] = (Cells + i)->F[15] - N;
+            (Cells + i)->F[11] = (Cells + i)->F[14] - N;
+            (Cells + i)->F[13] = (Cells + i)->F[12] + N;
+            (Cells + i)->F[16] = (Cells + i)->F[17] - N;
+            (Cells + i)->F[18] = (Cells + i)->F[15] + N;
 
             for (int j = 1; j < 7; ++j)
             {
@@ -815,10 +815,10 @@ void EdgeBC(CellProps *Cells, int i)
 
             N = 0.25 * ((Cells + i)->F[5] - (Cells + i)->F[6]);
 
-            (Cells + i)->F[12] = (Cells + i)->F[13] + N;
-            (Cells + i)->F[14] = (Cells + i)->F[11] - N;
-            (Cells + i)->F[16] = (Cells + i)->F[17] + N;
-            (Cells + i)->F[18] = (Cells + i)->F[15] - N;
+            (Cells + i)->F[12] = (Cells + i)->F[13] - N;
+            (Cells + i)->F[14] = (Cells + i)->F[11] + N;
+            (Cells + i)->F[16] = (Cells + i)->F[17] - N;
+            (Cells + i)->F[18] = (Cells + i)->F[15] + N;
 
             for (int j = 1; j < 8; ++j)
             {
@@ -1105,4 +1105,120 @@ void CornerBC(CellProps *Cells, int i) {
         }
 
     }
+}
+
+
+void generalWall(CellProps* Cells, int i) {
+
+    double v[3];
+    int wall_id = 0;
+
+
+    if ((Cells + i)->Boundary == 2 || (Cells + i)->Boundary == 1){
+        if ((Cells + i)->CoordX == 0)
+        {
+            wall_id = 0;
+        }
+        else if ((Cells + i)->CoordX == 1)
+        {
+            wall_id = 1;
+        }
+        else if ((Cells + i)->CoordY == 0)
+        {
+            wall_id = 2;
+        }
+        else if ((Cells + i)->CoordY == 1)
+        {
+            wall_id = 3;
+        }
+        else if ((Cells + i)->CoordZ == 0)
+        {
+            wall_id = 4;
+        }
+        else if ((Cells + i)->CoordZ == 1)
+        {
+            wall_id = 5;
+        }
+
+        if ((Cells + i)->Boundary == 2) {// INLET BOUNDARY
+            v[0] = (Cells + i)->Uo;
+            v[1] = (Cells + i)->Vo;
+            v[2] = (Cells + i)->Wo;
+        }
+        else if ((Cells + i)->Boundary == 1) {
+            v[0] = 0;
+            v[1] = 0;
+            v[2] = 0;
+        }
+        getWall(Cells,i,wall_id,v);
+    }
+}
+
+void getWall(CellProps *Cells, int i, int wall_ID, double* v) {
+
+
+
+    int cj[3];
+    int ck[3];
+    int j;
+    double temp = 0;
+
+    j = opp[j_wall_unknown[wall_ID][0]];
+
+    cj[0] = cx[j];
+    cj[1] = cy[j];
+    cj[2] = cz[j];
+
+    Cells[i].F[opp[j]] = Cells[i].F[j] - 1./3.*Cells[i].Rho * multVec(cj,v);
+
+    //f(opp(j)) = f(j) - rho/6 *c(j)*V - rho/3 * t(j)*V + 1/2 * SUM k=0:18 (fk * (t(j)*c(k)) * (1 - |c(k)*n|))
+    for (int l = 1; l<5; l++) {
+        //Ci
+        j = opp[j_wall_unknown[wall_ID][l]];
+
+        //c(j)
+        cj[0] = cx[j];
+        cj[1] = cy[j];
+        cj[2] = cz[j];
+        getTan(cj, norm[wall_ID], tang);
+
+        for (int k = 0; k<19; k++) {
+            ck[0] = cx[k];
+            ck[1] = cy[k];
+            ck[2] = cz[k];
+            temp += Cells[i].F[k]*multVec(tang,ck)*
+                    (1 - fabs(multVec(ck,norm[wall_ID])));
+        }
+
+        Cells[i].F[opp[j]] = Cells[i].F[j]
+                             - Cells[i].Rho/6 * multVec(cj,v)
+                             - Cells[i].Rho/3 * multVec(tang,v)
+                             + 0.5 * temp;
+
+        /*if (Cells[i].CoordZ == 1 && l == 1 && i == 6260)
+        {
+            printf("i = %i\n",i);
+            printf("Wall ID = %i\n",wall_ID);
+            printf("cj =(%i,%i,%i)\n",cj[0],cj[1],cj[2]);
+            printf("norm =(%i,%i,%i)\n",norm[wall_ID][0],norm[wall_ID][1],norm[wall_ID][2]);
+            printf("tang =(%i,%i,%i)\n",tang[0],tang[1],tang[2]);
+            printf("v =(%f,%f,%f)\n",v[0],v[1],v[2]);
+            printf("cj * v = %f\n",multVec(cj,v));
+            printf("v * v = %f\n",multVec(v,v));
+        }*/
+
+    }
+
+
+
+}
+
+
+void getTan(const int* c, const int* n, int* t) {
+    int cn = c[0]*n[0] + c[1]*n[1] + c[2]*n[2];
+
+    for (int i = 0; i<3; i++) {
+        t[i] = c[i] - cn*n[i];
+    }
+
 }

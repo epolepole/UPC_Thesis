@@ -4,7 +4,6 @@
 #include <upc.h>                // Required for UPC
 #include <CellFunctions.h>
 #include <ComputeResiduals.h>
-#include <ShellFunctions.h>
 #include <FilesWriting.h>
 #include <BoundaryConditions.h>
 
@@ -173,6 +172,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
     //testing_file = fopen(testingFileName,"w");
     //fprintf(testing_file,"  ID  j  METAF[j]  F[j]\n");
     while (Residuals[0] > ConvergenceCritVeloc && Residuals[1] > ConvergenceCritRho && iter < (*Iterations))
+    //while (true)
         //while (false)
     {
         //printf("T %i, Starting iteration %i\n",MYTHREAD,iter);
@@ -188,7 +188,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         for(i = LAYER;  i < LAYER + BLOCKSIZE;  i++)
             UpdateF(Cells, i);
         end_measure_time(tUpdateF);
-        //SAVE_ITERATION;
+        SAVE_ITERATION; //COLLISION ITER
         //printf("T %i, UpdateF\n",MYTHREAD);
 
 // PUT THREAD-BOUNDARY CELLS TO SHARED
@@ -217,7 +217,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         init_measure_time;
         StreamingStep();
         end_measure_time(tStreaming);
-        //SAVE_ITERATION;
+        SAVE_ITERATION;    //STREAMING 1 + iter
         //printf("T %i, Streaming\n",MYTHREAD);
         upc_barrier;
 
@@ -226,7 +226,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         HandleBoundariesStep(OutletProfile, CurvedBoundaries);
         end_measure_time(tBoundaries);
         //printf("T %i, Boundaries\n",MYTHREAD);
-        //SAVE_ITERATION;
+        SAVE_ITERATION;   //Boundaries 2 + Iter
 
 // UPDATE VELOCITY AND DENSITY
         init_measure_time;
@@ -273,7 +273,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
             printf("Iterations: %05d/%05d || ", iter, (*Iterations));
             printf("Residuals: l2norm  %e; L2_norm_weighted  %e\n", Residuals[0], Residuals[1]);
         }
-        SAVE_ITERATION;
+        //SAVE_ITERATION;
 
         //printf("Doing step :%i\n", iter);
 
@@ -335,7 +335,7 @@ void CollisionStep(int CollisionModel){
             for(i = LAYER;  i < BLOCKSIZE + LAYER;  i++)
             {
                 if( (Cells+i)->Fluid == 1 )
-                    BGKW(Cells, i, w, cx, cy, cz, Omega);
+                    BGKW(i,Omega);
             }
             break;
 
@@ -381,30 +381,15 @@ void StreamingStep(){
     int i, j;
     for(i = LAYER;  i < BLOCKSIZE + LAYER;  ++i)
     {
-        //int n_id = 6271;
-        //if(MYTHREAD == 1 && (Cells+i)->ID == n_id)
-            //printf("We are on the controll cell %i\n",n_id);
         for(j = 0; j <19; j++)
         {
-            /*if(MYTHREAD == 1 && (Cells+i)->ID ==n_id && j == 9) {
-                printf("    Streaming from %i\n", j);
-                printf("        F was %f\n",(Cells +i)->F[j]);
-                printf("        F will be %f\n",(Cells + i + c[j])-> METAF[j]);
-            }*/
+
             if (((Cells+i)->StreamLattice[j]) == 1)
             {
-                //printf("Thread: %i, i= %i, j=%i\n",MYTHREAD,i,j);
-                //printf("(Cells + %i + %i)-> METAF[%i] = %f",i,c[j],(Cells + i + c[j])-> METAF[j]);
                 (Cells +i)->F[j] = (Cells + i + c[j])-> METAF[j];
-                /*if (i == 5 + 2*NN + LAYER)
-                {
-                    printf("ID Cell: %i\tLattice: %i\tID Cell2: %i\n",Cells[i].ID,j,Cells[i + c[j]].ID);
-                }*/
+
             }
-            /*else
-            {
-                printf("Cell ID: %i\tLattice: %i\n", Cells[i].ID,j);
-            }*/
+
         }
     }
 }
@@ -416,6 +401,7 @@ void HandleBoundariesStep(int OutletProfile, int CurvedBoundaries){
     for (int i = LAYER; i < LAYER + BLOCKSIZE; ++i)
     {
         // INLET
+        //generalWall(Cells,i);
         InletBC(Cells, i);
 
         // WALL
@@ -433,6 +419,7 @@ void HandleBoundariesStep(int OutletProfile, int CurvedBoundaries){
                 WallBC(Cells, i, opp);
                 break;
         }
+
 
         EdgeBC(Cells, i);
         CornerBC(Cells, i);
@@ -560,7 +547,8 @@ void allocate_lattice_vars() {// D2Q9 Variables of the lattice
     cy  = Create1DArrayInt(19);    // y coordinate of the discrete lattice directions
     cz  = Create1DArrayInt(19);    // z coordinate of the discrete lattice directions
     opp = Create1DArrayInt(19);    // opposite vector
-
+    norm = Create2DArrayInt(3,6);
+    j_wall_unknown = Create2DArrayInt(5,6);
 }
 void allocate_residuals() {// allocate residuals
     sumVel0   = Create1DArrayDouble(1);
@@ -705,27 +693,35 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
 }
 void save_iteration(int postproc_prog) {
 
-    UpdateMacroscopicStep(0);
-    init_measure_time;
-    switch(postproc_prog) {
-        case 1: sprintf(IterationOutputFile, "Results/iterations/iter.csv.%i", iter_counter); break;
-        case 2: sprintf(IterationOutputFile, "Results/iterations/iter.dat.%i", iter_counter); break; }
-    putCellsToWCells(); // Put information to WCells and write (Write Cells)
-    /*int n_id = 6271;
-    i = n_id + LAYER - MYTHREAD*BLOCKSIZE;
-    if(MYTHREAD == 1)
-        printf("We are on iteration the controll cell %i\n",(Cells +i)->ID);
-    if(MYTHREAD == 1) {
-        printf("        F was %f\n", (Cells + i)->F[9]);
-        printf("        F was %f\n", (WCells + n_id)->F[9]);
+    //if (iter>499 && iter < 506) {
+    if (true) {
+        UpdateMacroscopicStep(0);
+        init_measure_time;
+        switch (postproc_prog) {
+            case 1:
+                sprintf(IterationOutputFile, "Results/iterations/iter.csv.%i", iter_counter);
+                break;
+            case 2:
+                sprintf(IterationOutputFile, "Results/iterations/iter.dat.%i", iter_counter);
+                break;
+        }
+        putCellsToWCells(); // Put information to WCells and write (Write Cells)
+        /*int n_id = 6271;
+        i = n_id + LAYER - MYTHREAD*BLOCKSIZE;
+        if(MYTHREAD == 1)
+            printf("We are on iteration the controll cell %i\n",(Cells +i)->ID);
+        if(MYTHREAD == 1) {
+            printf("        F was %f\n", (Cells + i)->F[9]);
+            printf("        F was %f\n", (WCells + n_id)->F[9]);
 
-    }*/
-        if (MYTHREAD==0) // AUTOSAVE
-        WriteResults(IterationOutputFile, ppp);
-    end_measure_time(tWriting);
+        }*/
+        if (MYTHREAD == 0) // AUTOSAVE
+            WriteResults(IterationOutputFile, ppp);
+        end_measure_time(tWriting);
 
 
-    iter_counter++;
+        iter_counter++;
+    }
 }
 void write_cells_to_results(int postproc_prog) {
 

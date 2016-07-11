@@ -11,10 +11,10 @@
 #define end_measure_time(t_var) tInstant2 = clock();\
                                 t_var = t_var + (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC
 
-#if __SAVE_ITER__ == 1
-#define SAVE_ITERATION save_iteration(postproc_prog)
-#else //__PRINT_ITER__
+#if __SAVE_ITER__ == 0
 #define SAVE_ITERATION
+#else //__PRINT_ITER__
+#define SAVE_ITERATION save_iteration(postproc_prog)
 #endif //__PRINT_ITER__
 
 
