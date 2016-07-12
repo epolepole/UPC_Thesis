@@ -809,7 +809,7 @@ void EdgeBC(CellProps *Cells, int i)
             //          f10            yz-plane
             //          f8, f9        Buried Links
 
-            (Cells + i)->F[1] = (Cells + i)->F[2];
+            (Cells + i)->F[2] = (Cells + i)->F[1];
             (Cells + i)->F[4] = (Cells + i)->F[3];
             (Cells + i)->F[10] = (Cells + i)->F[7];
 
