@@ -269,11 +269,11 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         }*/
 
 
-        if(iter%5==0 && MYTHREAD==0){
+        /*if(iter%5==0 && MYTHREAD==0){
             printf("Iterations: %05d/%05d || ", iter, (*Iterations));
             printf("Residuals: l2norm  %e; L2_norm_weighted  %e\n", Residuals[0], Residuals[1]);
-        }
-        
+        }*/
+
         SAVE_ITERATION;
 
         //printf("Doing step :%i\n", iter);
@@ -694,11 +694,11 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
 }
 void save_iteration(int postproc_prog) {
 
-    //if (iter>499 && iter < 506) {
-    if (true) {
         UpdateMacroscopicStep(0);
         init_measure_time;
-        switch (postproc_prog) {
+
+        switch (postproc_prog) 
+        {
             case 1:
                 sprintf(IterationOutputFile, "Results/iterations/iter.csv.%i", iter_counter);
                 break;
@@ -707,22 +707,12 @@ void save_iteration(int postproc_prog) {
                 break;
         }
         putCellsToWCells(); // Put information to WCells and write (Write Cells)
-        /*int n_id = 6271;
-        i = n_id + LAYER - MYTHREAD*BLOCKSIZE;
-        if(MYTHREAD == 1)
-            printf("We are on iteration the controll cell %i\n",(Cells +i)->ID);
-        if(MYTHREAD == 1) {
-            printf("        F was %f\n", (Cells + i)->F[9]);
-            printf("        F was %f\n", (WCells + n_id)->F[9]);
-
-        }*/
         if (MYTHREAD == 0) // AUTOSAVE
             WriteResults(IterationOutputFile, ppp);
         end_measure_time(tWriting);
 
 
         iter_counter++;
-    }
 }
 void write_cells_to_results(int postproc_prog) {
 

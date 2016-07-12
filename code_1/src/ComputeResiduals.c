@@ -213,11 +213,11 @@ void ComputeResiduals(CellProps *Cells, double* Residuals, double* sumVel0, doub
 
     }
 
-    if ((MYTHREAD == 0 && *iter%50 == 0) || ResRho != ResRho){
+    /*if ((MYTHREAD == 0 && *iter%50 == 0) || ResRho != ResRho){
         printf("SumRho0 = %f\n",*sumRho0);
         printf("SumRho1 = %f\n",*sumRho1);
         printf("ResRho = %f\n",ResRho);
-    }
+    }*/
 
     if(ResRho!=ResRho) // if density residuals are NaN
     {
