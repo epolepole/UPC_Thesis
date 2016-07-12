@@ -981,7 +981,7 @@ void CornerBC(CellProps *Cells, int i) {
             (Cells + i)->F[6] = (Cells + i)->F[5];
             (Cells + i)->F[7] = (Cells + i)->F[10];
             (Cells + i)->F[13] = (Cells + i)->F[12];
-            (Cells + i)->F[17] = (Cells + i)->F[16];
+            (Cells + i)->F[16] = (Cells + i)->F[17];
 
             for (int j = 1; j < 8; ++j) {
                 Fburied = Fburied + (Cells + i)->F[j];
@@ -993,15 +993,17 @@ void CornerBC(CellProps *Cells, int i) {
                 Fburied = Fburied + (Cells + i)->F[j];
             }
 
-            Fburied = Fburied + (Cells + i)->F[15];
-            Fburied = Fburied + (Cells + i)->F[18];
+            for (int j = 16; j < 18; ++i)
+            {
+              Fburied = Fburied + (Cells + i)->F[j];
+            }
 
             (Cells + i)->F[8] = Fburied / 18;
             (Cells + i)->F[9] = Fburied / 18;
             (Cells + i)->F[11] = Fburied / 18;
             (Cells + i)->F[14] = Fburied / 18;
-            (Cells + i)->F[16] = Fburied / 18;
-            (Cells + i)->F[17] = Fburied / 18;
+            (Cells + i)->F[15] = Fburied / 18;
+            (Cells + i)->F[18] = Fburied / 18;
             (Cells + i)->F[0] = 12 * (Cells + i)->F[8];
 
         }
