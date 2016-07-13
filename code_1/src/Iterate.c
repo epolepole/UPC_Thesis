@@ -204,12 +204,6 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         getSharedToCells();
         end_measure_time(tBCells);
 
-        /*sprintf(IterationOutputFile, "Results/outCells/GetShared_%i.csv", iter);
-        putCellsToWCells2();
-        upc_barrier;
-        if (MYTHREAD==0) // AUTOSAVE
-        WriteResults2(IterationOutputFile);*/
-
         //printf("T %i, getShared to cells\n",MYTHREAD);
         upc_barrier;         // Synchronise
 
@@ -321,10 +315,6 @@ void putCellsToWCells(){
     upc_memput( &WCells[MYTHREAD * BLOCKSIZE], &Cells[LAYER], BLOCKSIZE * sizeof(CellProps));
 }
 
-void putCellsToWCells2(){
-    //printf("Put Cells to W cells things\n");
-    upc_memput( &WCells2[MYTHREAD * (BLOCKSIZE + 2*LAYER)], &Cells[0], (2 * LAYER + BLOCKSIZE) * sizeof(CellProps));
-}
 void CollisionStep(int CollisionModel){
 
     int i, j;
@@ -514,7 +504,6 @@ void time_meas_vars_init() {// Time measurement variables
 void alloc_cells() {//////////////////////////////////////////////////////
     // Allocate structure for the cell properties (see ShellFunctions.h)
     WCells = (shared_block(BLOCKSIZE)   CellProps*)upc_all_alloc(THREADS, BLOCKSIZE*sizeof(CellProps));
-    WCells2 = (shared_block(BLOCKSIZE + 2 * LAYER)   CellProps*)upc_all_alloc(THREADS, (BLOCKSIZE+2*LAYER)*sizeof(CellProps)); ////////////////////////// REMEMBER TO DELETE
     BCells = (shared_block(2*LAYER)     CellProps*)upc_all_alloc(THREADS,     2*LAYER*sizeof(CellProps));
     Cells = calloc(BLOCKSIZE+2*LAYER,sizeof(CellProps));
     //////////////////////////////////////////////////////

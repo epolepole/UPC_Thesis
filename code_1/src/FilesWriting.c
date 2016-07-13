@@ -146,35 +146,3 @@ void WriteBCells(char* OutputFile, int* postproc_prog)
     }
 }
 
-void WriteResults2(char* OutputFile)
-{
-    int i,index;                     // Loop variable
-    index = 2*(2*LAYER + BLOCKSIZE);
-    FILE * fp1;                 // file pointer to output file
-    fp1=fopen(OutputFile, "w"); // open file
-    //upc_barrier;
-
-    fprintf(fp1, "X Column,Y Column,Z Column,u,v,w,vel_mag,"\
-                 "f00,f01,f02,f03,f04,f05,f06,f07,f08,f09,f10,f11,f12,f13,f14,f15,f16,f17,f18,"\
-                 "rho\n");
-
-    for(i = 0; i < index; i++)
-    {
-        fprintf(fp1, "%f, %f, %f, %f, %f, %f, %f,",
-                (WCells2+i)->CoordX, // x
-                (WCells2+i)->CoordY, // y
-                (WCells2+i)->CoordZ, // z
-                (WCells2+i)->U,      // u
-                (WCells2+i)->V,      // v
-                (WCells2+i)->W,      // w
-                sqrt(pow((WCells2+i)->U,2)+pow((WCells2+i)->V,2)+pow((WCells2+i)->W,2)));
-        for (int j = 0; j<19; j++) 
-        {
-            fprintf(fp1," %f,",(WCells2+i)->F[j]);
-        }
-        
-        fprintf(fp1," %f\n", (WCells2+i)->Rho);    // density
-    }
-    fclose(fp1);
-}
-
