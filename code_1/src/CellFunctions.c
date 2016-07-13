@@ -166,7 +166,7 @@ void CellIni(CellProps *Cells,
         (Cells + index_Cell)->CoordZ = Nod[i][5];
 
         // CHECK FLUID OR NOT
-        (Cells + index_Cell)->Fluid  = (int) Nod[i][6];
+        //(Cells + index_Cell)->Fluid  = (int) Nod[i][6];
 
         // Which thread does it belongs to
         (Cells + index_Cell)->ThreadNumber = MYTHREAD;
@@ -248,7 +248,6 @@ void CellIni(CellProps *Cells,
 
         // CORNER DETERMINATION
         (Cells + index_Cell)->Boundary = 0;  // IT IS NOT BOUNDARY NODE   (0->Fluid / 1-> Wall / 2->Inlet or outlet / 3-> Edge / 4-> Corner
-        (Cells + index_Cell)->Corner = 0;      // IT IS NOT A CORNER // WITH THE NEW SYSTEM, THIS IS NOT IMPORTANT ANYMORE
 
         int number_solid_lattices;
         number_solid_lattices = 0;

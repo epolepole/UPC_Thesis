@@ -68,7 +68,6 @@ ComputeResiduals_H	include/ComputeResiduals.h	/^#define ComputeResiduals_H$/;"	d
 CoordX	include/ShellFunctions.h	/^    MyReal CoordX;$/;"	m	struct:__anon1
 CoordY	include/ShellFunctions.h	/^    MyReal CoordY;$/;"	m	struct:__anon1
 CoordZ	include/ShellFunctions.h	/^    MyReal CoordZ;$/;"	m	struct:__anon1
-Corner	include/ShellFunctions.h	/^    int    Corner;$/;"	m	struct:__anon1
 CornerBC	src/BoundaryConditions.c	/^void CornerBC(CellProps *Cells, int i) {$/;"	f
 Create1DArrayDouble	src/ShellFunctions.c	/^double *Create1DArrayDouble(int length)$/;"	f
 Create1DArrayFloat	src/ShellFunctions.c	/^float *Create1DArrayFloat(int length)$/;"	f

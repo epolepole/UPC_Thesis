@@ -335,7 +335,7 @@ void CollisionStep(int CollisionModel){
         case 1:
             for(i = LAYER;  i < BLOCKSIZE + LAYER;  i++)
             {
-                if( (Cells+i)->Fluid == 1 )
+                //if( (Cells+i)->Fluid == 1 )
                     BGKW(i,Omega);
             }
             break;
@@ -344,7 +344,7 @@ void CollisionStep(int CollisionModel){
         case 2:
             for(i = LAYER;  i < BLOCKSIZE + LAYER;  i++)
             {
-                if( (Cells+i)->Fluid == 1)
+                //if( (Cells+i)->Fluid == 1)
                     TRT (Cells, i, w, cx, cy, opp, Omega, OmegaA);
             }
             break;
@@ -353,7 +353,7 @@ void CollisionStep(int CollisionModel){
         case 3:
             for(i = LAYER;  i < BLOCKSIZE + LAYER;  i++)
             {
-                if( (Cells+i)->Fluid == 1)
+                //if( (Cells+i)->Fluid == 1)
                     MRT(Cells, i, tm, stmiv);
             }
             break;

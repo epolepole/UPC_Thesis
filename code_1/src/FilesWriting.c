@@ -42,7 +42,7 @@ void WriteResults(char* OutputFile, int* postproc_prog)
                         (WCells+i)->ThreadNumber);  */      
 
             fprintf(fp1, "Points:0,Points:1,Points:2,u,v,w,vel_mag,"\
-                         "f00,f01,f02,f03,f04,f05,f06,f07,f08,f09,f10,f11,f12,f13,f14,f15,f16,f17,f18,"\
+                         //"f00,f01,f02,f03,f04,f05,f06,f07,f08,f09,f10,f11,f12,f13,f14,f15,f16,f17,f18,"
                          "rho\n");
 
             for(i = 0; i < NODES; i++)
@@ -55,9 +55,9 @@ void WriteResults(char* OutputFile, int* postproc_prog)
                         (WCells+i)->V,      // v
                         (WCells+i)->W,      // w
                         sqrt(pow((WCells+i)->U,2)+pow((WCells+i)->V,2)+pow((WCells+i)->W,2)));
-                for (int j = 0; j<19; j++) {
-                    fprintf(fp1," %f,",(WCells+i)->F[j]);
-                }
+                //for (int j = 0; j<19; j++) {
+                    //fprintf(fp1," %f,",(WCells+i)->F[j]);
+                //}
                 
                 fprintf(fp1," %f\n", (WCells+i)->Rho);    // density
             }
@@ -104,7 +104,7 @@ void WriteBCells(char* OutputFile, int* postproc_prog)
             fprintf(fp1, "x,y,z,u,v,w,vel_mag,rho,press,fluid,ThID\n");
             for(i=0;i<(2*THREADS*LAYER);i++)
             {
-                fprintf(fp1, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d\n",
+                fprintf(fp1, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %d\n",
                         (BCells+i)->CoordX, // x
                         (BCells+i)->CoordY, // y
                         (BCells+i)->CoordZ, // z
@@ -114,7 +114,7 @@ void WriteBCells(char* OutputFile, int* postproc_prog)
                         sqrt(pow((BCells+i)->U,2)+pow((BCells+i)->V,2)+pow((BCells+i)->W,2)), // velocity magnitude
                         (BCells+i)->Rho,    // density
                         ((BCells+i)->Rho)/3,  // pressure
-                        (BCells+i)->Fluid, // fluid or solid
+                        //(BCells+i)->Fluid, // fluid or solid
                         (BCells+i)->ThreadNumber);
             }
 

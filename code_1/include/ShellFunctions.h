@@ -55,8 +55,7 @@ typedef double MyReal;
 
 typedef struct
 {
-    int    Fluid;
-    int    Corner;
+    //int Fluid;
     int    StreamLattice[19];
     int    ID;
     int    Boundary;
