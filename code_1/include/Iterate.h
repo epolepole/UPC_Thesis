@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 #include <time.h>
-#include "ShellFunctions.h" // convenience
+#include "BoundaryConditions.h" // convenience
 
 #define init_measure_time tInstant1 = clock()
 #define end_measure_time(t_var) tInstant2 = clock();\

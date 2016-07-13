@@ -132,7 +132,6 @@ void ComputeResiduals(CellProps *Cells, double* Residuals,
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <upc_relaxed.h>                 // Required for UPC
 
 #include "ShellFunctions.h"
 
