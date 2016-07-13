@@ -8,7 +8,7 @@ cmake_minimum_required (VERSION 2.6)
 #set(UPC "")
 
 if(DEFINED UPC)
-	set(CMAKE_C_COMPILER /usr/local/berkeley_upc/bin/upcc)
+	set(CMAKE_C_COMPILER upcc)
 	message(STATUS "Using Berkeley UPC")
 else(DEFINED UPC)
 	#set(CMAKE_C_COMPILER /usr/bin/gcc)
