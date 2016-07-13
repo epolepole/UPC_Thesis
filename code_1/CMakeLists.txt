@@ -71,7 +71,8 @@ file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/Mesh" DESTINATION "${EXECUTABLE_OUTPUT_PA
 
 
 set(HEAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/)
-include_directories ("./include/")
+message(STATUS "${HEAD_DIR}")
+include_directories ("${HEAD_DIR}")
 
 add_subdirectory (src)
 
