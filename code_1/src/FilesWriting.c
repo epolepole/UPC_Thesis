@@ -144,9 +144,4 @@ void WriteBCells(char* OutputFile, int* postproc_prog)
             fclose(fp1);
             break;
     }
-<<<<<<< HEAD
 }
-
-=======
-}
->>>>>>> 53a7e6a4c0a8b9022bdc077c691d3307ae18f959
