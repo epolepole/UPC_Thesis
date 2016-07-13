@@ -6,7 +6,7 @@ scalar-vector-matrix allocation and this header includes the multifunctional
 
 #include <stdbool.h>  // bool variables
 #include <string.h>   // string handling
-#include <upc.h>
+#include "upc.h"
 
 
 

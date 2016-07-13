@@ -12,6 +12,7 @@ else
 threads=$2
 fi
 
+rm -fr bin/Results
 
 if [ $1 == "R" ] ; then
     echo Running without iterations
@@ -30,4 +31,3 @@ else
 fi
 
 cd ../
-#cmake .. -DCMAKE_VERBOSE_MAKEFILE=OFF
