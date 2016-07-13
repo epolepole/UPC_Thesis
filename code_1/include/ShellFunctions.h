@@ -4,11 +4,10 @@ scalar-vector-matrix allocation and this header includes the multifunctional
 #ifndef SHELLFUNCTIONS_H
 #define SHELLFUNCTIONS_H
 
-#include <stdbool.h>  // bool variables
-#include <string.h>   // string handling
-
 #include "upc.h"
 
+#include <stdbool.h>  // bool variables
+#include <string.h>   // string handling
 
 
 #if __UPC__ == 0
