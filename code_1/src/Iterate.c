@@ -689,8 +689,9 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
 }
 void save_iteration(int postproc_prog) {
 
+    if (iter%1000==0) {
     //if (iter>499 && iter < 506) {
-    if (true) {
+    //if(true) {
         UpdateMacroscopicStep(0);
         init_measure_time;
         switch (postproc_prog) {
