@@ -13,6 +13,8 @@ if(DEFINED UPC)
 else(DEFINED UPC)
 	#set(CMAKE_C_COMPILER /usr/bin/gcc)
 	message(STATUS "Using default compiler")
+	include_directories(/home/epolepole/Programs/berkeley_upc-2.22.2/upcr_preinclude/ /home/epolepole/Programs/berkeley_upc-2.22.2/)
+
 endif(DEFINED UPC)
 
 project (thesis_upc)
@@ -70,7 +72,6 @@ file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/Mesh" DESTINATION "${EXECUTABLE_OUTPUT_PA
 
 set(HEAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/)
 include_directories ("./include/")
-include_directories(/home/epolepole/Programs/berkeley_upc-2.22.2/upcr_preinclude/ /home/epolepole/Programs/berkeley_upc-2.22.2/)
 
 add_subdirectory (src)
 
