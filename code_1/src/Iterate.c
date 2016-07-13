@@ -1,7 +1,7 @@
 #include <stdio.h>                      // printf();
 #include <stdlib.h>                     // for calloc();
 #include <time.h>                       // time functions
-//#include <upc.h>                // Required for UPC
+//#include <upc_relaxed.h>                // Required for UPC
 #include <CellFunctions.h>
 #include <ComputeResiduals.h>
 #include <FilesWriting.h>

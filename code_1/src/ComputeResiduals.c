@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <upc.h>                 // Required for UPC
+#include <upc_relaxed.h>                 // Required for UPC
 
 #include "ComputeResiduals.h"
 #include "tests.h"
