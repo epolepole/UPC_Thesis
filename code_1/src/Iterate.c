@@ -269,10 +269,11 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         }*/
 
 
-        if(iter%5==0 && MYTHREAD==0){
+        /*if(iter%5==0 && MYTHREAD==0){
             printf("Iterations: %05d/%05d || ", iter, (*Iterations));
             printf("Residuals: l2norm  %e; L2_norm_weighted  %e\n", Residuals[0], Residuals[1]);
-        }
+        }*/
+
         SAVE_ITERATION;
 
         //printf("Doing step :%i\n", iter);
@@ -694,8 +695,7 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
 void save_iteration(int postproc_prog) {
 
     //if (iter>499 && iter < 506) {
-    //if (true) {
-    if (iter%25 == 0) {
+    if (true) {
         UpdateMacroscopicStep(0);
         init_measure_time;
         switch (postproc_prog) {
