@@ -5,7 +5,6 @@
 #include <Iterate.h>
 
 #include "CellFunctions.h"
-#include "ShellFunctions.h" // convenience
 
 /*==================================================
 =========Initialization for the MRT model===========

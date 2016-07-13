@@ -1,8 +1,7 @@
 #include <stdio.h>                  // printf();
 #include <stdlib.h>                 // for malloc();
-#include <CellFunctions.h>
+#include "CellFunctions.h"
 #include <math.h>
-#include <ShellFunctions.h>
 
 #include "BoundaryConditions.h" // convenience
 

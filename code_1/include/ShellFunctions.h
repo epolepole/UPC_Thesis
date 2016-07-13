@@ -4,13 +4,14 @@ scalar-vector-matrix allocation and this header includes the multifunctional
 #ifndef SHELLFUNCTIONS_H
 #define SHELLFUNCTIONS_H
 
+#include "BlockSizeDefiner.h"
 #include "upc.h"
 
 #include <stdbool.h>  // bool variables
 #include <string.h>   // string handling
 
 
-#if __UPC__ == 0
+/*#if __UPC__ == 0
 
 
 #define MYTHREAD  0
@@ -22,9 +23,9 @@ scalar-vector-matrix allocation and this header includes the multifunctional
 #define upc_barrier
 #define upc_forall(a) ();
 
-#else
+#else*/
 #define shared_block(var) shared [var]
-#endif
+//#endif
 
 //#define main_thread(c) if (MYTHREAD == 0) { c }
 #define main_thread if(MYTHREAD == 0)
@@ -36,7 +37,6 @@ scalar-vector-matrix allocation and this header includes the multifunctional
 
 //#define UPC_MAX_BLOCK_SIZE 145000000
 
-#include "BlockSizeDefiner.h"
 
 //#define BLOCKSIZE 802*((int)(83/THREADS+1))
 //#define NN 802

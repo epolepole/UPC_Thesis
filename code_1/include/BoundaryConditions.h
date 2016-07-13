@@ -3,9 +3,11 @@
 #ifndef BOUNDARYCONDITIONS_H
 #define BOUNDARYCONDITIONS_H
 
+#define multVec(a,b) a[0]*b[0] + a[1]*b[1] + a[2]*b[2]
+
+
 #include "ShellFunctions.h" // convenience
 
-#define multVec(a,b) a[0]*b[0] + a[1]*b[1] + a[2]*b[2]
 
 
 int tang[3];
