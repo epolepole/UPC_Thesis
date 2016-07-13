@@ -84,9 +84,8 @@ typedef struct
 
 //shared [BLOCKSIZE+2*NN] CellProps  *SCells;
 shared_block(BLOCKSIZE)     CellProps  *WCells; // Writing Cells: cells to write data
-shared_block(BLOCKSIZE + 2*LAYER)     CellProps  *WCells2; // Writing Cells: cells to write data
-shared_block(2*LAYER)           CellProps  *BCells; // Boundary cells
-shared_block(5)              double sResiduals[5*THREADS]; // variable to store residuals
+shared_block(2*LAYER)       CellProps  *BCells; // Boundary cells
+shared_block(5)             double sResiduals[5*THREADS]; // variable to store residuals
 
 shared  int    *NumNodes;       // This will store the number of lines of the read files
 shared  int    *NumConn;        // This will store the number of lines of the read files

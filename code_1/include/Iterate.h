@@ -121,7 +121,6 @@ void print_cell_line(FILE* file, const CellProps* Cell);
 void putCellsToShared();
 void getSharedToCells();
 void putCellsToWCells();
-void putCellsToWCells2();
 
 
 
