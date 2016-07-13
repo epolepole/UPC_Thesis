@@ -72,7 +72,7 @@ void WriteResults(char* OutputFile, int* postproc_prog)
 
             for(i = 0; i < NODES; i++)
             {
-                fprintf(fp1, "%f %f %f %f %f %f %f %f %f %d\n",
+                fprintf(fp1, "%f %f %f %f %f %f %f %f %f\n",
                         (WCells+i)->CoordX, // x
                         (WCells+i)->CoordY, // y
                         (WCells+i)->CoordZ, // z
@@ -81,8 +81,8 @@ void WriteResults(char* OutputFile, int* postproc_prog)
                         (WCells+i)->W,      // w
                         sqrt(pow((WCells+i)->U,2)+pow((WCells+i)->V,2)+pow((WCells+i)->W,2)), // velocity magnitude
                         (WCells+i)->Rho,    // density
-                        ((WCells+i)->Rho)/3,  // pressure
-                        (WCells+i)->Fluid); // fluid or solid
+                        ((WCells+i)->Rho)/3);  // pressure
+                        //(WCells+i)->Fluid); // fluid or solid
             }
 
             fclose(fp1);
@@ -128,7 +128,7 @@ void WriteBCells(char* OutputFile, int* postproc_prog)
 
             for(i=0;i<(2*THREADS*LAYER);i++)
             {
-                fprintf(fp1, "%f %f %f %f %f %f %f %f %f %d\n",
+                fprintf(fp1, "%f %f %f %f %f %f %f %f %f\n",
                         (BCells+i)->CoordX, // x
                         (BCells+i)->CoordY, // y
                         (BCells+i)->CoordZ, // z
@@ -137,8 +137,8 @@ void WriteBCells(char* OutputFile, int* postproc_prog)
                         (BCells+i)->W,      // w
                         sqrt(pow((BCells+i)->U,2)+pow((BCells+i)->V,2)+pow((BCells+i)->W,2)), // velocity magnitude
                         (BCells+i)->Rho,    // density
-                        ((BCells+i)->Rho)/3,  // pressure
-                        (BCells+i)->Fluid); // fluid or solid
+                        ((BCells+i)->Rho)/3);  // pressure
+                        //(BCells+i)->Fluid); // fluid or solid
             }
 
             fclose(fp1);
