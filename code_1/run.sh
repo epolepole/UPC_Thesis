@@ -2,7 +2,7 @@
 
 cd build/bin
 if [ $1 == "R" ] ; then
-    upcrun -backtrace LBMSolver
+    upcrun -shared-heap 128MB -backtrace LBMSolver
 else
     if [ $1 == "I" ] ; then
         upcrun -backtrace LBMSolver
