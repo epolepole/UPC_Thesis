@@ -96,13 +96,19 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
         printf("Cell intialization completed\n");
     upc_barrier;
 
+    /*
     print_cells_info(Cells);
     upc_barrier;
     print_boundary_type(Cells);
     upc_barrier;
+    */
     end_measure_time(tInitialization);
 
     upc_barrier;         // Synchronise
+    if (MYTHREAD == 0)
+    {
+        printf("Size of Cells = %d\n", sizeof(CellProps));    
+    }
 
     // PUT INITIALIZED DATA TO BOUNDARIES
     putCellsToShared();
@@ -504,6 +510,7 @@ void time_meas_vars_init() {// Time measurement variables
 void alloc_cells() {//////////////////////////////////////////////////////
     // Allocate structure for the cell properties (see ShellFunctions.h)
     WCells = (shared_block(BLOCKSIZE)   CellProps*)upc_all_alloc(THREADS, BLOCKSIZE*sizeof(CellProps));
+    WCells2 = (shared_block(BLOCKSIZE + 2 * LAYER)   CellProps*)upc_all_alloc(THREADS, (BLOCKSIZE+2*LAYER)*sizeof(CellProps)); ////////////////////////// REMEMBER TO DELETE
     BCells = (shared_block(2*LAYER)     CellProps*)upc_all_alloc(THREADS,     2*LAYER*sizeof(CellProps));
     Cells = calloc(BLOCKSIZE+2*LAYER,sizeof(CellProps));
     //////////////////////////////////////////////////////
@@ -840,7 +847,7 @@ void print_boundary_type(CellProps* Cells) {
         printf("Get cell boundary info\n");
     for (int node_to_look = LAYER;node_to_look<BLOCKSIZE+LAYER;node_to_look++) {
         int BT;
-        //printf("TEST, thread %i\n",MYTHREAD);
+        printf("TEST, thread %i\n",MYTHREAD);
         if (node_to_look == LAYER)    {
             printf("Thread: %i,Node: %i,BT: %i\n",MYTHREAD,node_to_look,(Cells+node_to_look)->Boundary);
             int index_n, index_i, index_j, index_k;
