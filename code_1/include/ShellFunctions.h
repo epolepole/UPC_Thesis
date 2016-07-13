@@ -6,6 +6,7 @@ scalar-vector-matrix allocation and this header includes the multifunctional
 
 #include <stdbool.h>  // bool variables
 #include <string.h>   // string handling
+
 #include "upc.h"
 
 
@@ -13,7 +14,7 @@ scalar-vector-matrix allocation and this header includes the multifunctional
 #if __UPC__ == 0
 
 
-#define MYTHREAD  (int) rand()*8
+#define MYTHREAD  0
 #define THREADS  8
 
 #define shared_block(var)
