@@ -510,7 +510,6 @@ void time_meas_vars_init() {// Time measurement variables
 void alloc_cells() {//////////////////////////////////////////////////////
     // Allocate structure for the cell properties (see ShellFunctions.h)
     WCells = (shared_block(BLOCKSIZE)   CellProps*)upc_all_alloc(THREADS, BLOCKSIZE*sizeof(CellProps));
-    WCells2 = (shared_block(BLOCKSIZE + 2 * LAYER)   CellProps*)upc_all_alloc(THREADS, (BLOCKSIZE+2*LAYER)*sizeof(CellProps)); ////////////////////////// REMEMBER TO DELETE
     BCells = (shared_block(2*LAYER)     CellProps*)upc_all_alloc(THREADS,     2*LAYER*sizeof(CellProps));
     Cells = calloc(BLOCKSIZE+2*LAYER,sizeof(CellProps));
     //////////////////////////////////////////////////////
