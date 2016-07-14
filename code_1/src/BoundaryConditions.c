@@ -14,6 +14,7 @@
 
 void InletBC(CellProps *Cells, int i)
 {
+
     MyReal Rho = 0.0;
     MyReal U, V, W, N1, N2, XMAX, YMAX, ZMAX;
     XMAX = 1;
@@ -24,9 +25,12 @@ void InletBC(CellProps *Cells, int i)
     V = (Cells + i)->Vo;
     W = (Cells + i)->Wo;
 
+
+
+    //printf("Test Before bondary == 2\n");
     if ((Cells + i)->Boundary == 2) // INLET BOUNDARY
     {
-
+        //printf("Test After bondary == 2\n");
         if ((Cells + i)->CoordZ == 0) // INLET PLANE xy, z=0
         {
             //Unknowns: Rho, f5, f11, f12, f15 and f16
@@ -49,6 +53,7 @@ void InletBC(CellProps *Cells, int i)
         }
         else if ((Cells + i)->CoordZ == ZMAX) // INLET PLANE xy, z=zmax
         {
+
             //Unknowns: Rho, f6, f13, f14, f17 and f18
 
             Rho = ((Cells + i)->F[0] + (Cells + i)->F[1] + (Cells + i)->F[2] + (Cells + i)->F[3] + (Cells + i)->F[4] +
@@ -980,7 +985,7 @@ void CornerBC(CellProps *Cells, int i) {
                 Fburied = Fburied + (Cells + i)->F[j];
             }
 
-            for (int j = 16; j < 18; ++i)
+            for (int j = 16; j < 18; ++j)
             {
               Fburied = Fburied + (Cells + i)->F[j];
             }

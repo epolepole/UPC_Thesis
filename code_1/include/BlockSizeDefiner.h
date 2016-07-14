@@ -2,9 +2,9 @@
 #define BLOCKSIZEDEFINER_H
 
 
-#define NN 75
-#define NM 75
-#define NL 75
+#define NN 128
+#define NM 128
+#define NL 128
 #define LAYER NN*NM
 #define NODES NN*NM*NL
 #define LAYERS_PER_THREAD ((int)(NL/THREADS))

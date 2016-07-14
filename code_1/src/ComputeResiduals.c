@@ -130,7 +130,6 @@ void ComputeResiduals(CellProps *Cells, double* Residuals,
 
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
 
 #include "ShellFunctions.h"
@@ -152,13 +151,11 @@ void ComputeResiduals(CellProps *Cells, double* Residuals, double* sumVel0, doub
 
     *sumVel1 = 0;
     *sumRho1 = 0;
-
     // sum up velocity and density
 
-    for(i=LAYER; i<BLOCKSIZE + LAYER; i++)
-    {
-        *sumVel1 = *sumVel1 + sqrt( pow( (Cells+i)->U ,2) + pow( (Cells+i)->V ,2) + pow( (Cells+i)->W ,2));
-        *sumRho1 = *sumRho1 + (Cells+i)->Rho;
+    for(i=LAYER; i<BLOCKSIZE + LAYER; i++) {
+        *sumVel1 = *sumVel1 + sqrt(pow((Cells + i)->U, 2) + pow((Cells + i)->V, 2) + pow((Cells + i)->W, 2));
+        *sumRho1 = *sumRho1 + (Cells + i)->Rho;
         /*if ((Cells+i)->Rho < 0) {
             printf("Iteration %i\n",*iter);
             printf("T=%i, rho[%i] = %f\n",MYTHREAD,i+LAYER+MYTHREAD*BLOCKSIZE,(Cells+i)->Rho);
@@ -174,6 +171,8 @@ void ComputeResiduals(CellProps *Cells, double* Residuals, double* sumVel0, doub
         }*/
 
     }
+
+    upc_barrier;
 
     sResiduals[0+5*MYTHREAD] = *sumVel1;
     sResiduals[1+5*MYTHREAD] = *sumRho1;

@@ -96,12 +96,12 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
         printf("Cell intialization completed\n");
     upc_barrier;
 
-    /*
+
     print_cells_info(Cells);
     upc_barrier;
     print_boundary_type(Cells);
     upc_barrier;
-    */
+
     end_measure_time(tInitialization);
 
     upc_barrier;         // Synchronise
@@ -189,6 +189,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
 
         //printf("T %i, Collision\n",MYTHREAD);
 
+        upc_barrier;
 ////////////// UPDATE DISTR ///////////////
         init_measure_time;
         for(i = LAYER;  i < LAYER + BLOCKSIZE;  i++)
@@ -197,6 +198,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         //SAVE_ITERATION; //COLLISION ITER
         //printf("T %i, UpdateF\n",MYTHREAD);
 
+        upc_barrier;
 // PUT THREAD-BOUNDARY CELLS TO SHARED
         init_measure_time;
         putCellsToShared();
@@ -228,12 +230,14 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         //printf("T %i, Boundaries\n",MYTHREAD);
         //SAVE_ITERATION;   //Boundaries 2 + Iter
 
+        upc_barrier;
 // UPDATE VELOCITY AND DENSITY
         init_measure_time;
         UpdateMacroscopicStep(CalculateDragLift);
         end_measure_time(tUpdateMacro);
         //printf("T %i, Update Macro\n",MYTHREAD);
 
+        upc_barrier;
 ////////////// Residuals ///////////////
         init_measure_time;
         ComputeResiduals(Cells, Residuals, sumVel0, sumVel1, sumRho0, sumRho1, CalculateDragLift, &iter, Iterations);
@@ -394,11 +398,9 @@ void StreamingStep(){
 void HandleBoundariesStep(int OutletProfile, int CurvedBoundaries){
     int i, j, k;
 
-
     for (int i = LAYER; i < LAYER + BLOCKSIZE; ++i)
     {
         // INLET
-        //generalWall(Cells,i);
         InletBC(Cells, i);
 
         // WALL
@@ -687,11 +689,14 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
         }
     }
 }
+
 void save_iteration(int postproc_prog) {
 
-    if (iter%1000==0) {
+    if (iter%5==0) {
     //if (iter>499 && iter < 506) {
     //if(true) {
+        if(MYTHREAD == 0)
+            printf("Saving iteration %i, Rho residual = %lf\n",iter,Residuals[1]);
         UpdateMacroscopicStep(0);
         init_measure_time;
         switch (postproc_prog) {
@@ -720,6 +725,7 @@ void save_iteration(int postproc_prog) {
         iter_counter++;
     }
 }
+
 void write_cells_to_results(int postproc_prog) {
 
 // Write boundary cells to Results to see how mesh was distributed
@@ -802,6 +808,7 @@ void export_data(int postproc_prog) {
 
 
 }
+
 void print_cells_info(CellProps* Cells) {
     upc_barrier;
     FILE* out_cells_file;
@@ -829,6 +836,9 @@ void print_boundary_type(CellProps* Cells) {
         printf("printing boundaries T%i\n",MYTHREAD);
 
 
+    if (MYTHREAD == 4 && (Cells + 6247)->Boundary == 2)
+        printf("Printing: We are on thread 4\n");
+
     int count_B[4];
     count_B[0]=0;
     count_B[1]=0;
@@ -847,7 +857,7 @@ void print_boundary_type(CellProps* Cells) {
         printf("Get cell boundary info\n");
     for (int node_to_look = LAYER;node_to_look<BLOCKSIZE+LAYER;node_to_look++) {
         int BT;
-        printf("TEST, thread %i\n",MYTHREAD);
+        //printf("TEST, thread %i\n",MYTHREAD);
         if (node_to_look == LAYER)    {
             printf("Thread: %i,Node: %i,BT: %i\n",MYTHREAD,node_to_look,(Cells+node_to_look)->Boundary);
             int index_n, index_i, index_j, index_k;
@@ -871,6 +881,8 @@ void print_boundary_type(CellProps* Cells) {
         if ((BT = (Cells+node_to_look)->Boundary-1) !=-1 ) {
             //printf("BT: %i\n",BT);
             N_B[BT][count_B[BT]] = (Cells+node_to_look)->ID;
+            if (MYTHREAD == 4 && (Cells+node_to_look)->Boundary == 2)
+                //printf("Node = %i, Boundary = 2\n",node_to_look);
             count_B[BT]++;
         }
     }
