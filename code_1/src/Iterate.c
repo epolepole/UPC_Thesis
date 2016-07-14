@@ -32,6 +32,15 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
                float ConvergenceCritVeloc, float ConvergenceCritRho)
 {
 
+    if(MYTHREAD == 0) {
+        printf("Compiler defined parameters:\n");
+        printf("NN = %i\n", NN);
+        printf("NM = %i\n", NM);
+        printf("NL = %i\n", NL);
+        printf("LAYER = %i\n", LAYER);
+        printf("BLOCKSIZE = %i\n", BLOCKSIZE);
+        printf("LAYERS_PER_THREAD = %i\n", LAYERS_PER_THREAD);
+    }
 
     main_thread
         tStart = clock(); // BEGIN OF OVERALL TIME MEASUREMENT
@@ -692,7 +701,7 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
 
 void save_iteration(int postproc_prog) {
 
-    if (iter%500==0) {
+    if (iter%5==0) {
     //if (iter>499 && iter < 506) {
     //if(true) {
         if(MYTHREAD == 0)
@@ -856,7 +865,7 @@ void print_boundary_type(CellProps* Cells) {
         int BT;
         //printf("TEST, thread %i\n",MYTHREAD);
         if (node_to_look == LAYER)    {
-            //printf("Thread: %i,Node: %i,BT: %i\n",MYTHREAD,node_to_look,(Cells+node_to_look)->Boundary);
+            //printf("Thread: %i,Node: %i,BT: i\n",MYTHREAD,node_to_look,(Cells+node_to_look)->Boundary);
             int index_n, index_i, index_j, index_k;
             index_n = (Cells+LAYER)->ID;
             index_k = index_n/(NM*NN);
@@ -878,8 +887,6 @@ void print_boundary_type(CellProps* Cells) {
         if ((BT = (Cells+node_to_look)->Boundary-1) !=-1 ) {
             //printf("BT: %i\n",BT);
             N_B[BT][count_B[BT]] = (Cells+node_to_look)->ID;
-            if (MYTHREAD == 4 && (Cells+node_to_look)->Boundary == 2)
-                //printf("Node = %i, Boundary = 2\n",node_to_look);
             count_B[BT]++;
         }
     }
@@ -952,15 +959,14 @@ void print_cell_line(FILE* file, const CellProps* Cell) {
     index_k = index_n/(NM*NN);
     index_j = (index_n - index_k * NM* NN)/NM;
     index_i = (index_n - index_k * NM* NN - index_j * NM);
-    fprintf(file,"%7i |%3i |%3i |%3i || %5.5f | %5.5f | %5.5f ||%3i \n",
+    fprintf(file,"%7i |%3i |%3i |%3i || %5.5f | %5.5f | %5.5f \n",
             index_n,
             index_i,
             index_j,
             index_k,
             Cell->CoordX,
             Cell->CoordY,
-            Cell->CoordZ,
-            Cell->StreamLattice[14]
+            Cell->CoordZ
     );
 }
 

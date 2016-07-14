@@ -14,6 +14,7 @@
 #define NL 30
 #endif  //NL
 
+
 #define LAYER NN*NM
 #define NODES NN*NM*NL
 #define LAYERS_PER_THREAD ((int)(NL/THREADS))

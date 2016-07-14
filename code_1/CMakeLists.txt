@@ -40,6 +40,12 @@ message(STATUS "Compiling for ${THREADS} threads")
 set(CMAKE_C_FLAGS_DEBUG " -T ${THREADS} -g ")
 set(CMAKE_C_FLAGS_RELEASE " -T ${THREADS} ")
 
+if(NOT DEFINED NN)
+	set(NN 30)
+	set(NM 30)
+	set(NL 30)
+endif(NOT DEFINED NN)
+
 add_definitions(-DNN=${NN})
 add_definitions(-DNM=${NM})
 add_definitions(-DNL=${NL})
