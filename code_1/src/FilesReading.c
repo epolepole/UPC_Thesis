@@ -13,7 +13,7 @@
 
 float **ReadNodes(char* NodeDataFile)
 {
-  printf("Thread %i of %i running ReadNodes function\n", MYTHREAD, THREADS);
+  //printf("Thread %i of %i running ReadNodes function\n", MYTHREAD, THREADS);
 
   ////////////////////////////////////////////////////
   ///////////////////// Declare //////////////////////

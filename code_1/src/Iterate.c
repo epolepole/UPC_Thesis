@@ -192,7 +192,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         upc_barrier;
 ////////////// UPDATE DISTR ///////////////
         init_measure_time;
-        for(i = LAYER;  i < LAYER + BLOCKSIZE;  i++)
+        for(i = 60*60;  i < LAYER + BLOCKSIZE;  i++)
             UpdateF(Cells, i);
         end_measure_time(tUpdateF);
         //SAVE_ITERATION; //COLLISION ITER
@@ -818,7 +818,7 @@ void print_cells_info(CellProps* Cells) {
     for (int t_to_print_from = 0; t_to_print_from<THREADS;t_to_print_from++){
         if (MYTHREAD == t_to_print_from)
         {
-            printf("Going to Thread %i\n",MYTHREAD);
+            //printf("Going to Thread %i\n",MYTHREAD);
             fprintf(out_cells_file,"Printing from thread %i\n",MYTHREAD);
             fprintf(out_cells_file,"   ID   |  i |  j |  k ||    x    |    y    |    z   | s14 |\n");
             for(int cell_to_print = LAYER; cell_to_print< BLOCKSIZE+LAYER; cell_to_print++) {
@@ -829,15 +829,12 @@ void print_cells_info(CellProps* Cells) {
     }
     fclose(out_cells_file);
     upc_barrier;
-    printf("Cells info printed\n");
+    //printf("Cells info printed\n");
 }
 void print_boundary_type(CellProps* Cells) {
     main_thread
         printf("printing boundaries T%i\n",MYTHREAD);
 
-
-    if (MYTHREAD == 4 && (Cells + 6247)->Boundary == 2)
-        printf("Printing: We are on thread 4\n");
 
     int count_B[4];
     count_B[0]=0;
@@ -855,11 +852,11 @@ void print_boundary_type(CellProps* Cells) {
     upc_barrier;
     main_thread
         printf("Get cell boundary info\n");
-    for (int node_to_look = LAYER;node_to_look<BLOCKSIZE+LAYER;node_to_look++) {
+    for (int node_to_look = LAYER; node_to_look<BLOCKSIZE+LAYER; node_to_look++) {
         int BT;
         //printf("TEST, thread %i\n",MYTHREAD);
         if (node_to_look == LAYER)    {
-            printf("Thread: %i,Node: %i,BT: %i\n",MYTHREAD,node_to_look,(Cells+node_to_look)->Boundary);
+            //printf("Thread: %i,Node: %i,BT: %i\n",MYTHREAD,node_to_look,(Cells+node_to_look)->Boundary);
             int index_n, index_i, index_j, index_k;
             index_n = (Cells+LAYER)->ID;
             index_k = index_n/(NM*NN);
