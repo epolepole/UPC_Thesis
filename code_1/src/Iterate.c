@@ -287,7 +287,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
 
     }
 
-    test_all(Cells,iter);
+    //test_all(Cells,iter);
 
     //fclose(testing_file);
 //////////////////////////////////////////////////////
@@ -692,7 +692,7 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
 
 void save_iteration(int postproc_prog) {
 
-    if (iter%5==0) {
+    if (iter%500==0) {
     //if (iter>499 && iter < 506) {
     //if(true) {
         if(MYTHREAD == 0)
