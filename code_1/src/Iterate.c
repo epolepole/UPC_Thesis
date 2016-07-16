@@ -566,12 +566,15 @@ void allocate_residuals() {// allocate residuals
 }
 
 void free_vars() {
-    upc_free(Delta);
-    //upc_free(MaxInletCoordY);
-    //upc_free(MinInletCoordY);
-    upc_free(NumInletNodes);
-    upc_free(NumNodes);
-    upc_free(NumConn);
+    if (MYTHREAD == 0)
+    {
+        upc_free(Delta);
+        //upc_free(MaxInletCoordY);
+        //upc_free(MinInletCoordY);
+        upc_free(NumInletNodes);
+        upc_free(NumNodes);
+        upc_free(NumConn);
+    }
 
     free(Cells);
     free(w);
