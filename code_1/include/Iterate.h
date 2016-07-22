@@ -14,7 +14,7 @@
 #if __SAVE_ITER__ == 0
 #define SAVE_ITERATION
 #else //__SAVE_ITER__
-#define SAVE_ITERATION save_iteration(postproc_prog)
+#define SAVE_ITERATION save_iteration(postproc_prog,Iterations,AutosaveEvery)
 #endif //__SAVE_ITER__
 
 
@@ -109,10 +109,13 @@ void print_init_info_to_log(float Uavg, float Vavg, float Wavg, float rho_ini, f
 
 
 void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog);
-void save_iteration(int postproc_prog);
-void write_cells_to_results(int postproc_prog);
+void save_iteration(int postproc_prog,int Iterations, int AutosaveEvery);
+
+
+void write_boundary_cells_to_results(int postproc_prog);
 void save_init_data(int postproc_prog);
 void export_data(int postproc_prog);
+
 void print_cells_info(CellProps* Cells);
 void print_boundary_type(CellProps* Cells);
 void print_cell_line(FILE* file, const CellProps* Cell);

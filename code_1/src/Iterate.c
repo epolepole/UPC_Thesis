@@ -106,9 +106,9 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     upc_barrier;
 
 
-    print_cells_info(Cells);
+    //print_cells_info(Cells);
     upc_barrier;
-    print_boundary_type(Cells);
+    //print_boundary_type(Cells);
     upc_barrier;
 
     end_measure_time(tInitialization);
@@ -116,7 +116,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     upc_barrier;         // Synchronise
     if (MYTHREAD == 0)
     {
-        printf("Size of Cells = %d\n", sizeof(CellProps));    
+        printf("Size of Cells = %d\n", sizeof(CellProps));
     }
 
     // PUT INITIALIZED DATA TO BOUNDARIES
@@ -124,7 +124,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     // COPY CELLS TO WCELLS (writing cells) TO WRITE DATA
     putCellsToWCells();
 
-    write_cells_to_results(postproc_prog);
+    //write_cells_to_results(postproc_prog);
 
 
     free_mesh_data_matrices();  //BCNode
@@ -141,7 +141,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
         printf("\n:::: Initialization done! ::::\n");
 
 
-        save_init_data(postproc_prog);
+        //save_init_data(postproc_prog);
 
         // Open residuals file
         resid_file = fopen("Results/residuals.dat", "w");
@@ -176,8 +176,9 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     export_data(postproc_prog);
 
     upc_barrier;         // Synchronise
-
+    printf("Before freeing vars\n");
     free_vars();
+    printf("After freeing vars\n");
 
 }
 
@@ -187,7 +188,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
     //testing_file = fopen(testingFileName,"w");
     //fprintf(testing_file,"  ID  j  METAF[j]  F[j]\n");
     while (Residuals[0] > ConvergenceCritVeloc && Residuals[1] > ConvergenceCritRho && iter < (*Iterations))
-    //while (true)
+        //while (true)
         //while (false)
     {
         //printf("T %i, Starting iteration %i\n",MYTHREAD,iter);
@@ -345,7 +346,7 @@ void CollisionStep(int CollisionModel){
             for(i = LAYER;  i < BLOCKSIZE + LAYER;  i++)
             {
                 //if( (Cells+i)->Fluid == 1 )
-                    BGKW(i,Omega);
+                BGKW(i,Omega);
             }
             break;
 
@@ -354,7 +355,7 @@ void CollisionStep(int CollisionModel){
             for(i = LAYER;  i < BLOCKSIZE + LAYER;  i++)
             {
                 //if( (Cells+i)->Fluid == 1)
-                    TRT (Cells, i, w, cx, cy, opp, Omega, OmegaA);
+                TRT (Cells, i, w, cx, cy, opp, Omega, OmegaA);
             }
             break;
 
@@ -363,7 +364,7 @@ void CollisionStep(int CollisionModel){
             for(i = LAYER;  i < BLOCKSIZE + LAYER;  i++)
             {
                 //if( (Cells+i)->Fluid == 1)
-                    MRT(Cells, i, tm, stmiv);
+                MRT(Cells, i, tm, stmiv);
             }
             break;
     }
@@ -566,15 +567,14 @@ void allocate_residuals() {// allocate residuals
 }
 
 void free_vars() {
-    if (MYTHREAD == 0)
-    {
-        upc_free(Delta);
-        //upc_free(MaxInletCoordY);
-        //upc_free(MinInletCoordY);
-        upc_free(NumInletNodes);
-        upc_free(NumNodes);
-        upc_free(NumConn);
-    }
+    //if (MYTHREAD == 0) {
+    upc_free(Delta);
+    //upc_free(MaxInletCoordY);
+    //upc_free(MinInletCoordY);
+    upc_free(NumInletNodes);
+    upc_free(NumNodes);
+    upc_free(NumConn);
+    //}
 
     free(Cells);
     free(w);
@@ -702,11 +702,11 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
     }
 }
 
-void save_iteration(int postproc_prog) {
+void save_iteration(int postproc_prog,int Iterations, int AutosaveEvery) {
 
-    if (iter%500==0) {
-    //if (iter>499 && iter < 506) {
-    //if(true) {
+    if ((iter * 100)%AutosaveEvery == 0) {
+        //if (iter>499 && iter < 506) {
+        //if(true) {
         if(MYTHREAD == 0)
             printf("Saving iteration %i, Rho residual = %lf\n",iter,Residuals[1]);
         UpdateMacroscopicStep(0);
@@ -738,18 +738,21 @@ void save_iteration(int postproc_prog) {
     }
 }
 
-void write_cells_to_results(int postproc_prog) {
+void write_boundary_cells_to_results(int postproc_prog) {
 
 // Write boundary cells to Results to see how mesh was distributed
     if(MYTHREAD==0)
     {
-        switch(postproc_prog)
-        { case 1: sprintf(fnMemCopyRes, "Results/MyBoundaryCells.csv");   break;
-            case 2: sprintf(fnMemCopyRes, "Results/MyBoundaryCells.dat");   break; }
-
+        switch(postproc_prog)  {
+            case 1: sprintf(fnMemCopyRes, "Results/MyBoundaryCells.csv");   break;
+            case 2: sprintf(fnMemCopyRes, "Results/MyBoundaryCells.dat");   break;
+        }
+        printf(fnMemCopyRes);
+        printf("\n");
         WriteBCells(fnMemCopyRes, ppp);
     }
 }
+
 void save_init_data(int postproc_prog) {// Write Initialized data
     switch(postproc_prog)
     { case 1: sprintf(OutputFile, "Results/InitialData.csv");   break;
@@ -812,10 +815,11 @@ void export_data(int postproc_prog) {
         printf("Residuals were written to Results/residuals.dat\n");
         printf("Profiling results were written to Results/ParallelTimeMeasuerment.dat\n");
         printf("Final results were written to %s\n", FinalOutputFile);
+        //write_boundary_cells_to_results(*ppp);
 
-        WriteBCells(fnMemCopyRes, ppp);
-        printf("BCells were written!\n");
-        puts("BCells were written!");
+        //WriteBCells(fnMemCopyRes, ppp);
+        //printf("BCells were written!\n");
+        //puts("BCells were written!");
     } // END OF THREAD ZERO
 
 
@@ -906,7 +910,7 @@ void print_boundary_type(CellProps* Cells) {
     b_filename[1] = b2_filename;
     b_filename[2] = b3_filename;
     b_filename[3] = b4_filename;
-    if (MYTHREAD == 0) {
+    /*if (MYTHREAD == 0) {
         printf(b_filename[0]);
         printf("\n");
         printf(b1_filename);
@@ -922,7 +926,7 @@ void print_boundary_type(CellProps* Cells) {
         printf(b_filename[3]);
         printf("\n");
         printf(b4_filename);
-        printf("\n");}
+        printf("\n");}*/
 
     if (MYTHREAD == 0){
         for(int BT = 0; BT<4; BT++) {
