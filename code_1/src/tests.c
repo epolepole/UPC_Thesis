@@ -55,8 +55,7 @@ void test_stream(int ID,CellProps* Cells,int iter) {
 
 void test_boundaries(CellProps* Cells,int iter) {
 
-    int ID;
-    int T;
+    int ID = 0;
     double temp;
     if (MYTHREAD == 0) {
         tests_file = fopen(tests_file_name, "a");
