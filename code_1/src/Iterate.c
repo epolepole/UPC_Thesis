@@ -1,7 +1,6 @@
 #include <stdio.h>                      // printf();
 #include <stdlib.h>                     // for calloc();
 #include <time.h>                       // time functions
-//#include <upc_relaxed.h>                // Required for UPC
 #include <CellFunctions.h>
 #include <ComputeResiduals.h>
 #include <FilesWriting.h>
@@ -178,8 +177,8 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     upc_barrier;         // Synchronise
     printf("Before freeing vars\n");
     free_vars();
+    upc_barrier;         // Synchronise
     printf("After freeing vars\n");
-
 }
 
 void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile, int *Iterations, int AutosaveAfter,
@@ -202,7 +201,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         upc_barrier;
 ////////////// UPDATE DISTR ///////////////
         init_measure_time;
-        for(i = 60*60;  i < LAYER + BLOCKSIZE;  i++)
+        for(i = LAYER;  i < LAYER + BLOCKSIZE;  i++)
             UpdateF(Cells, i);
         end_measure_time(tUpdateF);
         //SAVE_ITERATION; //COLLISION ITER
@@ -669,8 +668,8 @@ void print_init_info_to_log(float Uavg, float Vavg, float Wavg, float rho_ini, f
         fprintf(log_file,">>> # of nodes in y (m) = %d\n", NM);
         fprintf(log_file,">>> # of nodes in z (l) = %d\n", NL);
         fprintf(log_file,">>> NumInletNodes       = %d\n", *NumInletNodes);
-//fprintf(log_file,">>> MaxInletCoordY      = %f\n", *MaxInletCoordY);
-//fprintf(log_file,">>> MinInletCoordY      = %f\n", *MinInletCoordY);
+        //fprintf(log_file,">>> MaxInletCoordY      = %f\n", *MaxInletCoordY);
+        //fprintf(log_file,">>> MinInletCoordY      = %f\n", *MinInletCoordY);
 
         fprintf(log_file,"\n:::: Parallel properties :::: \n");
         fprintf(log_file,">>> # of threads        = %d\n", THREADS);

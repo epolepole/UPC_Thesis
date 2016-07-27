@@ -81,7 +81,6 @@ int main(int argc, char* argv[])
               ConvergenceCritVeloc,  // convergence criterion for velocity
               ConvergenceCritRho);   // convergence criterion for density
 
-
   ///////////////////////
   // END OF THE SOLVER //
   ///////////////////////
