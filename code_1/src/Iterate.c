@@ -133,7 +133,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     upc_barrier;         // Synchronise
     if (MYTHREAD == 0)
     {
-        printf("Size of Cells = %d\n", sizeof(CellProps));
+        printf("Size of Cells = %i\n", (int)sizeof(CellProps));
     }
 
     // PUT INITIALIZED DATA TO BOUNDARIES
@@ -278,6 +278,14 @@ void putCellsToShared(){
     upc_memput( &BCells[    2 * LAYER * MYTHREAD   ], &Cells[       LAYER       ], LAYER * sizeof(CellProps) ); // FIRST LAYER
     upc_memput( &BCells[ LAYER * (2 * MYTHREAD + 1)], &Cells[     BLOCKSIZE     ], LAYER * sizeof(CellProps) ); // LAST LAYER
 }
+
+void putCellsToShared_NEW(){
+//                     DESTINATION                           SOURCE                            SIZE
+    upc_memput( &BCells[    2 * LAYER * MYTHREAD   ], &Cells[       LAYER       ], LAYER * sizeof(CellProps) ); // FIRST LAYER
+    upc_memput( &BCells[ LAYER * (2 * MYTHREAD + 1)], &Cells[     BLOCKSIZE     ], LAYER * sizeof(CellProps) ); // LAST LAYER
+}
+
+
 void getSharedToCells(){
 
     if (MYTHREAD == THREADS-1)  // LAST THREAD ::: copy only the first layer
