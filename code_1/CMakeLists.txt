@@ -5,11 +5,12 @@ cmake_minimum_required (VERSION 2.6)
 
 
 
-#set(UPC "")
+#set(UPC "1")
 
 if(DEFINED UPC)
 	set(CMAKE_C_COMPILER upcc)
 	message(STATUS "Using Berkeley UPC")
+	include_directories(/home/epolepole/Programs/berkeley_upc-2.22.2/upcr_preinclude/ /home/epolepole/Programs/berkeley_upc-2.22.2/)
 else(DEFINED UPC)
 	#set(CMAKE_C_COMPILER /usr/bin/gcc)
 	message(STATUS "Using default compiler")
