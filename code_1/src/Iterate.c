@@ -103,8 +103,10 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
              CollisionModel,   // INPUT PARAMETER
              opp,              // Opposite direction
              rho_ini);         // Initial density
+    end_measure_time(tCellsInitialization);
 
 
+    init_measure_time;
     CellIni_NEW( Cells_NEW,
              Nodes,            // Nodes
              BCconn,           // BCconn
@@ -115,8 +117,8 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
              CollisionModel,   // INPUT PARAMETER
              opp,              // Opposite direction
              rho_ini);         // Initial density
+    end_measure_time(tCellsInitialization_NEW);
 
-    end_measure_time(tCellsInitialization);
     main_thread
         printf("Cell intialization completed\n");
     upc_barrier;
@@ -128,7 +130,8 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     upc_barrier;
     */
 
-    end_measure_time(tInitialization);
+    tInitialization =+ (float)(tStart-clock()) / CLOCKS_PER_SEC;
+    //end_measure_time(tInitialization);
 
     upc_barrier;         // Synchronise
     if (MYTHREAD == 0)
@@ -220,11 +223,18 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         end_measure_time(tUpdateF);
         upc_barrier;
 
-// PUT THREAD-BOUNDARY CELLS TO SHARED
+//////////////// PUT THREAD-BOUNDARY CELLS TO SHARED ////////////////
         init_measure_time;
         putCellsToShared();
         end_measure_time(tBCells);
-        upc_barrier;         
+        upc_barrier;
+
+//////////////// PUT THREAD-BOUNDARY CELLS TO SHARED WITH CUBES ////////////////
+        init_measure_time;
+        putCellsToShared_NEW();
+        end_measure_time(tBCells_NEW);
+        upc_barrier;
+
 
 //////////////// COPY SHARED BCELLS TO CELLS ////////////////
         init_measure_time;
@@ -280,10 +290,167 @@ void putCellsToShared(){
 }
 
 void putCellsToShared_NEW(){
+    FillLocalBCells();
 //                     DESTINATION                           SOURCE                            SIZE
-    upc_memput( &BCells[    2 * LAYER * MYTHREAD   ], &Cells[       LAYER       ], LAYER * sizeof(CellProps) ); // FIRST LAYER
-    upc_memput( &BCells[ LAYER * (2 * MYTHREAD + 1)], &Cells[     BLOCKSIZE     ], LAYER * sizeof(CellProps) ); // LAST LAYER
+    upc_memput( &BCells_NEW[MYTHREAD*B_CELLS_SIZE],&Local_BCells_NEW[0],    B_CELLS_SIZE*sizeof(CellProps));
 }
+void FillLocalBCells() {
+    int i, j, k;
+    int c_BC = 0;         //Local BCells counter
+    //Faces
+    for (int f=0;f<7;f++){
+        int min_max = f%2;
+        int dir = f/2;
+        for (i = 1; i<LAT+1; i++) {
+            for (j = 1; j < LAT + 1; j++) {
+                for (k = 1; k < LAT + 1; k++) {
+                    Local_BCells_NEW[c_BC] = Cells[lID(i, j, k)];
+                    c_BC++;
+                }
+            }
+        }
+
+
+    }
+
+    //X min:
+    i = 1;
+    for (j = 1; j<LAT+1; j++){
+        for (k = 1; k<LAT+1; k++){
+            Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
+            c_BC++;
+        }
+    }
+    //X max:
+    i=LAT;
+    for (j = 1; j<LAT+1; j++){
+        for (k = 1; k<LAT+1; k++){
+            Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
+            c_BC++;
+        }
+    }
+    //Y min:
+    j = 1;
+    for (i = 1; i<LAT+1; i++){
+        for (k = 1; k<LAT+1; k++){
+            Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
+            c_BC++;
+        }
+    }
+    //Y max:
+    j=LAT;
+    for (i = 1; i<LAT+1; i++){
+        for (k = 1; k<LAT+1; k++){
+            Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
+            c_BC++;
+        }
+    }
+    //Z min:
+    k = 1;
+    for (i = 1; i<LAT+1; i++){
+        for (j = 1; j<LAT+1; j++){
+            Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
+            c_BC++;
+        }
+    }
+    //Z max:
+    k=LAT;
+    for (i = 1; i<LAT+1; i++){
+        for (j = 1; j<LAT+1; j++){
+            Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
+            c_BC++;
+        }
+    }
+    //Edges
+    //X
+    j=1;
+    k=1;
+    for (i=1;i<LAT+1;i++){
+        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
+        c_BC++;
+    }
+    j=1;
+    k=LAT;
+    for (i=1;i<LAT+1;i++){
+        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
+        c_BC++;
+    }
+    j=LAT;
+    k=1;
+    for (i=1;i<LAT+1;i++){
+        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
+        c_BC++;
+    }
+    j=LAT;
+    k=LAT;
+    for (i=1;i<LAT+1;i++){
+        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
+        c_BC++;
+    }
+
+    //Y
+    k=1;
+    i=1;
+    for (j=1;j<LAT+1;j++){
+        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
+        c_BC++;
+    }
+    k=1;
+    i=LAT;
+    for (j=1;j<LAT+1;j++){
+        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
+        c_BC++;
+    }
+    k=LAT;
+    i=1;
+    for (j=1;j<LAT+1;j++){
+        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
+        c_BC++;
+    }
+    k=LAT;
+    i=LAT;
+    for (j=1;j<LAT+1;j++){
+        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
+        c_BC++;
+    }
+
+    //Z
+    i=1;
+    j=1;
+    for (k=1;k<LAT+1;k++){
+        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
+        c_BC++;
+    }
+    i=1;
+    j=LAT;
+    for (k=1;k<LAT+1;k++){
+        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
+        c_BC++;
+    }
+    i=LAT;
+    j=1;
+    for (k=1;k<LAT+1;k++){
+        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
+        c_BC++;
+    }
+    i=LAT;
+    j=LAT;
+    for (k=1;k<LAT+1;k++){
+        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
+        c_BC++;
+    }
+    //Corners
+    for(i=1; i < LAT + 1;i =+ LAT - 1){
+        for(j=1; j < LAT + 1;j =+ LAT - 1) {
+            for (k = 1; k < LAT + 1; k =+ LAT - 1) {
+                Local_BCells_NEW[c_BC] = Cells[lID(i, j, k)];
+                c_BC++;
+            }
+        }
+    }
+
+}
+
 
 
 void getSharedToCells(){
@@ -467,6 +634,8 @@ void time_meas_vars_init() {// Time measurement variables
     tResiduals       = 0.0; // Time measurement of calculating residuals
     tWriting         = 0.0; // Time measurement of writing data
     tBCells          = 0.0; // Time measurement of handling boundaries
+    tCellsInitialization_NEW  = 0.0; // Time measurement of Initialization
+    tBCells_NEW          = 0.0; // Time measurement of handling boundaries
 
 }
 
@@ -480,6 +649,7 @@ void alloc_cells() {//////////////////////////////////////////////////////
     WCells_NEW = (shared_block(BLOCKSIZE_NEW)    CellProps*)upc_all_alloc(THREADS, BLOCKSIZE_NEW*sizeof(CellProps));
     BCells_NEW = (shared_block(B_CELLS_SIZE)     CellProps*)upc_all_alloc(THREADS, B_CELLS_SIZE*sizeof(CellProps));
     Cells_NEW = calloc(BLOCKSIZE_NEW + (size_t)B_CELLS_SIZE,sizeof(CellProps));
+    Local_BCells_NEW = calloc((size_t)B_CELLS_SIZE ,sizeof(CellProps));
     //////////////////////////////////////////////////////
 
 }
@@ -720,6 +890,7 @@ void export_data(int postproc_prog) {
 
         fprintf(log_file,"\nOverall calculations took %f seconds\n", tOverall);
         fprintf(log_file,"Main while loop took %f seconds\n",        tIteration);
+        fprintf(log_file,"Cells init took %f seconds\n",             tCellsInitialization);
         fprintf(log_file,"Initialization took %f seconds\n",         tInitialization);
         fprintf(log_file,"Collision took %f seconds\n",              tCollision);
         fprintf(log_file,"UpdateF took %f seconds\n",                tUpdateF);
@@ -729,6 +900,9 @@ void export_data(int postproc_prog) {
         fprintf(log_file,"Calculating Residuals took %f seconds\n",  tResiduals);
         fprintf(log_file,"Writing results took %f seconds\n",        tWriting);
         fprintf(log_file,"Copying boundary cells took %f seconds\n", tBCells);
+        fprintf(log_file,"Times with CUBES\n");
+        fprintf(log_file,"Cells init with CUBES took %f seconds\n",  tCellsInitialization_NEW);
+        fprintf(log_file,"Copying boundary cells with CUBES took %f seconds\n", tBCells_NEW);
 
 
         // end time measurement, close log file
@@ -738,6 +912,8 @@ void export_data(int postproc_prog) {
         TimeMeasurementFile = fopen("Results/ParallelTimeMeasuerment.dat","w");
         fprintf(TimeMeasurementFile,"tOverall %f\n",        tOverall);
         fprintf(TimeMeasurementFile,"tIteration %f\n",      tIteration);
+        fprintf(TimeMeasurementFile,"tCellsInitialization %f\n", tCellsInitialization);
+        fprintf(TimeMeasurementFile,"tCellsInitialization_with_CUBES %f\n", tCellsInitialization_NEW);
         fprintf(TimeMeasurementFile,"tInitialization %f\n", tInitialization);
         fprintf(TimeMeasurementFile,"tCollision %f\n",      tCollision);
         fprintf(TimeMeasurementFile,"tUpdateF %f\n",        tUpdateF);
@@ -747,6 +923,7 @@ void export_data(int postproc_prog) {
         fprintf(TimeMeasurementFile,"tResiduals %f\n",      tResiduals);
         fprintf(TimeMeasurementFile,"tWriting %f\n",        tWriting);
         fprintf(TimeMeasurementFile,"tBCells %f\n",         tBCells);
+        fprintf(TimeMeasurementFile,"tBCells_with_CUBES %f\n",         tBCells_NEW);
         fprintf(TimeMeasurementFile,"THREADS %d\n",         THREADS);
         fclose(TimeMeasurementFile);
 

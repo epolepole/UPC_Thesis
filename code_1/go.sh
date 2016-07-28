@@ -5,5 +5,5 @@
 #3: Mesh size
 
 #./clean.sh
-./rebuild.sh $1 $2 $3
+./rebuild.sh $1 $2 $3 $4
 ./run.sh $1

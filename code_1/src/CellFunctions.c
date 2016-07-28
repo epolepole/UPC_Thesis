@@ -560,8 +560,8 @@ void CellIni_NEW(CellProps *Cells,
 
                 index_Cell = i*(LAT+2)*(LAT+2) + j*(LAT+2) + k;
                 lID = i_r*(LAT)*(LAT) + j_r*(LAT) + k_r;
-                //Local movement
-                int ID  = lID%LAT +                                         //   i
+                          //Local movement
+                int ID  = lID%LAT +                                           //   i
                           (lID/LAT)%LAT*NL +                                  //   j
                           lID%(LAT*LAT)*NL*NM +                               //   k
                           //Global movement

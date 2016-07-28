@@ -17,7 +17,6 @@ rm -fr bin/Results
 
 
 
-
 if [ $1 == "R" ] ; then
     verbose_makefile=OFF
     build_type=Release
@@ -43,6 +42,6 @@ elif [ $1 == "D" ] ; then
     echo Debugging
 fi
 
-cmake .. -DUPC=1 -DTHREADS=$threads -DCMAKE_VERBOSE_MAKEFILE=$verbose_makefile -DCMAKE_BUILD_TYPE=$build_type -DSAVE_ITER=$save_iter -DNN=$3 -DNM=$3 -DNL=$3
+cmake .. -DUPC=1 -DTHREADS=$threads -DCMAKE_VERBOSE_MAKEFILE=$verbose_makefile -DCMAKE_BUILD_TYPE=$build_type -DSAVE_ITER=$save_iter -DNN=$3 -DNM=$3 -DNL=$3 -DLAT=$4
 make
 cd ../

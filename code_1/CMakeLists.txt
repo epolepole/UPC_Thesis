@@ -13,6 +13,7 @@ if(DEFINED UPC)
 	include_directories(/home/epolepole/Programs/berkeley_upc-2.22.2/upcr_preinclude/ /home/epolepole/Programs/berkeley_upc-2.22.2/)
 else(DEFINED UPC)
 	#set(CMAKE_C_COMPILER /usr/bin/gcc)
+	set(LAT 8)
 	message(STATUS "Using default compiler")
 	include_directories(/home/epolepole/Programs/berkeley_upc-2.22.2/upcr_preinclude/ /home/epolepole/Programs/berkeley_upc-2.22.2/)
 
@@ -47,11 +48,15 @@ if(NOT DEFINED NN)
 	set(NL 30)
 endif(NOT DEFINED NN)
 
+if(NOT DEFINED LAT)
+	message(FATAL_ERROR "Not cube lateral size input")
+endif(NOT DEFINED LAT)
 add_definitions(-DGASNET_TRACEMASK="BNH")
 
 add_definitions(-DNN=${NN})
 add_definitions(-DNM=${NM})
 add_definitions(-DNL=${NL})
+add_definitions(-DLAT=${LAT})
 
 IF(DEFINED SAVE_ITER AND SAVE_ITER)
 	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D__SAVE_ITER__=1")

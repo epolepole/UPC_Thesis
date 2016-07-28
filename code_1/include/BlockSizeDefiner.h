@@ -3,7 +3,6 @@
 
 #include <math.h>
 
-#define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 
 
@@ -30,16 +29,16 @@
 #define NTD (int) pow(THREADS,1/3.)
 
 //Lateral of cube
-#define LAT (int) pow(NODES/THREADS,1/3.)
+//#define LAT (int) pow(NODES/THREADS,1/3.)
 
 #define NTDX (int)NN/LAT
 #define NTDY (int)NM/LAT
 #define NTDZ (int)NL/LAT
 
 
-#define BLOCKSIZE_NEW (int) pow(LAT,3.)
-        //           Faces          Edges    Corners
-#define B_CELLS_SIZE (int)(6*pow(LAT,2) + 12*LAT + 8)
+#define BLOCKSIZE_NEW (int)LAT*LAT*LAT
+        //                 Faces       Edges    Corners
+#define B_CELLS_SIZE (int)(6*LAT*LAT + 12*LAT + 8)
 
 
 #endif

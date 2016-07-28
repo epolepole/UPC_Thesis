@@ -47,6 +47,7 @@ int iter_counter;
 
 CellProps *Cells;                       // Struct for Cells
 CellProps *Cells_NEW;                       // Struct for Cells
+CellProps *Local_BCells_NEW;
 
 
 // Time measurement variables
@@ -61,6 +62,9 @@ float tUpdateMacro;             // Time measurement of Update Macroscopic vars
 float tResiduals;               // Time measurement of calculating residuals
 float tWriting;                 // Time measurement of writing data
 float tBCells;                  // Time measurement of handling boundaries
+
+float tCellsInitialization_NEW;          // Time measurement of Initialization
+float tBCells_NEW;                  // Time measurement of handling boundaries
 clock_t tInstant1, tInstant2;   // Time measurement points: universal
 clock_t tIterStart, tIterEnd;   // Time measurement points: main loop
 
@@ -125,6 +129,7 @@ void print_cell_line(FILE* file, const CellProps* Cell);
 
 void putCellsToShared();
 void putCellsToShared_NEW();
+void FillLocalBCells();
 void getSharedToCells();
 void putCellsToWCells();
 

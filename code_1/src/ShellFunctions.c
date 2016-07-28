@@ -8,6 +8,8 @@
 #include <dirent.h>    // Directory management
 #include <sys/stat.h>  // system commands ?
 
+#include "ShellFunctions.h"
+
 
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
@@ -239,4 +241,9 @@ void StringAddition(char* first, char* second, char* result)
 {
   strcat(result, first); 
   strcat(result, second); 
+}
+
+
+int lID(int i, int j, int k) {
+    return i*(LAT+2)*(LAT+2) + j*(LAT+2) + k;
 }
