@@ -187,7 +187,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
                      int AutosaveEvery, int postproc_prog, int CalculateDragLift, float ConvergenceCritVeloc,
                      float ConvergenceCritRho) {
 
-    while (Residuals[0] > ConvergenceCritVeloc && Residuals[1] > ConvergenceCritRho && iter < (*Iterations))
+    while ((Residuals[0] > ConvergenceCritVeloc || Residuals[1] > ConvergenceCritRho) && iter < (*Iterations))
             {
        
 //////////////// COLLISION ////////////////
