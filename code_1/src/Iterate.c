@@ -104,11 +104,12 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
         printf("Cell intialization completed\n");
     upc_barrier;
 
-
-    //print_cells_info(Cells);
+    /*
+    print_cells_info(Cells);
     upc_barrier;
-    //print_boundary_type(Cells);
+    print_boundary_type(Cells);
     upc_barrier;
+    */
 
     end_measure_time(tInitialization);
 
@@ -179,126 +180,74 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     free_vars();
     upc_barrier;         // Synchronise
     printf("After freeing vars\n");
+
 }
 
 void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile, int *Iterations, int AutosaveAfter,
                      int AutosaveEvery, int postproc_prog, int CalculateDragLift, float ConvergenceCritVeloc,
                      float ConvergenceCritRho) {
-    //testing_file = fopen(testingFileName,"w");
-    //fprintf(testing_file,"  ID  j  METAF[j]  F[j]\n");
+
     while (Residuals[0] > ConvergenceCritVeloc && Residuals[1] > ConvergenceCritRho && iter < (*Iterations))
-        //while (true)
-        //while (false)
-    {
-        //printf("T %i, Starting iteration %i\n",MYTHREAD,iter);
+            {
+       
 //////////////// COLLISION ////////////////
         init_measure_time;
         CollisionStep(CollisionModel); ////////////////////// !!!!!!!!!!!!!!!!! CX CY!
         end_measure_time(tCollision);
-
-        //printf("T %i, Collision\n",MYTHREAD);
-
         upc_barrier;
-////////////// UPDATE DISTR ///////////////
+
+       ////////////// UPDATE DISTR ///////////////
         init_measure_time;
         for(i = LAYER;  i < LAYER + BLOCKSIZE;  i++)
             UpdateF(Cells, i);
         end_measure_time(tUpdateF);
-        //SAVE_ITERATION; //COLLISION ITER
-        //printf("T %i, UpdateF\n",MYTHREAD);
-
         upc_barrier;
+
 // PUT THREAD-BOUNDARY CELLS TO SHARED
         init_measure_time;
         putCellsToShared();
         end_measure_time(tBCells);
-        //printf("T %i, BCells\n",MYTHREAD);
-
-        upc_barrier;         // Synchronise
+        upc_barrier;         
 
 //////////////// COPY SHARED BCELLS TO CELLS ////////////////
         init_measure_time;
         getSharedToCells();
         end_measure_time(tBCells);
-
-        //printf("T %i, getShared to cells\n",MYTHREAD);
-        upc_barrier;         // Synchronise
+        upc_barrier;
 
 ////////////// STREAMING ///////////////
         init_measure_time;
         StreamingStep();
         end_measure_time(tStreaming);
-        //SAVE_ITERATION;    //STREAMING 1 + iter
-        //printf("T %i, Streaming\n",MYTHREAD);
         upc_barrier;
 
 ////////////// BOUNDARIES ///////////////
         init_measure_time;
         HandleBoundariesStep(OutletProfile, CurvedBoundaries);
         end_measure_time(tBoundaries);
-        //printf("T %i, Boundaries\n",MYTHREAD);
-        //SAVE_ITERATION;   //Boundaries 2 + Iter
-
         upc_barrier;
+
 // UPDATE VELOCITY AND DENSITY
         init_measure_time;
         UpdateMacroscopicStep(CalculateDragLift);
         end_measure_time(tUpdateMacro);
-        //printf("T %i, Update Macro\n",MYTHREAD);
-
         upc_barrier;
+
 ////////////// Residuals ///////////////
         init_measure_time;
         ComputeResiduals(Cells, Residuals, sumVel0, sumVel1, sumRho0, sumRho1, CalculateDragLift, &iter, Iterations);
         end_measure_time(tResiduals);
 
-        //printf("T %i, Residuals\n",MYTHREAD);
-
         if(MYTHREAD==0)
             fprintf(resid_file,"%d %5.4e %5.4e %5.4e %f %f\n", iter, (iter+1.0)*(*Delta), Residuals[0], Residuals[1], Residuals[2], Residuals[3]);
 
         iter++; // update loop variable
-        //printf("Iteration: %i\n", iter);
-
-
-        //Thread, coords,
-        /*if(MYTHREAD == 0 && iter<3) {
-            for (i = 2*LAYER + NN; i < 2*LAYER+ NN + 10; i++) {
-                for (j = 0; j < 19; j++) {
-                    fprintf(testing_file, "%5i %2i %7.5f %7.5f\n", (Cells + i)->ID, j, (Cells + i)->METAF[j],
-                            (Cells + i)->F[j]);
-                }
-            }
-            for (i = 2 * LAYER+ NN + 30; i < 2 * LAYER+ NN + 40; i++)
-                for (j = 0; j < 19; j++) {
-                    fprintf(testing_file, "%5i %2i %7.5f %7.5f\n", (Cells + i)->ID, j, (Cells + i)->METAF[j],
-                            (Cells + i)->F[j]);
-                }
-            for (i = 3 * LAYER+ NN; i < 3 * LAYER+ NN + 10; i++)
-                for (j = 0; j < 19; j++) {
-                    fprintf(testing_file, "%5i %2i %7.5f %7.5f\n", (Cells + i)->ID, j, (Cells + i)->METAF[j],
-                            (Cells + i)->F[j]);
-                }
-        }*/
-
-
-        /*if(iter%5==0 && MYTHREAD==0){
-            printf("Iterations: %05d/%05d || ", iter, (*Iterations));
-            printf("Residuals: l2norm  %e; L2_norm_weighted  %e\n", Residuals[0], Residuals[1]);
-        }*/
-
         SAVE_ITERATION;
-
-        //printf("Doing step :%i\n", iter);
 
 ////////////// Autosave ///////////////
         auto_save(AutosaveAfter, AutosaveEvery, postproc_prog);
-
     }
 
-    //test_all(Cells,iter);
-
-    //fclose(testing_file);
 //////////////////////////////////////////////////////
 ////////////// END OF MAIN WHILE CYCLE ///////////////
 //////////////////////////////////////////////////////
@@ -367,26 +316,8 @@ void CollisionStep(int CollisionModel){
             }
             break;
     }
-
-    /* OLD CODE, simpler but switches at every cell
-      for (i=0; i<*m;i++)
-      {
-        for (j=0; j<*n;j++)
-        {
-          if (Cells[j][i].Fluid == 1)
-          {
-            switch(CollisionModel)
-            {
-              case 1:  BGKW(Cells, j, i, w, cx, cy, Omega);               break;
-              case 2:  TRT (Cells, j, i, w, cx, cy, opp, Omega, OmegaA);  break;
-              case 3:  MRT (Cells, j, i, tm, stmiv);                      break;
-            }
-          }
-        }
-      }
-    */
-
 }
+
 void StreamingStep(){
     int i, j;
     for(i = LAYER;  i < BLOCKSIZE + LAYER;  ++i)
@@ -422,7 +353,6 @@ void HandleBoundariesStep(int OutletProfile, int CurvedBoundaries){
                 CurvedWallBoundaries(Cells, j, i, opp);
                 break;
 
-                // bounceback boundaries
             case 2:
                 WallBC(Cells, i, opp);
                 break;
@@ -476,10 +406,7 @@ void HandleBoundariesStep(int OutletProfile, int CurvedBoundaries){
     }
 }
 void UpdateMacroscopicStep(int CalculateDragLift){
-    int i, j;
-    //upc_forall(i=0; i<((*m)*(*n)); i++; &Cells[i])
-    //for(i = NN;  i < (LAYER+1)*NN;  i++)
-    for(i = LAYER;  i < (LAYER+BLOCKSIZE);  i++)
+    for(int i = LAYER;  i < (LAYER+BLOCKSIZE);  i++)
     {
         //if ((Cells+i)->Fluid == 1)
         UpdateMacroscopic(Cells, i, CalculateDragLift);
@@ -602,7 +529,7 @@ void read_data(const char *NodeDataFile, const char *BCconnectorDataFile) {/////
     Nodes   = ReadNodes(NodeDataFile);          // Read Node data
     BCconn  = ReadBCconn(BCconnectorDataFile);  // Read BCconn data
     CompDataNode(Nodes);
-    //CompDataConn(BCconn);
+    CompDataConn(BCconn);
 
 }
 
@@ -667,9 +594,9 @@ void print_init_info_to_log(float Uavg, float Vavg, float Wavg, float rho_ini, f
         fprintf(log_file,">>> # of nodes in x (n) = %d\n", NN);
         fprintf(log_file,">>> # of nodes in y (m) = %d\n", NM);
         fprintf(log_file,">>> # of nodes in z (l) = %d\n", NL);
-        fprintf(log_file,">>> NumInletNodes       = %d\n", *NumInletNodes);
-        //fprintf(log_file,">>> MaxInletCoordY      = %f\n", *MaxInletCoordY);
-        //fprintf(log_file,">>> MinInletCoordY      = %f\n", *MinInletCoordY);
+        //fprintf(log_file,">>> NumInletNodes       = %d\n", *NumInletNodes);
+//fprintf(log_file,">>> MaxInletCoordY      = %f\n", *MaxInletCoordY);
+//fprintf(log_file,">>> MinInletCoordY      = %f\n", *MinInletCoordY);
 
         fprintf(log_file,"\n:::: Parallel properties :::: \n");
         fprintf(log_file,">>> # of threads        = %d\n", THREADS);
@@ -704,8 +631,7 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
 void save_iteration(int postproc_prog,int Iterations, int AutosaveEvery) {
 
     if ((iter * 100)%AutosaveEvery == 0) {
-        //if (iter>499 && iter < 506) {
-        //if(true) {
+        
         if(MYTHREAD == 0)
             printf("Saving iteration %i, Rho residual = %lf\n",iter,Residuals[1]);
         UpdateMacroscopicStep(0);
@@ -718,18 +644,11 @@ void save_iteration(int postproc_prog,int Iterations, int AutosaveEvery) {
                 sprintf(IterationOutputFile, "Results/iterations/iter.dat.%i", iter_counter);
                 break;
         }
-        putCellsToWCells(); // Put information to WCells and write (Write Cells)
-        /*int n_id = 6271;
-        i = n_id + LAYER - MYTHREAD*BLOCKSIZE;
-        if(MYTHREAD == 1)
-            printf("We are on iteration the controll cell %i\n",(Cells +i)->ID);
-        if(MYTHREAD == 1) {
-            printf("        F was %f\n", (Cells + i)->F[9]);
-            printf("        F was %f\n", (WCells + n_id)->F[9]);
+        putCellsToWCells();
 
-        }*/
         if (MYTHREAD == 0) // AUTOSAVE
             WriteResults(IterationOutputFile, ppp);
+
         end_measure_time(tWriting);
 
 
