@@ -34,6 +34,18 @@ void CellIni(CellProps *Cells,
              int*   opp,
              float  rho_ini);
 
+
+void CellIni_NEW(CellProps *Cells,
+             float  **Nod,
+             float  **Con,
+             float  Uavg,
+             float  Vavg,
+             float  Wavg,
+             int    InletProfile,
+             int    CollisionModel,
+             int*   opp,
+             float  rho_ini);
+
 void BGKW(int i, double Omega);
 
 void TRT(CellProps *Cells, int i, double* w, int* cx, int* cy, int* opp, double Omega, double OmegaA);

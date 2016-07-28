@@ -87,6 +87,11 @@ shared_block(BLOCKSIZE)     CellProps  *WCells; // Writing Cells: cells to write
 shared_block(2*LAYER)       CellProps  *BCells; // Boundary cells
 shared_block(5)             double sResiduals[5*THREADS]; // variable to store residuals
 
+
+//New things
+shared_block(BLOCKSIZE_NEW) CellProps  *WCells_NEW; // Writing Cells: cells to write data
+shared_block(B_CELLS_SIZE)  CellProps  *BCells_NEW; // Boundary cells
+
 shared  int    *NumNodes;       // This will store the number of lines of the read files
 shared  int    *NumConn;        // This will store the number of lines of the read files
 shared  int    *NumInletNodes;  // number of inlet nodes

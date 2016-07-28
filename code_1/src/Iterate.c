@@ -38,6 +38,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
         printf("NL = %i\n", NL);
         printf("LAYER = %i\n", LAYER);
         printf("BLOCKSIZE = %i\n", BLOCKSIZE);
+        printf("BLOCKSIZE_NEW = %i\n", BLOCKSIZE_NEW);
         printf("LAYERS_PER_THREAD = %i\n", LAYERS_PER_THREAD);
     }
 
@@ -76,6 +77,9 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     upc_forall(i = 0; i < 2*LAYER*THREADS; i++; &BCells[i])
     { (BCells+i)->ThreadNumber = MYTHREAD; }
 
+    upc_forall(i = 0; i < B_CELLS_SIZE*THREADS; i++; &BCells_NEW[i])
+    { (BCells_NEW+i)->ThreadNumber = MYTHREAD; }
+
     if(MYTHREAD==0)
     {
         fprintf(log_file,"\n:::: Initializing ::::\n");
@@ -99,6 +103,19 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
              CollisionModel,   // INPUT PARAMETER
              opp,              // Opposite direction
              rho_ini);         // Initial density
+
+
+    CellIni_NEW( Cells_NEW,
+             Nodes,            // Nodes
+             BCconn,           // BCconn
+             Uavg,             // INPUT PARAMETER
+             Vavg,             // INPUT PARAMETER
+             Wavg,             // INPUT PARAMETER
+             InletProfile,     // INPUT PARAMETER
+             CollisionModel,   // INPUT PARAMETER
+             opp,              // Opposite direction
+             rho_ini);         // Initial density
+
     end_measure_time(tCellsInitialization);
     main_thread
         printf("Cell intialization completed\n");
@@ -187,7 +204,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
                      int AutosaveEvery, int postproc_prog, int CalculateDragLift, float ConvergenceCritVeloc,
                      float ConvergenceCritRho) {
 
-    while (Residuals[0] > ConvergenceCritVeloc && Residuals[1] > ConvergenceCritRho && iter < (*Iterations))
+    while ((Residuals[0] > ConvergenceCritVeloc || Residuals[1] > ConvergenceCritRho) && iter < (*Iterations))
             {
        
 //////////////// COLLISION ////////////////
@@ -450,6 +467,11 @@ void alloc_cells() {//////////////////////////////////////////////////////
     WCells = (shared_block(BLOCKSIZE)   CellProps*)upc_all_alloc(THREADS, BLOCKSIZE*sizeof(CellProps));
     BCells = (shared_block(2*LAYER)     CellProps*)upc_all_alloc(THREADS,     2*LAYER*sizeof(CellProps));
     Cells = calloc(BLOCKSIZE+2*LAYER,sizeof(CellProps));
+
+    // New approach
+    WCells_NEW = (shared_block(BLOCKSIZE_NEW)    CellProps*)upc_all_alloc(THREADS, BLOCKSIZE_NEW*sizeof(CellProps));
+    BCells_NEW = (shared_block(B_CELLS_SIZE)     CellProps*)upc_all_alloc(THREADS, B_CELLS_SIZE*sizeof(CellProps));
+    Cells_NEW = calloc(BLOCKSIZE_NEW + (size_t)B_CELLS_SIZE,sizeof(CellProps));
     //////////////////////////////////////////////////////
 
 }

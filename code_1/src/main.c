@@ -27,9 +27,9 @@ int main(int argc, char* argv[])
        printf("###############################################\n");
     // Create the working directory, continue if it already exist!
     CreateDirectory(MainWorkDir);
-    CreateDirectory(OutputCellsDir);
-    CreateDirectory(BoundaryDir);
-    CreateDirectory(IterDir);
+    //CreateDirectory(OutputCellsDir);
+    //CreateDirectory(BoundaryDir);
+    //CreateDirectory(IterDir);
   }
   ///////////////////// Declare Simulation Variables //////////////////////
   

@@ -46,6 +46,8 @@ int* ppp;                               // pointer of the postproc_prog variable
 int iter_counter;
 
 CellProps *Cells;                       // Struct for Cells
+CellProps *Cells_NEW;                       // Struct for Cells
+
 
 // Time measurement variables
 float tInitialization;          // Time measurement of Initialization
