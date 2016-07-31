@@ -978,6 +978,8 @@ void free_vars() {
     upc_free(NumNodes);
     upc_free(NumConn);
     //}
+    upc_all_free(WCells);
+    upc_all_free(BCells);
 
     free(Cells);
     free(L_B_Cells);
