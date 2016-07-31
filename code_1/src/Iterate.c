@@ -20,8 +20,6 @@
 ////////////////////////////////////////////////////
 
 
-
-
 void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
                float Uavg, float Vavg, float Wavg,
                float rho_ini, float Viscosity,
@@ -500,6 +498,9 @@ void free_vars() {
     upc_free(NumInletNodes);
     upc_free(NumNodes);
     upc_free(NumConn);
+
+    upc_all_free(WCells);
+    upc_all_free(BCells);
     //}
 
     free(Cells);
