@@ -36,10 +36,10 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
         printf("NN = %i\n", NN);
         printf("NM = %i\n", NM);
         printf("NL = %i\n", NL);
-        printf("LAYER = %i\n", LAYER);
-        printf("BLOCKSIZE = %i\n", BLOCKSIZE);
+        //printf("LAYER = %i\n", LAYER);
+        //printf("BLOCKSIZE = %i\n", BLOCKSIZE);
         printf("BLOCKSIZE_NEW = %i\n", BLOCKSIZE_NEW);
-        printf("LAYERS_PER_THREAD = %i\n", LAYERS_PER_THREAD);
+        //printf("LAYERS_PER_THREAD = %i\n", LAYERS_PER_THREAD);
     }
 
     main_thread
@@ -74,11 +74,11 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
 
     // PUT THREAD INFO TO BCELLS (boundary cells)
 
-    upc_forall(i = 0; i < 2*LAYER*THREADS; i++; &BCells[i])
-    { (BCells+i)->ThreadNumber = MYTHREAD; }
+    /*upc_forall(i = 0; i < 2*LAYER*THREADS; i++; &BCells[i])
+    { (BCells+i)->ThreadNumber = MYTHREAD; }*/
 
-    upc_forall(i = 0; i < B_CELLS_SIZE*THREADS; i++; &BCells_NEW[i])
-    { (BCells_NEW+i)->ThreadNumber = MYTHREAD; }
+    upc_forall(i = 0; i < B_CELLS_SIZE*THREADS; i++; &BCells[i])
+    { (BCells+i)->ThreadNumber = MYTHREAD; }
 
     if(MYTHREAD==0)
     {
@@ -93,7 +93,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     upc_barrier;         // Synchronise
 
     init_measure_time;
-    CellIni( Cells,
+    /*CellIni( Cells,
              Nodes,            // Nodes
              BCconn,           // BCconn
              Uavg,             // INPUT PARAMETER
@@ -102,21 +102,22 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
              InletProfile,     // INPUT PARAMETER
              CollisionModel,   // INPUT PARAMETER
              opp,              // Opposite direction
-             rho_ini);         // Initial density
+             rho_ini);         // Initial density*/
     end_measure_time(tCellsInitialization);
 
+    upc_barrier;
 
     init_measure_time;
-    CellIni_NEW( Cells_NEW,
-             Nodes,            // Nodes
-             BCconn,           // BCconn
-             Uavg,             // INPUT PARAMETER
-             Vavg,             // INPUT PARAMETER
-             Wavg,             // INPUT PARAMETER
-             InletProfile,     // INPUT PARAMETER
-             CollisionModel,   // INPUT PARAMETER
-             opp,              // Opposite direction
-             rho_ini);         // Initial density
+    CellIni_NEW( Cells,
+                 Nodes,            // Nodes
+                 BCconn,           // BCconn
+                 Uavg,             // INPUT PARAMETER
+                 Vavg,             // INPUT PARAMETER
+                 Wavg,             // INPUT PARAMETER
+                 InletProfile,     // INPUT PARAMETER
+                 CollisionModel,   // INPUT PARAMETER
+                 opp,              // Opposite direction
+                 rho_ini);         // Initial density
     end_measure_time(tCellsInitialization_NEW);
 
     main_thread
@@ -130,7 +131,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     upc_barrier;
     */
 
-    tInitialization =+ (float)(tStart-clock()) / CLOCKS_PER_SEC;
+    tInitialization = tInitialization + (float)(tStart-clock()) / CLOCKS_PER_SEC;
     //end_measure_time(tInitialization);
 
     upc_barrier;         // Synchronise
@@ -142,7 +143,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     // PUT INITIALIZED DATA TO BOUNDARIES
     putCellsToShared();
     // COPY CELLS TO WCELLS (writing cells) TO WRITE DATA
-    putCellsToWCells();
+    putCellsToWCell();
 
     //write_cells_to_results(postproc_prog);
 
@@ -208,62 +209,88 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
                      float ConvergenceCritRho) {
 
     while ((Residuals[0] > ConvergenceCritVeloc || Residuals[1] > ConvergenceCritRho) && iter < (*Iterations))
-            {
-       
+    {
+
 //////////////// COLLISION ////////////////
         init_measure_time;
         CollisionStep(CollisionModel); ////////////////////// !!!!!!!!!!!!!!!!! CX CY!
         end_measure_time(tCollision);
+        PRINTING
+            printf("T%i: Collsision\n",MYTHREAD);
         upc_barrier;
 
-       ////////////// UPDATE DISTR ///////////////
+        ////////////// UPDATE DISTR ///////////////
         init_measure_time;
-        for(i = LAYER;  i < LAYER + BLOCKSIZE;  i++)
-            UpdateF(Cells, i);
+        UpdateStep();
         end_measure_time(tUpdateF);
+        PRINTING
+            printf("T%i: UpdateF\n",MYTHREAD);
         upc_barrier;
 
 //////////////// PUT THREAD-BOUNDARY CELLS TO SHARED ////////////////
         init_measure_time;
-        putCellsToShared();
+        //putCellsToShared();
         end_measure_time(tBCells);
+        PRINTING
+            printf("T%i: putCellsToShared\n",MYTHREAD);
         upc_barrier;
 
 //////////////// PUT THREAD-BOUNDARY CELLS TO SHARED WITH CUBES ////////////////
         init_measure_time;
-        putCellsToShared_NEW();
+        putCellsToShared();
         end_measure_time(tBCells_NEW);
+        PRINTING
+            printf("T%i: putCellsToShared_NEW\n",MYTHREAD);
         upc_barrier;
 
 
 //////////////// COPY SHARED BCELLS TO CELLS ////////////////
         init_measure_time;
-        getSharedToCells();
+        //getSharedToCells();
         end_measure_time(tBCells);
+        PRINTING
+            printf("T%i: getSharedToCells\n",MYTHREAD);
         upc_barrier;
+
+//////////////// COPY SHARED BCELLS TO CELLS WITH CUBES////////////////
+        init_measure_time;
+        getSharedToCells();
+        end_measure_time(tBCells_NEW);
+        PRINTING
+            printf("T%i: getSharedToCells_NEW\n",MYTHREAD);
+        upc_barrier;
+
 
 ////////////// STREAMING ///////////////
         init_measure_time;
         StreamingStep();
         end_measure_time(tStreaming);
+        PRINTING
+            printf("T%i: StreamingStep\n",MYTHREAD);
         upc_barrier;
 
 ////////////// BOUNDARIES ///////////////
         init_measure_time;
         HandleBoundariesStep(OutletProfile, CurvedBoundaries);
         end_measure_time(tBoundaries);
+        PRINTING
+            printf("T%i: HandleBoundariesStep\n",MYTHREAD);
         upc_barrier;
 
 // UPDATE VELOCITY AND DENSITY
         init_measure_time;
         UpdateMacroscopicStep(CalculateDragLift);
         end_measure_time(tUpdateMacro);
+        PRINTING
+            printf("T%i: UpdateMacroscopicStep\n",MYTHREAD);
         upc_barrier;
 
 ////////////// Residuals ///////////////
         init_measure_time;
         ComputeResiduals(Cells, Residuals, sumVel0, sumVel1, sumRho0, sumRho1, CalculateDragLift, &iter, Iterations);
         end_measure_time(tResiduals);
+        PRINTING
+            printf("T%i: ComputeResiduals\n",MYTHREAD);
 
         if(MYTHREAD==0)
             fprintf(resid_file,"%d %5.4e %5.4e %5.4e %f %f\n", iter, (iter+1.0)*(*Delta), Residuals[0], Residuals[1], Residuals[2], Residuals[3]);
@@ -284,275 +311,498 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
 //Step functions
 
 void putCellsToShared(){
-//                     DESTINATION                           SOURCE                            SIZE
-    upc_memput( &BCells[    2 * LAYER * MYTHREAD   ], &Cells[       LAYER       ], LAYER * sizeof(CellProps) ); // FIRST LAYER
-    upc_memput( &BCells[ LAYER * (2 * MYTHREAD + 1)], &Cells[     BLOCKSIZE     ], LAYER * sizeof(CellProps) ); // LAST LAYER
-}
-
-void putCellsToShared_NEW(){
     FillLocalBCells();
 //                     DESTINATION                           SOURCE                            SIZE
-    upc_memput( &BCells_NEW[MYTHREAD*B_CELLS_SIZE],&Local_BCells_NEW[0],    B_CELLS_SIZE*sizeof(CellProps));
+    upc_memput( &BCells[MYTHREAD*B_CELLS_SIZE],&L_B_Cells[0],    B_CELLS_SIZE*sizeof(CellProps));
 }
 void FillLocalBCells() {
     int i, j, k;
     int c_BC = 0;         //Local BCells counter
+    int min=1;
+    int max=LAT;
+
     //Faces
-    for (int f=0;f<7;f++){
-        int min_max = f%2;
-        int dir = f/2;
-        for (i = 1; i<LAT+1; i++) {
-            for (j = 1; j < LAT + 1; j++) {
-                for (k = 1; k < LAT + 1; k++) {
-                    Local_BCells_NEW[c_BC] = Cells[lID(i, j, k)];
-                    c_BC++;
-                }
-            }
-        }
+    for (int f = 0; f<6; f++){
+        int Ax=getAx_F(f);
+        int Dir=getDir_F(f);
+        for (int b=0; b<max+1;b++) {
+            for (int a=0; a<max+1;a++){
+                i=eq(Ax,0)*(min+(max-min))*Dir + eq(Ax,1)*b + eq(Ax,2)*a;
+                j=eq(Ax,1)*(min+(max-min))*Dir + eq(Ax,2)*b + eq(Ax,0)*a;
+                k=eq(Ax,2)*(min+(max-min))*Dir + eq(Ax,0)*b + eq(Ax,1)*a;
 
-
-    }
-
-    //X min:
-    i = 1;
-    for (j = 1; j<LAT+1; j++){
-        for (k = 1; k<LAT+1; k++){
-            Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
-            c_BC++;
-        }
-    }
-    //X max:
-    i=LAT;
-    for (j = 1; j<LAT+1; j++){
-        for (k = 1; k<LAT+1; k++){
-            Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
-            c_BC++;
-        }
-    }
-    //Y min:
-    j = 1;
-    for (i = 1; i<LAT+1; i++){
-        for (k = 1; k<LAT+1; k++){
-            Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
-            c_BC++;
-        }
-    }
-    //Y max:
-    j=LAT;
-    for (i = 1; i<LAT+1; i++){
-        for (k = 1; k<LAT+1; k++){
-            Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
-            c_BC++;
-        }
-    }
-    //Z min:
-    k = 1;
-    for (i = 1; i<LAT+1; i++){
-        for (j = 1; j<LAT+1; j++){
-            Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
-            c_BC++;
-        }
-    }
-    //Z max:
-    k=LAT;
-    for (i = 1; i<LAT+1; i++){
-        for (j = 1; j<LAT+1; j++){
-            Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
-            c_BC++;
-        }
-    }
-    //Edges
-    //X
-    j=1;
-    k=1;
-    for (i=1;i<LAT+1;i++){
-        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
-        c_BC++;
-    }
-    j=1;
-    k=LAT;
-    for (i=1;i<LAT+1;i++){
-        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
-        c_BC++;
-    }
-    j=LAT;
-    k=1;
-    for (i=1;i<LAT+1;i++){
-        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
-        c_BC++;
-    }
-    j=LAT;
-    k=LAT;
-    for (i=1;i<LAT+1;i++){
-        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
-        c_BC++;
-    }
-
-    //Y
-    k=1;
-    i=1;
-    for (j=1;j<LAT+1;j++){
-        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
-        c_BC++;
-    }
-    k=1;
-    i=LAT;
-    for (j=1;j<LAT+1;j++){
-        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
-        c_BC++;
-    }
-    k=LAT;
-    i=1;
-    for (j=1;j<LAT+1;j++){
-        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
-        c_BC++;
-    }
-    k=LAT;
-    i=LAT;
-    for (j=1;j<LAT+1;j++){
-        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
-        c_BC++;
-    }
-
-    //Z
-    i=1;
-    j=1;
-    for (k=1;k<LAT+1;k++){
-        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
-        c_BC++;
-    }
-    i=1;
-    j=LAT;
-    for (k=1;k<LAT+1;k++){
-        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
-        c_BC++;
-    }
-    i=LAT;
-    j=1;
-    for (k=1;k<LAT+1;k++){
-        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
-        c_BC++;
-    }
-    i=LAT;
-    j=LAT;
-    for (k=1;k<LAT+1;k++){
-        Local_BCells_NEW[c_BC] = Cells[lID(i,j,k)];
-        c_BC++;
-    }
-    //Corners
-    for(i=1; i < LAT + 1;i =+ LAT - 1){
-        for(j=1; j < LAT + 1;j =+ LAT - 1) {
-            for (k = 1; k < LAT + 1; k =+ LAT - 1) {
-                Local_BCells_NEW[c_BC] = Cells[lID(i, j, k)];
+                PRINTING
+                    //printf("T%i: c_BC %i, lID(%i,%i,%i) = %i\n",MYTHREAD,c_BC,i,j,k,lID(i,j,k));
+                L_B_Cells[c_BC] = Cells[lID(i,j,k)];
                 c_BC++;
             }
         }
     }
 
-}
+    //Edges
+    for (int e = 0; e<12; e++){
+        int Ax=getAx_E(e);
+        int Pos=getPos_E(e);
+        for (int a=0; a<max+1;a++){
+            i=eq(Ax,0)*a + eq(Ax,1)*(min + (max-min)*(Pos/2)) + eq(Ax,2)*(min + (max-min)*(Pos%2));
+            j=eq(Ax,1)*a + eq(Ax,2)*(min + (max-min)*(Pos/2)) + eq(Ax,0)*(min + (max-min)*(Pos%2));
+            k=eq(Ax,2)*a + eq(Ax,0)*(min + (max-min)*(Pos/2)) + eq(Ax,1)*(min + (max-min)*(Pos%2));
 
+            L_B_Cells[c_BC] = Cells[lID(i,j,k)];
+            c_BC++;
+        }
+    }
+    //Corners
+    for (k = min; k < max+1; k = k + max - min) {
+        for(j = min; j < max+1; j = j + max - min) {
+            for(i = min; i < max+1; i = i + max - min) {
+                L_B_Cells[c_BC] = Cells[lID(i,j,k)];
+                c_BC++;
+            }
+        }
+    }
+}
 
 
 void getSharedToCells(){
 
-    if (MYTHREAD == THREADS-1)  // LAST THREAD ::: copy only the first layer
-    {
-        upc_memget( &Cells[       0        ], &BCells[LAYER * (2*MYTHREAD-1)], LAYER * sizeof(CellProps) ); // FIRST LINE
+    int n=MYTHREAD;
+    int cur_corner=-1;
+    int cur_edge=-1;
+    int cur_face=-1;
 
-    } else if (MYTHREAD == 0){ // FIRST THREAD ::: copy only the last line
+    int faces_to_get[6] = {0,0,0,
+                           0,0,0};
+    int edges_to_get[12] = {0, 0, 0, 0,
+                            0, 0, 0, 0,
+                            0, 0, 0, 0};
+    int corners_to_get[8] = {0, 0, 0, 0,
+                             0, 0, 0, 0};
 
-        upc_memget( &Cells[ LAYER + BLOCKSIZE  ], &BCells[LAYER * 2], LAYER * sizeof(CellProps) ); // LAST  LINE
 
-    } else {
 
-        upc_memget( &Cells[          0        ], &BCells[LAYER * (2*MYTHREAD-1)], LAYER * sizeof(CellProps) ); // FIRST LINE
-        upc_memget( &Cells[ LAYER + BLOCKSIZE ], &BCells[LAYER * (2*MYTHREAD+2)], LAYER * sizeof(CellProps) ); // LAST  LINE
+    //  cXYZ
+    int c000 = 0;
+    int c100 = NTDX-1;
+    int c010 = NTDX*(NTDY-1);
+    int c110 = NTDX*NTDY-1;
+    int c001 = NTDX*NTDY*(NTDZ-1);
+    int c101 = NTDX*NTDY*(NTDZ-1) + NTDX-1;
+    int c011 = NTDX*NTDY*(NTDZ-1) + NTDX*(NTDY-1);
+    int c111 = NTDX*NTDY*(NTDZ-1) + NTDX*NTDY-1;
+
+    //                                                              Corners
+    //                                                                XYZ
+    if (n == c000){                                                 //000
+        cur_corner=0;
+    }
+    else if (n == c100){                                            //100
+        cur_corner=1;
+    }
+    else if (n == c010){                                            //010
+        cur_corner=2;
+    }
+    else if (n == c110){                                            //110
+        cur_corner=3;
+    }
+    else if (n == c001){                                            //001
+        cur_corner=4;
+    }
+    else if (n == c101){                                            //101
+        cur_corner=5;
+    }
+    else if (n == c011){                                            //011
+        cur_corner=6;
+    }
+    else if (n == c111){                                            //111
+        cur_corner=7;
+    }
+        //                                                          Edges
+        //                                                            XYZ
+    else if (n < NTDX) {                                            //X00
+        cur_edge=0;
+    }
+    else if (n-c010 >= 0 && (n-c010) < NTDX) {                      //X10
+        cur_edge=1;
+    }
+    else if (n-c001 >= 0 && (n-c001) < NTDX) {                      //X01
+        cur_edge=2;
+    }
+    else if (n-c011 >= 0 && (n-c011) < NTDX) {                      //X11
+        cur_edge=3;
+    }
+    else if (n < NTDX*NTDY && n%NTDX==0) {                              //0Y0
+        cur_edge=4;
+    }
+    else if (n-c001>=0 && (n-c001) < NTDX*NTDY && (n-c001)%NTDX==0) {   //0Y1
+        cur_edge=5;
+    }
+    else if (n-c100>=0 && (n-c100) < NTDX*NTDY && (n-c100)%NTDX==0) {   //1Y0
+        cur_edge=6;
+    }
+    else if (n-c101>=0 && (n-c101) < NTDX*NTDY && (n-c101)%NTDX==0) {   //1Y1
+        cur_edge=7;
+    }
+        //
+    else if (n%(NTDX*NTDY) == 0) {                                  //00Z
+        cur_edge=8;
+    }
+    else if (n-c100 >= 0 && (n-c100)%(NTDX*NTDY) == 0) {            //10Z
+        cur_edge=9;
+    }
+    else if (n-c010 >= 0 && (n-c010)%(NTDX*NTDY) == 0) {            //01Z
+        cur_edge=10;
+    }
+    else if (n-c110 >= 0 && (n-c110)%(NTDX*NTDY) == 0) {            //11Z
+        cur_edge=11;
+    }
+        //                                                          FACES
+        //                                                            XYZ
+    else if (n%NTDX){                                               //0YZ
+        cur_face=0;
+    }
+    else if (n-c100>=0 && (n-c100)%NTDX == 0){                      //1YZ
+        cur_face=1;
+    }
+    else if ((n%(NTDX*NTDY)) < NTDX){                               //X0Z
+        cur_face=2;
+    }
+    else if (n-c010>=0 && ((n-c010)%(NTDX*NTDY)) < NTDX){           //X1Z
+        cur_face=3;
+    }
+    else if (n < (NTDX*NTDY)){                                      //XY0
+        cur_face=4;
+    }
+    else if (n-c001 >= 0 && (n-c001) < (NTDX*NTDY)){                //XY1
+        cur_face=5;
+    }
+
+        //                                                          INTERIOR
+    else {
 
     }
+
+    PRINTING
+        printf("T%i: Finished cube type\n",MYTHREAD);
+
+
+    if(cur_corner!=-1) {
+        int X = getX_C(cur_corner);
+        int Y = getY_C(cur_corner);
+        int Z = getZ_C(cur_corner);
+
+        corners_to_get[7-cur_corner] = 1;
+
+        edges_to_get[getE(0,3-Y-2*Z)] = 1;
+        edges_to_get[getE(1,3-Z-2*X)] = 1;
+        edges_to_get[getE(2,3-X-2*Y)] = 1;
+
+        faces_to_get[getF(0,1-X)] = 1;
+        faces_to_get[getF(0,1-Y)] = 1;
+        faces_to_get[getF(0,1-Z)] = 1;
+    }
+    else if(cur_edge!=-1) {
+
+        int Ax = getAx_E(cur_edge);
+        int Pos = getPos_E(cur_edge);
+
+        for (int t=0;t<2;t++) {
+            int X[3];
+            for (int r=0;r<3;r++){
+                X[r] = eq(Ax,r)*t +
+                       eq(Ax,(r+1)%3)*((3 - Pos)%3) +
+                       eq(Ax,(r+2)%3)*((3 - Pos)/3);
+            }
+            corners_to_get[getC(X[0],X[1],X[2])] = 1;
+        }
+
+        edges_to_get[getE(Ax,1-Pos)] = 1;
+        edges_to_get[getE((Ax+1)%3 , 3-Pos/2)] = 1;
+        edges_to_get[getE((Ax+1)%3 , 1-Pos/2)] = 1;
+        edges_to_get[getE((Ax+2)%3 , 3-2*(Pos%2))] = 1;
+        edges_to_get[getE((Ax+2)%3 , 2-2*(Pos%2))] = 1;
+
+        for (int f = 0;f<6;f++) {
+            if (f!=getF((Ax+1)%3 , Pos%2) && f!=getF((Ax+2)%3 , Pos/2)){
+                faces_to_get[f] = 1;
+            }
+        }
+    }
+
+    else if(cur_face!=-1) {
+        int Ax = getAx_F(cur_face);
+        int Dir = getDir_F(cur_face);
+
+        for (int a=0;a<2;a++){
+            for(int b=0;b<2;b++) {
+                int X[3];
+                for(int r=0; r<3;r++){
+                    X[r] = eq(Ax,r)*(1-Dir) +
+                           eq(Ax,(r+2)%3)*a +
+                           eq(Ax,(r+1)%3)*b;
+                }
+                corners_to_get[getC(X[0],X[1],X[2])] = 1;
+            }
+        }
+
+        for (int e = 0; e<12; e++) {
+            if(e!=getE((Ax+1)%3 , 2*Dir + 0) &&
+               e!=getE((Ax+1)%3 , 2*Dir + 1) &&
+               e!=getE((Ax+2)%3 , Dir + 0) &&
+               e!=getE((Ax+2)%3 , Dir + 2)) {
+
+                edges_to_get[e] = 1;
+            }
+        }
+
+        for (int f = 0; f<6; f++) {
+            if(f!=getF(Ax, Dir)){
+                faces_to_get[f] = 1;
+            }
+        }
+    }
+
+    else {
+        for (int c=0; c<8;c++) {
+            corners_to_get[c] = 1;
+        }
+        for (int e=0; e<12;e++) {
+            edges_to_get[e] = 1;
+        }
+        for (int f=0; f<6;f++) {
+            faces_to_get[f] = 1;
+        }
+    }
+
+    PRINTING
+        printf("T%i: Finished what to get\n",MYTHREAD);
+
+
+    int X[3];
+    int dX[3];
+    getCubeCoords(MYTHREAD,X);
+
+    for (int face=0; face<6; face++) {
+        if (faces_to_get[face] == 1){
+            int Ax = getAx_F(face);
+            int Dir = getDir_F(face);
+
+
+            for (int r = 0; r<3; r++) {
+                dX[r] = eq(Ax,r)*(2*Dir-1);
+            }
+
+            upc_memget(&L_B_Cells[face*(LAT*LAT)],
+                       &BCells[getCubeID(X[0] + dX[0],
+                                             X[1] + dX[1],
+                                             X[2] + dX[2])
+                                   *B_CELLS_SIZE + face*(LAT*LAT)],
+                       (LAT*LAT)*sizeof(CellProps));
+        }
+    }
+    PRINTING
+        printf("T%i: Got faces\n",MYTHREAD);
+    upc_barrier;
+
+    for (int edge = 0; edge <12; edge ++) {
+        if(edges_to_get[edge] == 1) {
+            int Ax = getAx_E(edge);
+            int Pos = getPos_E(edge);
+
+            for (int r = 0; r<3; r++) {
+                dX[r] = eq(Ax , (r+2)%3)*(2*(Pos%2) - 1) +  eq(Ax , (r+1)%3)*(2*(Pos/2) - 1);
+            }
+            /*PRINTING {
+                printf("T%i, edge %i, Ax %i, Pos %i, CubeID[X(%i,%i,%i) + dX(%i,%i,%i) = %i ]\n",
+                       MYTHREAD, edge, Ax, Pos, X[0], X[1], X[2], dX[0], dX[1], dX[2] ,
+                       getCubeID(X[0] + dX[0], X[1] + dX[1], X[2] + dX[2]));
+            };*/
+
+
+
+            upc_memget(&L_B_Cells[6*LAT*LAT + edge*LAT],
+                       &BCells[getCubeID(X[0] + dX[0], X[1] + dX[1], X[2] + dX[2])
+                                   *B_CELLS_SIZE + 6*LAT*LAT + edge*LAT],
+                       LAT*sizeof(CellProps));
+        }
+    }
+    PRINTING
+        printf("T%i: Got edges\n",MYTHREAD);
+
+    for (int corner = 0; corner <12; corner ++) {
+        if(edges_to_get[corner] == 1) {
+            int p[3];
+            p[0] = getX_C(corner);
+            p[1] = getY_C(corner);
+            p[2] = getZ_C(corner);
+
+            for (int r = 0; r<3; r++) {
+                dX[r] = p[r];
+            }
+
+            upc_memget(&L_B_Cells[6*LAT*LAT + 12*LAT + corner],
+                       &BCells[getCubeID(X[0] + dX[0],
+                                             X[1] + dX[1],
+                                             X[2] + dX[2])
+                                   *B_CELLS_SIZE + 6*LAT*LAT + 12*LAT + corner],
+                       sizeof(CellProps));
+        }
+    }
+    PRINTING
+        printf("T%i: Got corners\n",MYTHREAD);
+    FillCellsWithLBCells();
 }
-void putCellsToWCells(){
-    //printf("Put Cells to W cells things\n");
-    upc_memput( &WCells[MYTHREAD * BLOCKSIZE], &Cells[LAYER], BLOCKSIZE * sizeof(CellProps));
+void FillCellsWithLBCells() {
+    int i, j, k;
+    int c_BC = 0;         //Local BCells counter
+    int min=0;
+    int max=LAT+1;
+
+    //Faces
+    for (int f = 0; f<6; f++){
+        int Ax=getAx_F(f);
+        int Dir=getDir_F(f);
+        for (int b=0; b<max+1;b++) {
+            for (int a=0; a<max+1;a++){
+                i=eq(Ax,0)*(min+(max-min))*Dir + eq(Ax,1)*b + eq(Ax,2)*a;
+                j=eq(Ax,1)*(min+(max-min))*Dir + eq(Ax,2)*b + eq(Ax,0)*a;
+                k=eq(Ax,2)*(min+(max-min))*Dir + eq(Ax,0)*b + eq(Ax,1)*a;
+
+                Cells[lID(i,j,k)] = L_B_Cells[c_BC];
+                c_BC++;
+            }
+        }
+    }
+
+    //Edges
+    for (int e = 0; e<12; e++){
+        int Ax=getAx_E(e);
+        int Pos=getPos_E(e);
+            for (int a=0; a<max+1;a++){
+                i=eq(Ax,0)*a + eq(Ax,1)*(min + (max-min)*(Pos/2)) + eq(Ax,2)*(min + (max-min)*(Pos%2));
+                j=eq(Ax,1)*a + eq(Ax,2)*(min + (max-min)*(Pos/2)) + eq(Ax,0)*(min + (max-min)*(Pos%2));
+                k=eq(Ax,2)*a + eq(Ax,0)*(min + (max-min)*(Pos/2)) + eq(Ax,1)*(min + (max-min)*(Pos%2));
+
+                Cells[lID(i,j,k)] = L_B_Cells[c_BC];
+                c_BC++;
+            }
+    }
+    //Corners
+    for (k = min; k < max+1; k = k + max - min) {
+        for(j = min; j < max+1; j = j + max - min) {
+            for(i = min; i < max+1; i = i + max - min) {
+                Cells[lID(i,j,k)] = L_B_Cells[c_BC];
+                c_BC++;
+            }
+        }
+    }
+}
+
+void putCellsToWCell(){
+    FillLocalWCells();
+    upc_memput( &WCells[MYTHREAD * BLOCKSIZE], &L_W_Cells[0], BLOCKSIZE * sizeof(CellProps));
+}
+void FillLocalWCells(){
+    int c_WC = 0;
+    for (int k = 1; k < LAT+1; k++) {
+        for (int j = 1; j < LAT + 1; j++) {
+            for (int i = 1; i < LAT + 1; i++) {
+                L_W_Cells[c_WC] = Cells[lID(i,j,k)];
+                c_WC++;
+            }
+        }
+    }
 }
 
 void CollisionStep(int CollisionModel){
 
-    int i, j;
 
     switch(CollisionModel)
     {
         // BGKW
         case 1:
-            for(i = LAYER;  i < BLOCKSIZE + LAYER;  i++)
-            {
-                //if( (Cells+i)->Fluid == 1 )
-                BGKW(i,Omega);
+            for (int k = 1; k < LAT+1; k++) {
+                for (int j = 1; j < LAT + 1; j++) {
+                    for (int i = 1; i < LAT + 1; i++) {
+                        int ID = i + j*(LAT+2) + k*(LAT+2)*(LAT+2);
+
+                        BGKW(ID, Omega);
+                    }
+                }
             }
-            break;
 
             // TRT
         case 2:
-            for(i = LAYER;  i < BLOCKSIZE + LAYER;  i++)
-            {
-                //if( (Cells+i)->Fluid == 1)
-                TRT (Cells, i, w, cx, cy, opp, Omega, OmegaA);
+            for (int k = 1; k < LAT+1; k++) {
+                for (int j = 1; j < LAT + 1; j++) {
+                    for (int i = 1; i < LAT + 1; i++) {
+                        int ID = i + j*(LAT+2) + k*(LAT+2)*(LAT+2);
+
+                        TRT (Cells, i, w, cx, cy, opp, Omega, OmegaA);
+                    }
+                }
             }
             break;
 
             // MRT
         case 3:
-            for(i = LAYER;  i < BLOCKSIZE + LAYER;  i++)
-            {
-                //if( (Cells+i)->Fluid == 1)
-                MRT(Cells, i, tm, stmiv);
+            for (int k = 1; k < LAT+1; k++) {
+                for (int j = 1; j < LAT + 1; j++) {
+                    for (int i = 1; i < LAT + 1; i++) {
+                        int ID = i + j*(LAT+2) + k*(LAT+2)*(LAT+2);
+
+                        MRT(Cells, i, tm, stmiv);
+                    }
+                }
             }
             break;
     }
 }
 
-void StreamingStep(){
-    int i, j;
-    for(i = LAYER;  i < BLOCKSIZE + LAYER;  ++i)
-    {
-        for(j = 0; j <19; j++)
-        {
-
-            if (((Cells+i)->StreamLattice[j]) == 1)
-            {
-                (Cells +i)->F[j] = (Cells + i + c[j])-> METAF[j];
-
+void UpdateStep(){
+    for (int k = 1; k < LAT+1; k++) {
+        for (int j = 1; j < LAT + 1; j++) {
+            for (int i = 1; i < LAT + 1; i++) {
+                int ID = i + j * (LAT + 2) + k * (LAT + 2) * (LAT + 2);
+                UpdateF(Cells, ID);
             }
+        }
+    }
+}
 
+void StreamingStep(){
+    for (int k = 1; k < LAT+1; k++) {
+        for (int j = 1; j < LAT + 1; j++) {
+            for (int i = 1; i < LAT + 1; i++) {
+                for (int l = 0; l < 19; l++) {
+
+                    if (((Cells + lID(i,j,k))->StreamLattice[l]) == 1) {
+                        PRINTING
+                        if(lID(i,j,k) > (LAT)*(LAT)*LAT)
+                            printf("T%i: (lID(%i,%i,%i) = %i) + (c[%i] = %i) = %i\n",MYTHREAD,i,j,k,lID(i,j,k),l,c[l],lID(i,j,k) + c[l]);
+                        (Cells + lID(i,j,k))->F[l] = (Cells + lID(i,j,k) + c[l])->METAF[l];
+
+                    }
+
+                }
+            }
         }
     }
 }
 
 void HandleBoundariesStep(int OutletProfile, int CurvedBoundaries){
-    int i, j, k;
 
-    for (int i = LAYER; i < LAYER + BLOCKSIZE; ++i)
-    {
-        // INLET
-        InletBC(Cells, i);
-
-        // WALL
-        switch(CurvedBoundaries)
-        {
-            // curved boundaries
-            case 1:
-                //for(k=0; k<19; k++)
-                //  (Cells + i)->Fneighbours[k] = (Cells + i + c[k])-> METAF[k];
-                CurvedWallBoundaries(Cells, j, i, opp);
-                break;
-
-            case 2:
-                WallBC(Cells, i, opp);
-                break;
+    for (int k = 1; k < LAT+1; k++) {
+        for (int j = 1; j < LAT + 1; j++) {
+            for (int i = 1; i < LAT + 1; i++) {
+                int ID = i + j * (LAT + 2) + k * (LAT + 2) * (LAT + 2);
+                // INLET
+                InletBC(Cells, ID);
+                WallBC(Cells, ID, opp);
+                EdgeBC(Cells, ID);
+                CornerBC(Cells, ID);
+            }
         }
-
-
-        EdgeBC(Cells, i);
-        CornerBC(Cells, i);
     }
 
     // OUTLET
@@ -598,10 +848,14 @@ void HandleBoundariesStep(int OutletProfile, int CurvedBoundaries){
     }
 }
 void UpdateMacroscopicStep(int CalculateDragLift){
-    for(int i = LAYER;  i < (LAYER+BLOCKSIZE);  i++)
-    {
-        //if ((Cells+i)->Fluid == 1)
-        UpdateMacroscopic(Cells, i, CalculateDragLift);
+    for (int k = 1; k < LAT+1; k++) {
+        for (int j = 1; j < LAT + 1; j++) {
+            for (int i = 1; i < LAT + 1; i++) {
+                int ID = i + j * (LAT + 2) + k * (LAT + 2) * (LAT + 2);
+                //if ((Cells+i)->Fluid == 1)
+                UpdateMacroscopic(Cells, ID, CalculateDragLift);
+            }
+        }
     }
 }
 
@@ -620,6 +874,7 @@ void init_vars(int *postproc_prog) {
 
     time_meas_vars_init();
     allocate_vars();
+    upc_barrier;
 }
 
 void time_meas_vars_init() {// Time measurement variables
@@ -641,15 +896,13 @@ void time_meas_vars_init() {// Time measurement variables
 
 void alloc_cells() {//////////////////////////////////////////////////////
     // Allocate structure for the cell properties (see ShellFunctions.h)
-    WCells = (shared_block(BLOCKSIZE)   CellProps*)upc_all_alloc(THREADS, BLOCKSIZE*sizeof(CellProps));
-    BCells = (shared_block(2*LAYER)     CellProps*)upc_all_alloc(THREADS,     2*LAYER*sizeof(CellProps));
-    Cells = calloc(BLOCKSIZE+2*LAYER,sizeof(CellProps));
 
     // New approach
-    WCells_NEW = (shared_block(BLOCKSIZE_NEW)    CellProps*)upc_all_alloc(THREADS, BLOCKSIZE_NEW*sizeof(CellProps));
-    BCells_NEW = (shared_block(B_CELLS_SIZE)     CellProps*)upc_all_alloc(THREADS, B_CELLS_SIZE*sizeof(CellProps));
-    Cells_NEW = calloc(BLOCKSIZE_NEW + (size_t)B_CELLS_SIZE,sizeof(CellProps));
-    Local_BCells_NEW = calloc((size_t)B_CELLS_SIZE ,sizeof(CellProps));
+    WCells = (shared_block(BLOCKSIZE_NEW)    CellProps*)upc_all_alloc(THREADS, BLOCKSIZE_NEW*sizeof(CellProps));
+    BCells = (shared_block(B_CELLS_SIZE)     CellProps*)upc_all_alloc(THREADS, B_CELLS_SIZE*sizeof(CellProps));
+    Cells = calloc((size_t)B_CELLS_SIZE + BLOCKSIZE_NEW,sizeof(CellProps));
+    L_B_Cells = calloc((size_t)B_CELLS_SIZE,sizeof(CellProps));
+    L_W_Cells = calloc(BLOCKSIZE_NEW,sizeof(CellProps));
     //////////////////////////////////////////////////////
 
 }
@@ -670,8 +923,8 @@ void allocate_shared() {////////////////////////////
     Delta          = (shared double*)upc_alloc(1*sizeof(double));
     NumNodes       = (shared int*)upc_alloc(1*sizeof(int));
     NumConn        = (shared int*)upc_alloc(1*sizeof(int));
-    //MaxInletCoordY = (shared [] double*)upc_alloc(1*sizeof(double));--------------------------> DO I NEED THIS?
-    //MinInletCoordY = (shared [] double*)upc_alloc(1*sizeof(double));--------------------------> DO I NEED THIS?
+    MaxInletCoordY = (shared double*)upc_alloc(1*sizeof(double));//--------------------------> DO I NEED THIS?
+    MinInletCoordY = (shared double*)upc_alloc(1*sizeof(double));//--------------------------> DO I NEED THIS?
     NumInletNodes  = (shared int*)upc_alloc(1*sizeof(int));
 }
 void allocate_lattice_vars() {// D2Q9 Variables of the lattice
@@ -692,17 +945,44 @@ void allocate_residuals() {// allocate residuals
     Residuals = Create1DArrayDouble(5);
 }
 
+/*void InitOrderedCells() {
+    int i_r, j_r, k_r;
+    int ID;
+    //int lID;
+
+
+    for (int k = 1; k < LAT+1; k++) {
+        for (int j = 1; j < LAT + 1; j++) {
+            for (int i = 1; i < LAT + 1; i++) {
+                i_r = i - 1;
+                j_r = j - 1;
+                k_r = k - 1;
+
+
+                //lID = i + j * (LAT + 2) + k * (LAT + 2) * (LAT + 2);
+                ID = i_r + j_r * (LAT) + k_r * (LAT) * (LAT);
+                PRINTING
+                        printf("T%i, LWCells[(%i,%i,%i) = %i] = Cells[(%i,%i,%i) = %i]\n",MYTHREAD,i_r,j_r,k_r,ID,i,j,k,lID(i,j,k));
+                Local_WCells_NEW[ID] = &Cells_NEW[lID(i,j,k)];
+            }
+        }
+    }
+}*/
+
 void free_vars() {
     //if (MYTHREAD == 0) {
     upc_free(Delta);
-    //upc_free(MaxInletCoordY);
-    //upc_free(MinInletCoordY);
+    upc_free(MaxInletCoordY);
+    upc_free(MinInletCoordY);
     upc_free(NumInletNodes);
     upc_free(NumNodes);
     upc_free(NumConn);
     //}
 
     free(Cells);
+    free(L_B_Cells);
+    free(L_W_Cells);
+
     free(w);
     free(cx);
     free(cy);
@@ -820,7 +1100,7 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
             switch(postproc_prog) {
                 case 1: sprintf(AutosaveOutputFile, "Results/autosave_iter%05d.csv", iter); break;
                 case 2: sprintf(AutosaveOutputFile, "Results/autosave_iter%05d.dat", iter); break; }
-            putCellsToWCells(); // Put information to WCells and write (Write Cells)
+            putCellsToWCell(); // Put information to WCells and write (Write Cells)
             if (MYTHREAD==0) // AUTOSAVE
                 WriteResults(AutosaveOutputFile, ppp);
             end_measure_time(tWriting);
@@ -831,7 +1111,7 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
 void save_iteration(int postproc_prog,int Iterations, int AutosaveEvery) {
 
     if ((iter * 100)%AutosaveEvery == 0) {
-        
+
         if(MYTHREAD == 0)
             printf("Saving iteration %i, Rho residual = %lf\n",iter,Residuals[1]);
         UpdateMacroscopicStep(0);
@@ -844,7 +1124,7 @@ void save_iteration(int postproc_prog,int Iterations, int AutosaveEvery) {
                 sprintf(IterationOutputFile, "Results/iterations/iter.dat.%i", iter_counter);
                 break;
         }
-        putCellsToWCells();
+        putCellsToWCell();
 
         if (MYTHREAD == 0) // AUTOSAVE
             WriteResults(IterationOutputFile, ppp);
@@ -932,6 +1212,7 @@ void export_data(int postproc_prog) {
             case 1: sprintf(FinalOutputFile, "Results/FinalData.csv"); break;
             case 2: sprintf(FinalOutputFile, "Results/FinalData.dat"); break;
         }
+
         WriteResults(FinalOutputFile,  ppp);
 
         // Write information for user

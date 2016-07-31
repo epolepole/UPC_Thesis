@@ -58,6 +58,22 @@ void UpdateMacroscopic(CellProps *Cells, int i, int CalculateDragLift);
 
 void CalculateDragLiftForces(CellProps *Cells, int j, int i, int CalculateDragLift, shared int* n, shared int* m);
 
+int getAx_F(int face);
+int getDir_F(int face);
+int getF(int Ax, int dir);
+
+int getAx_E(int edge);
+int getPos_E(int edge);
+int getE(int Ax, int pos);
+
+int getZ_C(int corner);
+int getY_C(int corner);
+int getX_C(int corner);
+int getC(int X, int Y, int Z);
+
+int getCubeID(int x, int y, int z);
+void getCubeCoords(int ID, int X[]);
+
 int getIndex(const int x, const int y, const int z);
 int getThread(int index);
 

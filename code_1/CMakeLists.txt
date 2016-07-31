@@ -26,7 +26,7 @@ set(CMAKE_BINARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/build")
 
 #set(CMAKE_BUILD_TYPE Debug)
 #set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_VERBOSE_MAKEFILE ON)
+#set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
@@ -51,12 +51,19 @@ endif(NOT DEFINED NN)
 if(NOT DEFINED LAT)
 	message(FATAL_ERROR "Not cube lateral size input")
 endif(NOT DEFINED LAT)
+
+if(NOT DEFINED PRINT_INFO)
+	set(PRINT_INFO 1)
+endif(NOT DEFINED PRINT_INFO)
+
+
 add_definitions(-DGASNET_TRACEMASK="BNH")
 
 add_definitions(-DNN=${NN})
 add_definitions(-DNM=${NM})
 add_definitions(-DNL=${NL})
 add_definitions(-DLAT=${LAT})
+add_definitions(-D__PRINT_INFO__=${PRINT_INFO})
 
 IF(DEFINED SAVE_ITER AND SAVE_ITER)
 	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D__SAVE_ITER__=1")

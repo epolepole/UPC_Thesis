@@ -7,6 +7,12 @@
 #include <time.h>
 #include "BoundaryConditions.h" // convenience
 
+#if __PRINT_INFO__ == 0
+#define PRINTING if (false)
+#else //__PRINT_INFO__
+#define PRINTING if (true)
+#endif //__PRINT_INFO__
+
 #define init_measure_time tInstant1 = clock()
 #define end_measure_time(t_var) tInstant2 = clock();\
                                 t_var = t_var + (float)(tInstant2-tInstant1) / CLOCKS_PER_SEC
@@ -45,9 +51,9 @@ int  AutosaveI;                         // autosave i variable, will be incremen
 int* ppp;                               // pointer of the postproc_prog variable
 int iter_counter;
 
-CellProps *Cells;                       // Struct for Cells
-CellProps *Cells_NEW;                       // Struct for Cells
-CellProps *Local_BCells_NEW;
+CellProps *Cells;                     // Pointer to Cells, Ordered with boundaries first and then internal point
+CellProps *L_B_Cells;
+CellProps *L_W_Cells;
 
 
 // Time measurement variables
@@ -128,15 +134,17 @@ void print_cell_line(FILE* file, const CellProps* Cell);
 
 
 void putCellsToShared();
-void putCellsToShared_NEW();
-void FillLocalBCells();
 void getSharedToCells();
-void putCellsToWCells();
+
+void FillLocalBCells();
+void FillCellsWithLBCells();
+void FillLocalWCells();
 
 
 
 //Step functions
 void CollisionStep(int CollisionModel);
+void UpdateStep();
 void StreamingStep();
 void HandleBoundariesStep(int OutletProfile, int CurvedBoundaries);
 void UpdateMacroscopicStep(int CalculateDragLift);

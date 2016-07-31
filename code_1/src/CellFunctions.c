@@ -127,7 +127,7 @@ void CellIni(CellProps *Cells,
              float  rho_ini)
 {
     ///////////// DECLARATION /////////////////
-    int i, j, l, k;  // loop variables
+    int j, l, k;  // loop variables
     float Qlat[19];  // Q lattice, length of the discrete directions
     Qlat[0]  =    0   ;
     Qlat[1]  =    1   ;
@@ -151,7 +151,7 @@ void CellIni(CellProps *Cells,
 
     int index_Cell;
 
-    for (i = MYTHREAD * BLOCKSIZE; i < BLOCKSIZE * (MYTHREAD + 1); i++ )
+    for (int i = MYTHREAD * BLOCKSIZE; i < BLOCKSIZE * (MYTHREAD + 1); i++ )
     {
         index_Cell = LAYER - MYTHREAD * BLOCKSIZE + i;
 
@@ -525,7 +525,7 @@ void CellIni_NEW(CellProps *Cells,
                  float  rho_ini)
 {
     ///////////// DECLARATION /////////////////
-    int i, j, k, l, n;  // loop variables
+    int l, n;  // loop variables
     int i_r, j_r, k_r;  // interior counting variables
     float Qlat[19];  // Q lattice, length of the discrete directions
     Qlat[0]  =    0   ;
@@ -550,26 +550,37 @@ void CellIni_NEW(CellProps *Cells,
 
     int index_Cell;         //Local global index inside a block
     int lID;          //Local real index inside a block
-    for (i = 1; i< LAT+1; i++) {
-        for (j = 1; j< LAT+1; j++) {
-            for (k = 1; k < LAT+1; k++) {
+    for (int k = 1; k < LAT+1; k++) {
+        for (int j = 1; j< LAT+1; j++) {
+            for (int i = 1; i< LAT+1; i++) {
                 i_r = i-1;
                 j_r = j-1;
                 k_r = k-1;
 
 
-                index_Cell = i*(LAT+2)*(LAT+2) + j*(LAT+2) + k;
-                lID = i_r*(LAT)*(LAT) + j_r*(LAT) + k_r;
-                          //Local movement
-                int ID  = lID%LAT +                                           //   i
-                          (lID/LAT)%LAT*NL +                                  //   j
-                          lID%(LAT*LAT)*NL*NM +                               //   k
-                          //Global movement
-                          MYTHREAD%NTDZ*LAT +                                 //   i
-                          (MYTHREAD/NTDZ)%NTDY*NTDZ*LAT*LAT +                 //   j
-                          (MYTHREAD/(NTDZ*NTDY))*NTDZ*NTDY*LAT*LAT*LAT;       //   k
+                index_Cell = i + j*(LAT+2) + k*(LAT+2)*(LAT+2);
+                lID = i_r + j_r*(LAT) + k_r*(LAT)*(LAT);
+
+                //local move
+                int l_i = lID%LAT;
+                int l_j = ((lID/LAT)%LAT)*NN;
+                int l_k = (lID/(LAT*LAT))*NN*NM;
+
+                //global move
+                int g_i = (MYTHREAD%NTDX)*LAT;
+                int g_j = ((MYTHREAD/NTDX)%NTDY)*NTDX*LAT*LAT;
+                int g_k = (MYTHREAD/(NTDX*NTDY))*NTDX*NTDY*LAT*LAT*LAT;
 
 
+                int ID  = l_i + l_j + l_k + g_i + g_j + g_k;
+
+                /*if (MYTHREAD == 0) {
+                    printf("T=%i: (%i,%i,%i), (%i,%i,%i), index_Cell = %i, lID = %i\n",
+                           MYTHREAD,i, j, k, i_r, j_r, k_r, index_Cell, lID);
+                    printf("T=%i: %i + %i + %i + %i + %i + %i = %i\n",
+                           MYTHREAD, l_i, l_j, l_k, g_i, g_j, g_k, ID);
+                }*/
+                upc_barrier;
                 //index_Cell = LAYER - MYTHREAD * BLOCKSIZE + i;
 
                 // FIND ID of the actual cell
@@ -632,8 +643,8 @@ void CellIni_NEW(CellProps *Cells,
                     //When current cell is on the con iteration
                     if (
                             ( (int)Con[l][0] == (int)Nod[ID][0] )\
-                && ( (int)Con[l][1] == (int)Nod[ID][1] )\
-                && ( (int)Con[l][2] == (int)Nod[ID][2] ) )
+                            && ( (int)Con[l][1] == (int)Nod[ID][1] )\
+                            && ( (int)Con[l][2] == (int)Nod[ID][2] ) )
                     {
                         for(n = 1; n < 19; n++)
                         {
@@ -880,25 +891,28 @@ void D3Q19Vars()
     // LAYER = n*m
 
     // Streaming comes from which node?
-    c[0]  =          0         ;
-    c[1]  = -1                 ; // (i-1)
-    c[2]  =  1                 ; // (i+1)
-    c[3]  =    -1*NN         ; //         (j-1)
-    c[4]  =       NN         ; //         (j+1)
-    c[5]  =            -1*LAYER; //                 (k-1)
-    c[6]  =               LAYER; //                 (k+1)
-    c[7]  = -1 -1*NN         ; // (i-1)   (j-1)
-    c[8]  =  1 -1*NN         ; // (i+1)   (j-1)
-    c[9]  = -1 +  NN         ; // (i-1)   (j+1)
-    c[10] =  1 +  NN         ; // (i+1)   (j+1)
-    c[11] = -1         -1*LAYER; // (i-1)           (k-1)
-    c[12] =  1         -1*LAYER; // (i+1)           (k-1)
-    c[13] = -1         +1*LAYER; // (i-1)           (k+1)
-    c[14] =  1         +1*LAYER; // (i+1)           (k+1)
-    c[15] =    -1*NN -1*LAYER; //         (j-1)   (k-1)
-    c[16] =       NN -1*LAYER; //         (j+1)   (k-1)
-    c[17] =    -1*NN +1*LAYER; //         (j-1)   (k+1)
-    c[18] =       NN +1*LAYER; //         (j+1)   (k+1)
+    int moveY = (LAT+2);
+    int moveZ = (LAT+2)*(LAT+2);
+
+    c[0]  =          0              ;
+    c[1]  = -1                      ; // (i-1)
+    c[2]  = +1                      ; // (i+1)
+    c[3]  =     -1*moveY            ; //         (j-1)
+    c[4]  =     +1*moveY            ; //         (j+1)
+    c[5]  =                 -1*moveZ; //                 (k-1)
+    c[6]  =                 +1*moveZ; //                 (k+1)
+    c[7]  = -1  -1*moveY            ; // (i-1)   (j-1)
+    c[8]  = +1  -1*moveY            ; // (i+1)   (j-1)
+    c[9]  = -1  +1*moveY            ; // (i-1)   (j+1)
+    c[10] = +1  +1*moveY            ; // (i+1)   (j+1)
+    c[11] = -1              -1*moveZ; // (i-1)           (k-1)
+    c[12] = +1              -1*moveZ; // (i+1)           (k-1)
+    c[13] = -1              +1*moveZ; // (i-1)           (k+1)
+    c[14] = +1              +1*moveZ; // (i+1)           (k+1)
+    c[15] =     -1*moveY    -1*moveZ; //         (j-1)   (k-1)
+    c[16] =     +1*moveY    -1*moveZ; //         (j+1)   (k-1)
+    c[17] =     -1*moveY    +1*moveZ; //         (j-1)   (k+1)
+    c[18] =     +1*moveY    +1*moveZ; //         (j+1)   (k+1)
 
 
 
@@ -1131,9 +1145,53 @@ void UpdateMacroscopic(CellProps *Cells, int i, int CalculateDragLift)
 
 }
 
-int getIndex(const int x, const int y, const int z) {
-    return x + y * NN + (z + MYTHREAD * LAYERS_PER_THREAD) * LAYER;
+int getAx_F(int face) {
+    return face/2;
 }
+int getDir_F(int face) {
+    return face%2;
+}
+int getF(int Ax, int dir) {
+    return Ax*2 + dir;
+}
+
+int getAx_E(int edge) {
+    return edge/4;
+}
+int getPos_E(int edge) {
+    return edge%4;
+}
+
+int getE(int Ax, int pos) {
+    return Ax*4 + pos;
+}
+
+int getZ_C(int corner) {
+    return corner/4;
+}
+int getY_C(int corner) {
+    return (corner - getZ_C(corner) * 4)/2;
+}
+int getX_C(int corner) {
+    return corner - getY_C(corner)*2 - getZ_C(corner)*4;
+}
+int getC(int X, int Y, int Z) {
+    return X + Y*2 + Z*4;
+}
+
+int getCubeID(int x, int y, int z) {
+    return x + y*NTDX + z*NTDX*NTDY;
+}
+
+void getCubeCoords(int ID, int X[]) {
+    X[2] = ID/(NTDX*NTDY);
+    X[1] = (ID - X[2] * NTDX*NTDY) / NTDX;
+    //printf("(%i - %i * %i * %i)/%i = %i\n",ID, X[2],NTDX,NTDY,NTDX,3/NTDX);
+    //printf("3/%i = %i\n",NTDX,100/NTDX);
+    X[0] = ID - X[1]*NTDX - X[2] * NTDX*NTDY;
+}
+
+
 
 int getThread(int index) {
     return index/BLOCKSIZE;

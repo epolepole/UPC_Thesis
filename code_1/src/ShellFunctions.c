@@ -245,5 +245,5 @@ void StringAddition(char* first, char* second, char* result)
 
 
 int lID(int i, int j, int k) {
-    return i*(LAT+2)*(LAT+2) + j*(LAT+2) + k;
+    return i + j*(LAT+2) + k*(LAT+2)*(LAT+2);
 }

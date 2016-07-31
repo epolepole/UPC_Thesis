@@ -14,8 +14,8 @@ scalar-vector-matrix allocation and this header includes the multifunctional
 #if __UPC__ == 0
 
 
-#define MYTHREAD  0
 #define THREADS  8
+#define MYTHREAD  (int)8*rand()
 
 #define shared_block(var)
 #define shared
@@ -83,14 +83,12 @@ typedef struct
 }CellProps ;
 
 //shared [BLOCKSIZE+2*NN] CellProps  *SCells;
-shared_block(BLOCKSIZE)     CellProps  *WCells; // Writing Cells: cells to write data
-shared_block(2*LAYER)       CellProps  *BCells; // Boundary cells
 shared_block(5)             double sResiduals[5*THREADS]; // variable to store residuals
 
 
 //New things
-shared_block(BLOCKSIZE_NEW) CellProps  *WCells_NEW; // Writing Cells: cells to write data
-shared_block(B_CELLS_SIZE)  CellProps  *BCells_NEW; // Boundary cells
+shared_block(BLOCKSIZE_NEW) CellProps  *WCells; // Writing Cells: cells to write data
+shared_block(B_CELLS_SIZE)  CellProps  *BCells; // Boundary cells
 
 shared  int    *NumNodes;       // This will store the number of lines of the read files
 shared  int    *NumConn;        // This will store the number of lines of the read files
@@ -135,5 +133,9 @@ int lID(int i, int j, int k);
        __typeof__ (b) _b = (b); \
      _a < _b ? _a : _b; })
 
+#define eq(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a == _b ? 1 : 0; })
 
 #endif
