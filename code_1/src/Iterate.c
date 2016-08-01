@@ -726,6 +726,7 @@ void export_data(int postproc_prog) {
             case 1: sprintf(FinalOutputFile, "Results/FinalData.csv"); break;
             case 2: sprintf(FinalOutputFile, "Results/FinalData.dat"); break;
         }
+        putCellsToWCells();
         WriteResults(FinalOutputFile,  ppp);
 
         // Write information for user
