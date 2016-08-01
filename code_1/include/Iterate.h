@@ -51,10 +51,13 @@ int  AutosaveI;                         // autosave i variable, will be incremen
 int* ppp;                               // pointer of the postproc_prog variable
 int iter_counter;
 
-CellProps Cells[B_CELLS_SIZE + BLOCKSIZE_NEW];                       // Pointer to Cells
+/*CellProps Cells[B_CELLS_SIZE + BLOCKSIZE_NEW];                       // Pointer to Cells
 CellProps L_B_Cells[B_CELLS_SIZE];
-CellProps L_W_Cells[BLOCKSIZE_NEW];
+CellProps L_W_Cells[BLOCKSIZE_NEW];*/
 
+CellProps *Cells;                       // Pointer to Cells
+CellProps *L_B_Cells;
+CellProps *L_W_Cells;
 
 // Time measurement variables
 float tInitialization;          // Time measurement of Initialization

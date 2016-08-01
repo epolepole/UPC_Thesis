@@ -133,7 +133,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     upc_barrier;
     */
 
-    tInitialization = tInitialization + (float)(tStart-clock()) / CLOCKS_PER_SEC;
+    tInitialization = tInitialization + (float)(clock()-tStart) / CLOCKS_PER_SEC;
     //end_measure_time(tInitialization);
 
     upc_barrier;         // Synchronise
@@ -331,8 +331,8 @@ void FillLocalBCells() {
     for (int f = 0; f<6; f++){
         int Ax=getAx_F(f);
         int Dir=getDir_F(f);
-        for (int b=min; b<max+1;b++) {
-            for (int a=min; a<max+1;a++){
+        for (int b=1; b<LAT + 1;b++) {
+            for (int a=1; a<LAT+1;a++){
                 i=eq(Ax,0)*(min+(max-min))*Dir + eq(Ax,1)*b + eq(Ax,2)*a;
                 j=eq(Ax,1)*(min+(max-min))*Dir + eq(Ax,2)*b + eq(Ax,0)*a;
                 k=eq(Ax,2)*(min+(max-min))*Dir + eq(Ax,0)*b + eq(Ax,1)*a;
@@ -350,7 +350,7 @@ void FillLocalBCells() {
     for (int e = 0; e<12; e++){
         int Ax=getAx_E(e);
         int Pos=getPos_E(e);
-        for (int a=min; a<max+1;a++){
+        for (int a=1; a<LAT+1;a++){
             i=eq(Ax,0)*a + eq(Ax,1)*(min + (max-min)*(Pos/2)) + eq(Ax,2)*(min + (max-min)*(Pos%2));
             j=eq(Ax,1)*a + eq(Ax,2)*(min + (max-min)*(Pos/2)) + eq(Ax,0)*(min + (max-min)*(Pos%2));
             k=eq(Ax,2)*a + eq(Ax,0)*(min + (max-min)*(Pos/2)) + eq(Ax,1)*(min + (max-min)*(Pos%2));
@@ -694,8 +694,8 @@ void FillCellsWithLBCells() {
     for (int f = 0; f<6; f++){
         int Ax=getAx_F(f);
         int Dir=getDir_F(f);
-        for (int b=0; b<max+1;b++) {
-            for (int a=0; a<max+1;a++){
+        for (int b=1; b<LAT+1;b++) {
+            for (int a=1; a<LAT+1;a++){
                 i=eq(Ax,0)*(min+(max-min))*Dir + eq(Ax,1)*b + eq(Ax,2)*a;
                 j=eq(Ax,1)*(min+(max-min))*Dir + eq(Ax,2)*b + eq(Ax,0)*a;
                 k=eq(Ax,2)*(min+(max-min))*Dir + eq(Ax,0)*b + eq(Ax,1)*a;
@@ -710,7 +710,7 @@ void FillCellsWithLBCells() {
     for (int e = 0; e<12; e++){
         int Ax=getAx_E(e);
         int Pos=getPos_E(e);
-            for (int a=0; a<max+1;a++){
+            for (int a=1; a<LAT+1;a++){
                 i=eq(Ax,0)*a + eq(Ax,1)*(min + (max-min)*(Pos/2)) + eq(Ax,2)*(min + (max-min)*(Pos%2));
                 j=eq(Ax,1)*a + eq(Ax,2)*(min + (max-min)*(Pos/2)) + eq(Ax,0)*(min + (max-min)*(Pos%2));
                 k=eq(Ax,2)*a + eq(Ax,0)*(min + (max-min)*(Pos/2)) + eq(Ax,1)*(min + (max-min)*(Pos%2));
@@ -743,11 +743,11 @@ void printTest(char * text,int it) {
     }
 }
 void putCellsToWCells(){
-    printTest("Before Fill", 25);
+    printTest("Before Fill", 0);
     FillLocalWCells();
-    printTest("After Fill", 25);
+    printTest("After Fill", 0);
     upc_memput( &WCells[MYTHREAD * BLOCKSIZE_NEW], &L_W_Cells[0], BLOCKSIZE_NEW * sizeof(CellProps));
-    printTest("After memput", 25);
+    printTest("After memput", 0);
 }
 void FillLocalWCells(){
     int c_WC = 0;
@@ -949,9 +949,9 @@ void alloc_cells() {//////////////////////////////////////////////////////
     // New approach
     WCells = (shared_block(BLOCKSIZE_NEW)    CellProps*)upc_all_alloc(THREADS, BLOCKSIZE_NEW*sizeof(CellProps));
     BCells = (shared_block(B_CELLS_SIZE)     CellProps*)upc_all_alloc(THREADS, B_CELLS_SIZE*sizeof(CellProps));
-    //Cells = (CellProps*)calloc(B_CELLS_SIZE + BLOCKSIZE_NEW,sizeof(CellProps));
-    //L_B_Cells = (CellProps*)calloc(B_CELLS_SIZE,sizeof(CellProps));
-    //L_W_Cells = (CellProps*)calloc(BLOCKSIZE_NEW,sizeof(CellProps));
+    Cells = (CellProps*)calloc(B_CELLS_SIZE + BLOCKSIZE_NEW,sizeof(CellProps));
+    L_B_Cells = (CellProps*)calloc(B_CELLS_SIZE,sizeof(CellProps));
+    L_W_Cells = (CellProps*)calloc(BLOCKSIZE_NEW,sizeof(CellProps));
     if (!Cells) {
         printf("Cells mem failure, exiting \n");
         exit(EXIT_FAILURE);
@@ -1045,9 +1045,9 @@ void free_vars() {
     upc_all_free(WCells);
     upc_all_free(BCells);
 
-    //free(Cells);
-    //free(L_B_Cells);
-    //free(L_W_Cells);
+    free(Cells);
+    free(L_B_Cells);
+    free(L_W_Cells);
 
     free(w);
     free(cx);
@@ -1279,6 +1279,7 @@ void export_data(int postproc_prog) {
             case 2: sprintf(FinalOutputFile, "Results/FinalData.dat"); break;
         }
 
+        putCellsToWCells();
         WriteResults(FinalOutputFile,  ppp);
 
         // Write information for user

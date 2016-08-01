@@ -7,7 +7,6 @@
 
 void WriteResults(char* OutputFile, int* postproc_prog)
 {
-    int i;                      // Loop variable
     FILE * fp1;                 // file pointer to output file
     fp1=fopen(OutputFile, "w"); // open file
     //upc_barrier;
@@ -44,21 +43,29 @@ void WriteResults(char* OutputFile, int* postproc_prog)
             fprintf(fp1, "Points:0,Points:1,Points:2,u,v,w,vel_mag,"\
                          //"f00,f01,f02,f03,f04,f05,f06,f07,f08,f09,f10,f11,f12,f13,f14,f15,f16,f17,f18,"
                          "rho\n");
-            for(i = 0; i < NODES; i++)
-            {
-                fprintf(fp1, "%f, %f, %f, %f, %f, %f, %f,",
-                        (WCells+i)->CoordX, // x
-                        (WCells+i)->CoordY, // y
-                        (WCells+i)->CoordZ, // z
-                        (WCells+i)->U,      // u
-                        (WCells+i)->V,      // v
-                        (WCells+i)->W,      // w
-                        sqrt(pow((WCells+i)->U,2)+pow((WCells+i)->V,2)+pow((WCells+i)->W,2)));
-                //for (int j = 0; j<19; j++) {
-                    //fprintf(fp1," %f,",(WCells+i)->F[j]);
-                //}
-                
-                fprintf(fp1," %f\n", (WCells+i)->Rho);    // density
+            for(int th = 0; th<THREADS;th++) {
+                for (int k = 0; k < LAT; k++) {
+                    for (int j = 0; j < LAT; j++) {
+                        for (int i = 0; i < LAT; i++) {
+                            int total_ID = i + j * (LAT) + k * (LAT) * (LAT);
+
+                            fprintf(fp1, "%f, %f, %f, %f, %f, %f, %f,",
+                                    (WCells + ID)->CoordX, // x
+                                    (WCells + ID)->CoordY, // y
+                                    (WCells + ID)->CoordZ, // z
+                                    (WCells + ID)->U,      // u
+                                    (WCells + ID)->V,      // v
+                                    (WCells + ID)->W,      // w
+                                    sqrt(pow((WCells + ID)->U, 2) + pow((WCells + ID)->V, 2) +
+                                         pow((WCells + ID)->W, 2)));
+                            //for (int j = 0; j<19; j++) {
+                            //fprintf(fp1," %f,",(WCells+i)->F[j]);
+                            //}
+
+                            fprintf(fp1, " %f\n", (WCells + ID)->Rho);    // density
+                        }
+                    }
+                }
             }
 
             fclose(fp1);
@@ -69,7 +76,7 @@ void WriteResults(char* OutputFile, int* postproc_prog)
             fprintf(fp1, "Variables = \"x\",\"y\",\"z\",\"u\",\"v\",\"w\",\"u mag\",\"rho\",\"press\",\"fluid\"\n");
             fprintf(fp1, "Zone i=%d, j=%d, k=%d, f=point\n",NN,NM,NL);
 
-            for(i = 0; i < NODES; i++)
+            for(int i = 0; i < NODES; i++)
             {
                 fprintf(fp1, "%f %f %f %f %f %f %f %f %f\n",
                         (WCells+i)->CoordX, // x

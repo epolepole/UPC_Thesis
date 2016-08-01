@@ -575,10 +575,10 @@ void CellIni_NEW(CellProps *Cells,
                 int ID  = l_i + l_j + l_k + g_i + g_j + g_k;
 
                 /*if (MYTHREAD == 0) {
-                    printf("T=%i: (%i,%i,%i), (%i,%i,%i), index_Cell = %i, lID = %i\n",
-                           MYTHREAD,i, j, k, i_r, j_r, k_r, index_Cell, lID);
-                    printf("T=%i: %i + %i + %i + %i + %i + %i = %i\n",
-                           MYTHREAD, l_i, l_j, l_k, g_i, g_j, g_k, ID);
+                    printf("(%i,%i,%i), (%i,%i,%i), index_Cell = %i, lID = %i\n",
+                           i, j, k, i_r, j_r, k_r, index_Cell, lID);
+                    printf("%i + %i + %i + %i + %i + %i = %i\n",
+                           l_i, l_j, l_k, g_i, g_j, g_k, ID);
                 }*/
                 upc_barrier;
                 //index_Cell = LAYER - MYTHREAD * BLOCKSIZE + i;
