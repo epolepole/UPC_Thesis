@@ -174,9 +174,11 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     export_data(postproc_prog);
 
     upc_barrier;         // Synchronise
+    main_thread
     printf("Before freeing vars\n");
     free_vars();
     upc_barrier;         // Synchronise
+    main_thread
     printf("After freeing vars\n");
 
 }
@@ -245,6 +247,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
 ////////////// Autosave ///////////////
         auto_save(AutosaveAfter, AutosaveEvery, postproc_prog);
     }
+    putCellsToWCells();
 
 //////////////////////////////////////////////////////
 ////////////// END OF MAIN WHILE CYCLE ///////////////
