@@ -34,7 +34,7 @@
 /////////// LOCAL VARIABLES FOR EACH CPU ///////////
 ////////////////////////////////////////////////////
 
-int i, j, k, iter;                      // variables for loops
+int iter;                      // variables for loops
 FILE* resid_file;                       // file for residuals
 FILE* log_file;                         // file for log
 FILE* TimeMeasurementFile;              // file for time measurement results
@@ -132,7 +132,7 @@ void print_cells_info(CellProps* Cells);
 void print_boundary_type(CellProps* Cells);
 void print_cell_line(FILE* file, const CellProps* Cell);
 
-
+void putCellsToWCells();
 void putCellsToShared();
 void getSharedToCells();
 

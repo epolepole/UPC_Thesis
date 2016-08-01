@@ -592,6 +592,9 @@ void CellIni_NEW(CellProps *Cells,
                 (Cells + index_Cell)->CoordX = Nod[ID][3];
                 (Cells + index_Cell)->CoordY = Nod[ID][4];
                 (Cells + index_Cell)->CoordZ = Nod[ID][5];
+                if (MYTHREAD==0 && i_r==0 && j_r==0 && k_r ==0) {
+                    printf("Nod[%i] = (%f,%f,%f)\n",ID,Nod[ID][3],Nod[ID][4],Nod[ID][5]);
+                }
 
                 // CHECK FLUID OR NOT
                 //(Cells + index_Cell)->Fluid  = (int) Nod[i][6];

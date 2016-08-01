@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
     CreateDirectory(MainWorkDir);
     //CreateDirectory(OutputCellsDir);
     //CreateDirectory(BoundaryDir);
-    //CreateDirectory(IterDir);
+    CreateDirectory(IterDir);
   }
   ///////////////////// Declare Simulation Variables //////////////////////
   

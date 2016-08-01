@@ -5,6 +5,7 @@
 #include <ComputeResiduals.h>
 #include <FilesWriting.h>
 #include <BoundaryConditions.h>
+#include <ShellFunctions.h>
 
 ////////////////////////////////////////////////////
 ////////////////// OWN HEADERS /////////////////////
@@ -77,8 +78,9 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     /*upc_forall(i = 0; i < 2*LAYER*THREADS; i++; &BCells[i])
     { (BCells+i)->ThreadNumber = MYTHREAD; }*/
 
-    upc_forall(i = 0; i < B_CELLS_SIZE*THREADS; i++; &BCells[i])
-    { (BCells+i)->ThreadNumber = MYTHREAD; }
+    upc_forall(int i = 0; i < B_CELLS_SIZE*THREADS; i++; &BCells[i]) {
+        (BCells+i)->ThreadNumber = MYTHREAD;
+    }
 
     if(MYTHREAD==0)
     {
@@ -143,12 +145,12 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     // PUT INITIALIZED DATA TO BOUNDARIES
     putCellsToShared();
     // COPY CELLS TO WCELLS (writing cells) TO WRITE DATA
-    putCellsToWCell();
+    putCellsToWCells();
 
     //write_cells_to_results(postproc_prog);
 
 
-    free_mesh_data_matrices();  //BCNode
+    //free_mesh_data_matrices();  //BCNode
 
     upc_barrier;         // Synchronise
 
@@ -182,6 +184,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     upc_barrier;         // Synchronise
 
     tIterStart = clock(); // Start measuring time of main loop
+    upc_barrier;         // Synchronise
 
     main_while_loop(CollisionModel, CurvedBoundaries, OutletProfile, &Iterations, AutosaveAfter, AutosaveEvery,
                     postproc_prog, CalculateDragLift, ConvergenceCritVeloc, ConvergenceCritRho);
@@ -698,9 +701,39 @@ void FillCellsWithLBCells() {
     }
 }
 
-void putCellsToWCell(){
+void putCellsToWCells(){
+    if (MYTHREAD == 0 && iter == 25) {
+        int i = 1;
+        int j = 1;
+        int k = 1;
+        printf("******Before Fill\n");
+        printf("    lID(%i,%i,%i) = %i\n",i,j,k,lID(i,j,k));
+        printf("    C[%i] = (%f,%f,%f)\n",lID(i,j,k),Cells[lID(i,j,k)].CoordX,Cells[lID(i,j,k)].CoordY,Cells[lID(i,j,k)].CoordZ);
+        printf("    LWCells[%i] = (%f,%f,%f)\n",0,L_W_Cells[0].CoordX,L_W_Cells[0].CoordY,L_W_Cells[0].CoordZ);
+        printf("    WCells[%i] = (%f,%f,%f)\n",0,WCells[0].CoordX,WCells[0].CoordY,WCells[0].CoordZ);
+    }
     FillLocalWCells();
-    upc_memput( &WCells[MYTHREAD * BLOCKSIZE], &L_W_Cells[0], BLOCKSIZE * sizeof(CellProps));
+    if (MYTHREAD == 0 && iter == 25) {
+        int i = 1;
+        int j = 1;
+        int k = 1;
+        printf("******After Fill\n");
+        printf("    lID(%i,%i,%i) = %i\n",i,j,k,lID(i,j,k));
+        printf("    C[%i] = (%f,%f,%f)\n",lID(i,j,k),Cells[lID(i,j,k)].CoordX,Cells[lID(i,j,k)].CoordY,Cells[lID(i,j,k)].CoordZ);
+        printf("    LWCells[%i] = (%f,%f,%f)\n",0,L_W_Cells[0].CoordX,L_W_Cells[0].CoordY,L_W_Cells[0].CoordZ);
+        printf("    WCells[%i] = (%f,%f,%f)\n",0,WCells[0].CoordX,WCells[0].CoordY,WCells[0].CoordZ);
+    }
+    upc_memput( &WCells[MYTHREAD * BLOCKSIZE_NEW], &L_W_Cells[0], BLOCKSIZE_NEW * sizeof(CellProps));
+    if (MYTHREAD == 0 && iter == 25) {
+        int i = 1;
+        int j = 1;
+        int k = 1;
+        printf("******After memput\n");
+        printf("    lID(%i,%i,%i) = %i\n",i,j,k,lID(i,j,k));
+        printf("    C[%i] = (%f,%f,%f)\n",lID(i,j,k),Cells[lID(i,j,k)].CoordX,Cells[lID(i,j,k)].CoordY,Cells[lID(i,j,k)].CoordZ);
+        printf("    LWCells[%i] = (%f,%f,%f)\n",0,L_W_Cells[0].CoordX,L_W_Cells[0].CoordY,L_W_Cells[0].CoordZ);
+        printf("    WCells[%i] = (%f,%f,%f)\n",0,WCells[0].CoordX,WCells[0].CoordY,WCells[0].CoordZ);
+    }
 }
 void FillLocalWCells(){
     int c_WC = 0;
@@ -806,6 +839,8 @@ void HandleBoundariesStep(int OutletProfile, int CurvedBoundaries){
     }
 
     // OUTLET
+    int i = 0;
+    int j = 0;
     switch(OutletProfile)
     {
         // set profile in outlet
@@ -900,9 +935,9 @@ void alloc_cells() {//////////////////////////////////////////////////////
     // New approach
     WCells = (shared_block(BLOCKSIZE_NEW)    CellProps*)upc_all_alloc(THREADS, BLOCKSIZE_NEW*sizeof(CellProps));
     BCells = (shared_block(B_CELLS_SIZE)     CellProps*)upc_all_alloc(THREADS, B_CELLS_SIZE*sizeof(CellProps));
-    Cells = calloc((size_t)B_CELLS_SIZE + BLOCKSIZE_NEW,sizeof(CellProps));
-    L_B_Cells = calloc((size_t)B_CELLS_SIZE,sizeof(CellProps));
-    L_W_Cells = calloc(BLOCKSIZE_NEW,sizeof(CellProps));
+    Cells = (CellProps *)calloc(B_CELLS_SIZE + BLOCKSIZE_NEW,sizeof(CellProps));
+    L_B_Cells = (CellProps *)calloc(B_CELLS_SIZE,sizeof(CellProps));
+    L_W_Cells = (CellProps *)calloc(BLOCKSIZE_NEW,sizeof(CellProps));
     //////////////////////////////////////////////////////
 
 }
@@ -1102,7 +1137,7 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
             switch(postproc_prog) {
                 case 1: sprintf(AutosaveOutputFile, "Results/autosave_iter%05d.csv", iter); break;
                 case 2: sprintf(AutosaveOutputFile, "Results/autosave_iter%05d.dat", iter); break; }
-            putCellsToWCell(); // Put information to WCells and write (Write Cells)
+            putCellsToWCells(); // Put information to WCells and write (Write Cells)
             if (MYTHREAD==0) // AUTOSAVE
                 WriteResults(AutosaveOutputFile, ppp);
             end_measure_time(tWriting);
@@ -1112,7 +1147,7 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
 
 void save_iteration(int postproc_prog,int Iterations, int AutosaveEvery) {
 
-    if ((iter * 100)%AutosaveEvery == 0) {
+    if ((iter * 20)%AutosaveEvery == 0) {
 
         if(MYTHREAD == 0)
             printf("Saving iteration %i, Rho residual = %lf\n",iter,Residuals[1]);
@@ -1126,11 +1161,11 @@ void save_iteration(int postproc_prog,int Iterations, int AutosaveEvery) {
                 sprintf(IterationOutputFile, "Results/iterations/iter.dat.%i", iter_counter);
                 break;
         }
-        putCellsToWCell();
-
+        putCellsToWCells();
         if (MYTHREAD == 0) // AUTOSAVE
             WriteResults(IterationOutputFile, ppp);
 
+        upc_barrier;
         end_measure_time(tWriting);
 
 

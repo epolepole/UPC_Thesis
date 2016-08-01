@@ -12,6 +12,7 @@ void WriteResults(char* OutputFile, int* postproc_prog)
     fp1=fopen(OutputFile, "w"); // open file
     //upc_barrier;
 
+
     switch(*postproc_prog)
     {
         case 1: // ParaView
@@ -39,12 +40,10 @@ void WriteResults(char* OutputFile, int* postproc_prog)
                         (WCells+i)->Rho,    // density
                         ((WCells+i)->Rho)/3,  // pressure
                         (WCells+i)->Fluid, // fluid or solid
-                        (WCells+i)->ThreadNumber);  */      
-
+                        (WCells+i)->ThreadNumber);  */
             fprintf(fp1, "Points:0,Points:1,Points:2,u,v,w,vel_mag,"\
                          //"f00,f01,f02,f03,f04,f05,f06,f07,f08,f09,f10,f11,f12,f13,f14,f15,f16,f17,f18,"
                          "rho\n");
-
             for(i = 0; i < NODES; i++)
             {
                 fprintf(fp1, "%f, %f, %f, %f, %f, %f, %f,",

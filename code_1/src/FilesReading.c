@@ -13,70 +13,77 @@
 
 float **ReadNodes(char* NodeDataFile)
 {
-  //printf("Thread %i of %i running ReadNodes function\n", MYTHREAD, THREADS);
+    //printf("Thread %i of %i running ReadNodes function\n", MYTHREAD, THREADS);
 
-  ////////////////////////////////////////////////////
-  ///////////////////// Declare //////////////////////
-  ////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////
+    ///////////////////// Declare //////////////////////
+    ////////////////////////////////////////////////////
 
-  //declare the file pointers of the nodes
-  FILE *fp_nodes;
+    //declare the file pointers of the nodes
+    FILE *fp_nodes;
 
-  // variable for loops
-  int i, j;               
+    // variable for loops
+    int i, j;
 
-  // number of lines in the files
-  int lines;               
+    // number of lines in the files
+    int lines;
 
-  // number of lines in the files
-  int Ir1,Ir2,Ir3, Ir4;
+    // number of lines in the files
+    int Ir1,Ir2,Ir3, Ir4;
 
-  // variables to read floats
-  float Fr1,Fr2,Fr3;           
+    // variables to read floats
+    float Fr1,Fr2,Fr3;
 
-  // variable for the Nodal data
-  float **Nodes;
+    // variable for the Nodal data
+    float **Nodes;
 
-  // D2node.dat includes:
-  //  ____________________________________________________________________________________________________________
-  // |         0          |        1         |        2         |    3    |    4    |    5    |         6        |
-  // |   node index i int | node index j int | node index k int | x coord | y coord | z coord | solid/fluid int  |
-  // |____________________|__________________|__________________|_________|_________|_________|__________________|
-  //  solid/fluid: 0 -> solid; 1 -> fluid
+    // var for check reading
+    int cr;
 
-  fp_nodes = fopen(NodeDataFile,"r"); // open the file to count the lines
+    // D2node.dat includes:
+    //  ____________________________________________________________________________________________________________
+    // |         0          |        1         |        2         |    3    |    4    |    5    |         6        |
+    // |   node index i int | node index j int | node index k int | x coord | y coord | z coord | solid/fluid int  |
+    // |____________________|__________________|__________________|_________|_________|_________|__________________|
+    //  solid/fluid: 0 -> solid; 1 -> fluid
 
-  if (fp_nodes==NULL) // if the file does not exist
-  {
-    fprintf(stderr, "Can't open the file %s\n", NodeDataFile);
-    return 0; 
-  }
-  else // if the file exist the following while goes to the end
-  {
-    lines=0;
-    while (fscanf(fp_nodes, "%d %d %d %f %f %f %d",&Ir1,&Ir2,&Ir3,&Fr1,&Fr2,&Fr3,&Ir4) == 7)
-    { lines++; } // counter of the lines
+    fp_nodes = fopen(NodeDataFile,"r"); // open the file to count the lines
 
-    fclose(fp_nodes); // close the file
-
-    // allocate matrix for nodes
-    Nodes = calloc(lines,sizeof(float*));
-    for (i = 0; i < lines; ++i)
-    Nodes[i] = calloc(7,sizeof(float));
-
-    fp_nodes = fopen(NodeDataFile,"r"); // and open again to read the data
-
-    for (j=0;j<lines;j++) // read the data from the file to the variables
+    if (fp_nodes==NULL) // if the file does not exist
     {
-      fscanf(fp_nodes,"%f %f %f %f %f %f %f", &Nodes[j][0],&Nodes[j][1],&Nodes[j][2],&Nodes[j][3],&Nodes[j][4],&Nodes[j][5],&Nodes[j][6]);
+        fprintf(stderr, "Can't open the file %s\n", NodeDataFile);
+        return 0;
     }
+    else // if the file exist the following while goes to the end
+    {
+        lines=0;
+        while (fscanf(fp_nodes, "%d %d %d %f %f %f %d",&Ir1,&Ir2,&Ir3,&Fr1,&Fr2,&Fr3,&Ir4) == 7)
+        { lines++; } // counter of the lines
 
-    fclose(fp_nodes); // close the file
-    
-    *NumNodes = lines; // number of lines
+        fclose(fp_nodes); // close the file
 
-    return Nodes;
-  }
+        // allocate matrix for nodes
+        Nodes = calloc(lines,sizeof(float*));
+        for (i = 0; i < lines; ++i)
+            Nodes[i] = calloc(7,sizeof(float));
+
+        fp_nodes = fopen(NodeDataFile,"r"); // and open again to read the data
+
+        for (j=0;j<lines;j++) // read the data from the file to the variables
+        {
+            if(fscanf(fp_nodes,"%f %f %f %f %f %f %f", &Nodes[j][0],&Nodes[j][1],
+                        &Nodes[j][2],&Nodes[j][3],&Nodes[j][4],&Nodes[j][5],&Nodes[j][6]) != 7) {
+                printf("Error reading file\n");
+                exit(1);
+            }
+        }
+
+        fclose(fp_nodes); // close the file
+
+        *NumNodes = lines; // number of lines
+
+        return Nodes;
+    }
 }
 
 
@@ -89,89 +96,95 @@ float **ReadNodes(char* NodeDataFile)
 float **ReadBCconn(char* BCconnectorDataFile)
 {
 
-  ////////////////////////////////////////////////////
-  ///////////////////// Declare //////////////////////
-  ////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////
+    ///////////////////// Declare //////////////////////
+    ////////////////////////////////////////////////////
 
-  //declare the file pointers of the connectors
-  FILE *fp_connect;
+    //declare the file pointers of the connectors
+    FILE *fp_connect;
 
-  // variable for loops
-  int i, j;               
+    // variable for loops
+    int i, j;
 
-  // number of lines in the files
-  int lines; 
+    // number of lines in the files
+    int lines;
 
-  // number of lines in the files
-  int Ir1,Ir2,Ir3,Ir4,Ir5,Ir6;
+    // number of lines in the files
+    int Ir1,Ir2,Ir3,Ir4,Ir5,Ir6;
 
-  // variables to read floats
-  float Fr1,Fr2,Fr3;  
+    // variables to read floats
+    float Fr1,Fr2,Fr3;
 
-  // variable for the conncection data
-  float **BCconn;
+    // variable for the conncection data
+    float **BCconn;
 
-  // BCconnectors.dat includes:
-  //  _________________________________________________________________________________________________________________
-  // |        0      |       1      |       2      |     3     |    4    |    5     |    6     |    7     |      8     |
-  // |  node index i | node index j | node index k | latticeID | BC type | x coord  | y coord  | z coord  | Boundary ID|
-  // |_______________|______________|______________|___________|_________|__________|__________|__________|____________| 
-  //     
-  // lattice ID is based on the following speed model and it depends on the BC
-  //  ID lattice
-  //
-  //   |       xy - plane          |       xz - plane          |       yz - plane          | 
-  //   |                           |                           |                           |
-  //   |     8       3       7     |     12      5      11     |     16      5       15    |
-  //   |       \     |     /       |       \     |     /       |       \     |     /       |
-  //   |         \   |   /         |         \   |   /         |         \   |   /         |
-  //   |           \ | /           |           \ | /           |           \ | /           |
-  //   |     2 - - - 0 - - - 1     |     2 - - - 0 - - - 1     |     4 - - - 0 - - - 3     |
-  //   |           / | \           |           / | \           |           / | \           |
-  //   |         /   |   \         |         /   |   \         |         /   |   \         |
-  //   |       /     |     \       |       /     |     \       |       /     |     \       |
-  //   |     10      4       9     |     14      6      13     |     18      6       17    |
-  
-  // BC types: *1->wall; *2->inlet; *3->outlet
-  // WHAT IS IN THE LAST COLUMN???
+    // var for check reading
+    int cr;
+
+    // BCconnectors.dat includes:
+    //  _________________________________________________________________________________________________________________
+    // |        0      |       1      |       2      |     3     |    4    |    5     |    6     |    7     |      8     |
+    // |  node index i | node index j | node index k | latticeID | BC type | x coord  | y coord  | z coord  | Boundary ID|
+    // |_______________|______________|______________|___________|_________|__________|__________|__________|____________|
+    //
+    // lattice ID is based on the following speed model and it depends on the BC
+    //  ID lattice
+    //
+    //   |       xy - plane          |       xz - plane          |       yz - plane          |
+    //   |                           |                           |                           |
+    //   |     8       3       7     |     12      5      11     |     16      5       15    |
+    //   |       \     |     /       |       \     |     /       |       \     |     /       |
+    //   |         \   |   /         |         \   |   /         |         \   |   /         |
+    //   |           \ | /           |           \ | /           |           \ | /           |
+    //   |     2 - - - 0 - - - 1     |     2 - - - 0 - - - 1     |     4 - - - 0 - - - 3     |
+    //   |           / | \           |           / | \           |           / | \           |
+    //   |         /   |   \         |         /   |   \         |         /   |   \         |
+    //   |       /     |     \       |       /     |     \       |       /     |     \       |
+    //   |     10      4       9     |     14      6      13     |     18      6       17    |
+
+    // BC types: *1->wall; *2->inlet; *3->outlet
+    // WHAT IS IN THE LAST COLUMN???
 
 
-  fp_connect = fopen(BCconnectorDataFile,"r"); // open the file to count the lines
+    fp_connect = fopen(BCconnectorDataFile,"r"); // open the file to count the lines
 
-  if (fp_connect==NULL) // if the file does not exist
-  {
-    fprintf(stderr, "Can't open the file %s!\n",BCconnectorDataFile);
-    return 0;
-  }
-  else // if the file exist the following while goes to the end
-  {
-    lines=0;
-    while (fscanf(fp_connect, "%d %d %d %d %d %f %f %f %d",&Ir1,&Ir2,&Ir3,&Ir4,&Ir5,&Fr1,&Fr2,&Fr3,&Ir6) == 9)
+    if (fp_connect==NULL) // if the file does not exist
     {
-      lines++; // counter of the lines
-    } 
-
-    fclose(fp_connect); // close the file
-
-    // allocate matrix for connectors
-    BCconn = malloc(lines*sizeof(float*));
-    for (i = 0; i < lines; ++i)
-    BCconn[i] = malloc(9*sizeof(float));
-
-    fp_connect = fopen(BCconnectorDataFile,"r"); // and open again to read the data
-
-    for (j=0;j<lines;j++) // read the data from the file to the variables
-    {
-    fscanf(fp_connect,"%f %f %f %f %f %f %f %f %f",&BCconn[j][0],&BCconn[j][1],&BCconn[j][2],&BCconn[j][3],
-      &BCconn[j][4],&BCconn[j][5],&BCconn[j][6],&BCconn[j][7],&BCconn[j][8]);
+        fprintf(stderr, "Can't open the file %s!\n",BCconnectorDataFile);
+        return 0;
     }
-    
-    fclose(fp_connect); // close the file
+    else // if the file exist the following while goes to the end
+    {
+        lines=0;
+        while (fscanf(fp_connect, "%d %d %d %d %d %f %f %f %d",&Ir1,&Ir2,&Ir3,&Ir4,&Ir5,&Fr1,&Fr2,&Fr3,&Ir6) == 9)
+        {
+            lines++; // counter of the lines
+        }
 
-    *NumConn = lines; // number of lines
+        fclose(fp_connect); // close the file
 
-    return BCconn;
-  }
+        // allocate matrix for connectors
+        BCconn = malloc(lines*sizeof(float*));
+        for (i = 0; i < lines; ++i)
+            BCconn[i] = malloc(9*sizeof(float));
+
+        fp_connect = fopen(BCconnectorDataFile,"r"); // and open again to read the data
+
+        for (j=0;j<lines;j++) // read the data from the file to the variables
+        {
+            if(fscanf(fp_connect,"%f %f %f %f %f %f %f %f %f",&BCconn[j][0],&BCconn[j][1],&BCconn[j][2],&BCconn[j][3],
+                        &BCconn[j][4],&BCconn[j][5],&BCconn[j][6],&BCconn[j][7],&BCconn[j][8]) != 9) {
+                printf("Error reading file\n");
+                exit(1);
+            }
+        }
+
+        fclose(fp_connect); // close the file
+
+        *NumConn = lines; // number of lines
+
+        return BCconn;
+    }
 }
 
 
@@ -184,26 +197,26 @@ float **ReadBCconn(char* BCconnectorDataFile)
 void CompDataNode(float **Nodes)
 {
 
-  ////////////////////////////////////////////////////
-  ///////////////////// Declare //////////////////////
-  ////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////
+    ///////////////////// Declare //////////////////////
+    ////////////////////////////////////////////////////
 
-  int i; // variable for the loop
-  float DeltaP1, DeltaP2; // local grid spacing
+    int i; // variable for the loop
+    float DeltaP1, DeltaP2; // local grid spacing
 
-  for(i=0;i<*NumNodes;i++)
-  {
-    if(Nodes[i][0]==0 && Nodes[i][1]==0)
+    for(i=0;i<*NumNodes;i++)
     {
-      DeltaP1=Nodes[i][3];
+        if(Nodes[i][0]==0 && Nodes[i][1]==0)
+        {
+            DeltaP1=Nodes[i][3];
+        }
+        if(Nodes[i][0]==1 && Nodes[i][1]==0)
+        {
+            DeltaP2=Nodes[i][3];
+        }
     }
-    if(Nodes[i][0]==1 && Nodes[i][1]==0)
-    {
-      DeltaP2=Nodes[i][3];
-    }
-  }
 
-  *Delta = (max(DeltaP1,DeltaP2)-min(DeltaP1,DeltaP2)); // grid spacing
+    *Delta = (max(DeltaP1,DeltaP2)-min(DeltaP1,DeltaP2)); // grid spacing
 }
 
 
@@ -216,38 +229,38 @@ void CompDataNode(float **Nodes)
 void CompDataConn(float** BCconn) // STILL NOT MODIFIED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 {
 
-  ////////////////////////////////////////////////////
-  ///////////////////// Declare //////////////////////
-  ////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////
+    ///////////////////// Declare //////////////////////
+    ////////////////////////////////////////////////////
 
-  int i=0; // counter
+    int i=0; // counter
 
-  while(BCconn[i][4]!=2)
-  {
-      MaxInletCoordY[0] = BCconn[i+1][5]; // maximum Y coordinate of the inlet line
-      MinInletCoordY[0] = BCconn[i+1][5]; // minimum Y coordinate of the inlet line
-      i++;
-  }
+    while(BCconn[i][4]!=2)
+    {
+        MaxInletCoordY[0] = BCconn[i+1][5]; // maximum Y coordinate of the inlet line
+        MinInletCoordY[0] = BCconn[i+1][5]; // minimum Y coordinate of the inlet line
+        i++;
+    }
 
-  *NumInletNodes = 0; // nunmber of inlet nodes
+    *NumInletNodes = 0; // nunmber of inlet nodes
 
-  for (i=0; i< *NumConn;i++)
-  {
-      if(BCconn[i][3]==2){
-          if(BCconn[i][2]==1 || BCconn[i][2]==2 || BCconn[i][2]==3 || BCconn[i][2]==4){
-              if(BCconn[i][5]>*MaxInletCoordY){
-                  *MaxInletCoordY = BCconn[i][5];
-              }
-              if(BCconn[i][5]<MinInletCoordY[0]){
-                  *MinInletCoordY = BCconn[i][5];
-              }
-              *NumInletNodes=*NumInletNodes+1;
-          }
-      }
-  }
+    for (i=0; i< *NumConn;i++)
+    {
+        if(BCconn[i][3]==2){
+            if(BCconn[i][2]==1 || BCconn[i][2]==2 || BCconn[i][2]==3 || BCconn[i][2]==4){
+                if(BCconn[i][5]>*MaxInletCoordY){
+                    *MaxInletCoordY = BCconn[i][5];
+                }
+                if(BCconn[i][5]<MinInletCoordY[0]){
+                    *MinInletCoordY = BCconn[i][5];
+                }
+                *NumInletNodes=*NumInletNodes+1;
+            }
+        }
+    }
 
-  (*MaxInletCoordY) = (*MaxInletCoordY)+(*Delta)/2;
-  (*MinInletCoordY) = (*MinInletCoordY)-(*Delta)/2;
+    (*MaxInletCoordY) = (*MaxInletCoordY)+(*Delta)/2;
+    (*MinInletCoordY) = (*MinInletCoordY)-(*Delta)/2;
 }
 
 
@@ -264,23 +277,28 @@ void ReadIniData(char* IniFileName, float* Uavg, float* Vavg, float* Wavg, float
                  int* CalculateDragLift, float* ConvergenceCritVeloc,
                  float* ConvergenceCritRho)
 {
-  FILE *f_init; // *.ini file pointer
-  f_init = fopen(IniFileName,"r");           // open the file
-  fscanf(f_init,"%f", Uavg);                 // U velocity to initialize
-  fscanf(f_init,"%f", Vavg);                 // V velocity to initialize
-  fscanf(f_init,"%f", Wavg);                 // W velocity to initialize
-  fscanf(f_init,"%f", rho_ini);              // Rho velocity to initialize
-  fscanf(f_init,"%f", Viscosity);            // Viscosity
-  fscanf(f_init,"%d", InletProfile);         // inlet profile (yes/no)
-  fscanf(f_init,"%d", CollisionModel);       // collision model (BGKW/TRT/MRT)
-  fscanf(f_init,"%d", CurvedBoundaries);     // curved boundaries (yes/no)
-  fscanf(f_init,"%d", OutletProfile);        // outlet profile (yes/no)
-  fscanf(f_init,"%d", Iterations);           // # of iterations
-  fscanf(f_init,"%d", AutosaveEvery);        // autosave every #th of iteration
-  fscanf(f_init,"%d", AutosaveAfter);        // autosave after the #th iteration
-  fscanf(f_init,"%d", PostprocProg);         // program of postp rocessing (Paraview/TECplot)
-  fscanf(f_init,"%d", CalculateDragLift);    // calculate drag & lift? if > 0 than on which BC_ID
-  fscanf(f_init,"%f", ConvergenceCritVeloc); // convergence criterion for velocity
-  fscanf(f_init,"%f", ConvergenceCritRho);   // convergence criterion for density
-  fclose(f_init);                            // close the file
+    int cr = 0;
+    FILE *f_init; // *.ini file pointer
+    f_init = fopen(IniFileName,"r");           // open the file
+    cr += fscanf(f_init,"%f", Uavg);                 // U velocity to initialize
+    cr += fscanf(f_init,"%f", Vavg);                 // V velocity to initialize
+    cr += fscanf(f_init,"%f", Wavg);                 // W velocity to initialize
+    cr += fscanf(f_init,"%f", rho_ini);              // Rho velocity to initialize
+    cr += fscanf(f_init,"%f", Viscosity);            // Viscosity
+    cr += fscanf(f_init,"%d", InletProfile);         // inlet profile (yes/no)
+    cr += fscanf(f_init,"%d", CollisionModel);       // collision model (BGKW/TRT/MRT)
+    cr += fscanf(f_init,"%d", CurvedBoundaries);     // curved boundaries (yes/no)
+    cr += fscanf(f_init,"%d", OutletProfile);        // outlet profile (yes/no)
+    cr += fscanf(f_init,"%d", Iterations);           // # of iterations
+    cr += fscanf(f_init,"%d", AutosaveEvery);        // autosave every #th of iteration
+    cr += fscanf(f_init,"%d", AutosaveAfter);        // autosave after the #th iteration
+    cr += fscanf(f_init,"%d", PostprocProg);         // program of postp rocessing (Paraview/TECplot)
+    cr += fscanf(f_init,"%d", CalculateDragLift);    // calculate drag & lift? if > 0 than on which BC_ID
+    cr += fscanf(f_init,"%f", ConvergenceCritVeloc); // convergence criterion for velocity
+    cr += fscanf(f_init,"%f", ConvergenceCritRho);   // convergence criterion for density
+    if(cr!=16){
+        printf("Error reading file\n");
+        exit(1);
+    }
+    fclose(f_init);                            // close the file
 }
