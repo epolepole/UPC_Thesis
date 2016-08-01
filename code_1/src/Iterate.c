@@ -306,6 +306,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
 ////////////// Autosave ///////////////
         auto_save(AutosaveAfter, AutosaveEvery, postproc_prog);
     }
+    putCellsToWCells();
 
 //////////////////////////////////////////////////////
 ////////////// END OF MAIN WHILE CYCLE ///////////////
@@ -824,9 +825,9 @@ void StreamingStep(){
                 for (int l = 0; l < 19; l++) {
 
                     if (((Cells + lID(i,j,k))->StreamLattice[l]) == 1) {
-                        PRINTING
-                        if(lID(i,j,k) > (LAT)*(LAT)*LAT)
-                            printf("T%i: (lID(%i,%i,%i) = %i) + (c[%i] = %i) = %i\n",MYTHREAD,i,j,k,lID(i,j,k),l,c[l],lID(i,j,k) + c[l]);
+                        //PRINTING
+                        //if(lID(i,j,k) > (LAT)*(LAT)*LAT)
+                            //printf("T%i: (lID(%i,%i,%i) = %i) + (c[%i] = %i) = %i\n",MYTHREAD,i,j,k,lID(i,j,k),l,c[l],lID(i,j,k) + c[l]);
                         (Cells + lID(i,j,k))->F[l] = (Cells + lID(i,j,k) + c[l])->METAF[l];
 
                     }
@@ -1033,7 +1034,6 @@ void allocate_residuals() {// allocate residuals
 void free_vars() {
     //if (MYTHREAD == 0) {
     upc_free(Delta);
-    upc_barrier;
     upc_free(MaxInletCoordY);
     upc_free(MinInletCoordY);
     upc_free(NumInletNodes);

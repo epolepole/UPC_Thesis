@@ -42,28 +42,29 @@ void WriteResults(char* OutputFile, int* postproc_prog)
                         (WCells+i)->ThreadNumber);  */
             fprintf(fp1, "Points:0,Points:1,Points:2,u,v,w,vel_mag,"\
                          //"f00,f01,f02,f03,f04,f05,f06,f07,f08,f09,f10,f11,f12,f13,f14,f15,f16,f17,f18,"
-                         "rho\n");
-            for(int th = 0; th<THREADS;th++) {
-                for (int k = 0; k < LAT; k++) {
-                    for (int j = 0; j < LAT; j++) {
-                        for (int i = 0; i < LAT; i++) {
-                            int total_ID = i + j * (LAT) + k * (LAT) * (LAT);
+                    "rho\n");
+            for (int k = 0; k < NN; k++) {
+                for (int j = 0; j < NM; j++) {
+                    for (int i = 0; i < NL; i++) {
 
-                            fprintf(fp1, "%f, %f, %f, %f, %f, %f, %f,",
-                                    (WCells + ID)->CoordX, // x
-                                    (WCells + ID)->CoordY, // y
-                                    (WCells + ID)->CoordZ, // z
-                                    (WCells + ID)->U,      // u
-                                    (WCells + ID)->V,      // v
-                                    (WCells + ID)->W,      // w
-                                    sqrt(pow((WCells + ID)->U, 2) + pow((WCells + ID)->V, 2) +
-                                         pow((WCells + ID)->W, 2)));
-                            //for (int j = 0; j<19; j++) {
-                            //fprintf(fp1," %f,",(WCells+i)->F[j]);
-                            //}
+                        int pos = i%LAT + (i/LAT)*LAT*LAT +
+                                (j%LAT)*LAT + (j/LAT)*LAT*LAT*NTDX +
+                                (k%LAT)*LAT*LAT + (k/LAT)*LAT*LAT*NTDX*NTDY;
+                        //printf("pos(%i,%i,%i)=%i\n",i,j,k,pos);
+                        fprintf(fp1, "%f, %f, %f, %f, %f, %f, %f,",
+                                (WCells + pos)->CoordX, // x
+                                (WCells + pos)->CoordY, // y
+                                (WCells + pos)->CoordZ, // z
+                                (WCells + pos)->U,      // u
+                                (WCells + pos)->V,      // v
+                                (WCells + pos)->W,      // w
+                                sqrt(pow((WCells + pos)->U, 2) + pow((WCells + pos)->V, 2) +
+                                     pow((WCells + pos)->W, 2)));
+                        //for (int j = 0; j<19; j++) {
+                        //fprintf(fp1," %f,",(WCells+i)->F[j]);
+                        //}
 
-                            fprintf(fp1, " %f\n", (WCells + ID)->Rho);    // density
-                        }
+                        fprintf(fp1, " %f\n", (WCells + pos)->Rho);    // density
                     }
                 }
             }
@@ -88,7 +89,7 @@ void WriteResults(char* OutputFile, int* postproc_prog)
                         sqrt(pow((WCells+i)->U,2)+pow((WCells+i)->V,2)+pow((WCells+i)->W,2)), // velocity magnitude
                         (WCells+i)->Rho,    // density
                         ((WCells+i)->Rho)/3);  // pressure
-                        //(WCells+i)->Fluid); // fluid or solid
+                //(WCells+i)->Fluid); // fluid or solid
             }
 
             fclose(fp1);
@@ -144,7 +145,7 @@ void WriteBCells(char* OutputFile, int* postproc_prog)
                         sqrt(pow((BCells+i)->U,2)+pow((BCells+i)->V,2)+pow((BCells+i)->W,2)), // velocity magnitude
                         (BCells+i)->Rho,    // density
                         ((BCells+i)->Rho)/3);  // pressure
-                        //(BCells+i)->Fluid); // fluid or solid
+                //(BCells+i)->Fluid); // fluid or solid
             }
 
             fclose(fp1);
