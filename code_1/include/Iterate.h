@@ -51,9 +51,9 @@ int  AutosaveI;                         // autosave i variable, will be incremen
 int* ppp;                               // pointer of the postproc_prog variable
 int iter_counter;
 
-CellProps *Cells;                     // Pointer to Cells, Ordered with boundaries first and then internal point
-CellProps *L_B_Cells;
-CellProps *L_W_Cells;
+CellProps Cells[B_CELLS_SIZE + BLOCKSIZE_NEW];                       // Pointer to Cells
+CellProps L_B_Cells[B_CELLS_SIZE];
+CellProps L_W_Cells[BLOCKSIZE_NEW];
 
 
 // Time measurement variables
@@ -131,6 +131,9 @@ void export_data(int postproc_prog);
 void print_cells_info(CellProps* Cells);
 void print_boundary_type(CellProps* Cells);
 void print_cell_line(FILE* file, const CellProps* Cell);
+
+
+void printTest(char * text, int it);
 
 void putCellsToWCells();
 void putCellsToShared();

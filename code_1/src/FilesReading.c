@@ -74,7 +74,7 @@ float **ReadNodes(char* NodeDataFile)
             if(fscanf(fp_nodes,"%f %f %f %f %f %f %f", &Nodes[j][0],&Nodes[j][1],
                         &Nodes[j][2],&Nodes[j][3],&Nodes[j][4],&Nodes[j][5],&Nodes[j][6]) != 7) {
                 printf("Error reading file\n");
-                exit(1);
+                exit(EXIT_FAILURE);
             }
         }
 
@@ -175,7 +175,7 @@ float **ReadBCconn(char* BCconnectorDataFile)
             if(fscanf(fp_connect,"%f %f %f %f %f %f %f %f %f",&BCconn[j][0],&BCconn[j][1],&BCconn[j][2],&BCconn[j][3],
                         &BCconn[j][4],&BCconn[j][5],&BCconn[j][6],&BCconn[j][7],&BCconn[j][8]) != 9) {
                 printf("Error reading file\n");
-                exit(1);
+                exit(EXIT_FAILURE);
             }
         }
 
@@ -298,7 +298,7 @@ void ReadIniData(char* IniFileName, float* Uavg, float* Vavg, float* Wavg, float
     cr += fscanf(f_init,"%f", ConvergenceCritRho);   // convergence criterion for density
     if(cr!=16){
         printf("Error reading file\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     fclose(f_init);                            // close the file
 }

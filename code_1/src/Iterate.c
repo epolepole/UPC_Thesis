@@ -221,7 +221,6 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         PRINTING
             printf("T%i: Collsision\n",MYTHREAD);
         upc_barrier;
-
         ////////////// UPDATE DISTR ///////////////
         init_measure_time;
         UpdateStep();
@@ -230,6 +229,9 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
             printf("T%i: UpdateF\n",MYTHREAD);
         upc_barrier;
 
+        //printTest("After UpdateF", 0);
+        //printTest("After UpdateF", 1);
+        //printTest("After UpdateF", 2);
 //////////////// PUT THREAD-BOUNDARY CELLS TO SHARED ////////////////
         init_measure_time;
         //putCellsToShared();
@@ -246,6 +248,9 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
             printf("T%i: putCellsToShared_NEW\n",MYTHREAD);
         upc_barrier;
 
+        //printTest("After putCellsToShared_NEW", 0);
+        //printTest("After putCellsToShared_NEW", 1);
+        //printTest("After putCellsToShared_NEW", 2);
 
 //////////////// COPY SHARED BCELLS TO CELLS ////////////////
         init_measure_time;
@@ -263,7 +268,6 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
             printf("T%i: getSharedToCells_NEW\n",MYTHREAD);
         upc_barrier;
 
-
 ////////////// STREAMING ///////////////
         init_measure_time;
         StreamingStep();
@@ -271,7 +275,6 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         PRINTING
             printf("T%i: StreamingStep\n",MYTHREAD);
         upc_barrier;
-
 ////////////// BOUNDARIES ///////////////
         init_measure_time;
         HandleBoundariesStep(OutletProfile, CurvedBoundaries);
@@ -287,7 +290,6 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         PRINTING
             printf("T%i: UpdateMacroscopicStep\n",MYTHREAD);
         upc_barrier;
-
 ////////////// Residuals ///////////////
         init_measure_time;
         ComputeResiduals(Cells, Residuals, sumVel0, sumVel1, sumRho0, sumRho1, CalculateDragLift, &iter, Iterations);
@@ -324,12 +326,13 @@ void FillLocalBCells() {
     int min=1;
     int max=LAT;
 
+    //printTest("0", 0);
     //Faces
     for (int f = 0; f<6; f++){
         int Ax=getAx_F(f);
         int Dir=getDir_F(f);
-        for (int b=0; b<max+1;b++) {
-            for (int a=0; a<max+1;a++){
+        for (int b=min; b<max+1;b++) {
+            for (int a=min; a<max+1;a++){
                 i=eq(Ax,0)*(min+(max-min))*Dir + eq(Ax,1)*b + eq(Ax,2)*a;
                 j=eq(Ax,1)*(min+(max-min))*Dir + eq(Ax,2)*b + eq(Ax,0)*a;
                 k=eq(Ax,2)*(min+(max-min))*Dir + eq(Ax,0)*b + eq(Ax,1)*a;
@@ -342,11 +345,12 @@ void FillLocalBCells() {
         }
     }
 
+    //printTest("1", 0);
     //Edges
     for (int e = 0; e<12; e++){
         int Ax=getAx_E(e);
         int Pos=getPos_E(e);
-        for (int a=0; a<max+1;a++){
+        for (int a=min; a<max+1;a++){
             i=eq(Ax,0)*a + eq(Ax,1)*(min + (max-min)*(Pos/2)) + eq(Ax,2)*(min + (max-min)*(Pos%2));
             j=eq(Ax,1)*a + eq(Ax,2)*(min + (max-min)*(Pos/2)) + eq(Ax,0)*(min + (max-min)*(Pos%2));
             k=eq(Ax,2)*a + eq(Ax,0)*(min + (max-min)*(Pos/2)) + eq(Ax,1)*(min + (max-min)*(Pos%2));
@@ -355,15 +359,40 @@ void FillLocalBCells() {
             c_BC++;
         }
     }
+    //printTest("2", 0);
     //Corners
     for (k = min; k < max+1; k = k + max - min) {
         for(j = min; j < max+1; j = j + max - min) {
             for(i = min; i < max+1; i = i + max - min) {
+                /*if (lID(i,j,k) == 818 && MYTHREAD == 0 && iter == 0) {
+                    char str[15];
+                    printf("c_BC = %i\n", c_BC);
+                    sprintf(str, "%i of %i", lID(i,j,k), BLOCKSIZE_NEW+B_CELLS_SIZE);
+                    printTest(str, 0);
+                }*/
                 L_B_Cells[c_BC] = Cells[lID(i,j,k)];
                 c_BC++;
+                /*if (lID(i,j,k) == 818 && MYTHREAD == 0 && iter == 0) {
+                    char str[15];
+                    printf("c_BC = %i\n", c_BC);
+                    sprintf(str, "%i of %i", lID(i,j,k), BLOCKSIZE_NEW+B_CELLS_SIZE);
+                    printTest(str, 0);
+                }*/
+                if (lID(i,j,k) == 818) {
+                    Cells[111].CoordX -= Cells[111].CoordX;
+                    Cells[111].CoordY -= Cells[111].CoordY;
+                    Cells[111].CoordZ -= Cells[111].CoordZ;
+                }
+                /*if (lID(i,j,k) == 818 && MYTHREAD == 0 && iter == 0) {
+                    char str[15];
+                    printf("c_BC = %i\n", c_BC);
+                    sprintf(str, "%i of %i", lID(i,j,k), BLOCKSIZE_NEW+B_CELLS_SIZE);
+                    printTest(str, 0);
+                }*/
             }
         }
     }
+    //printTest("3", 0);
 }
 
 
@@ -701,39 +730,24 @@ void FillCellsWithLBCells() {
     }
 }
 
+void printTest(char * text,int it) {
+    if (MYTHREAD == 0 && iter == it) {
+        int i = 1;
+        int j = 1;
+        int k = 1;
+        printf("******%s\n",text);
+        printf("    lID(%i,%i,%i) = %i\n",i,j,k,lID(i,j,k));
+        printf("    C[%i] = (%f,%f,%f)\n",lID(i,j,k),Cells[lID(i,j,k)].CoordX,Cells[lID(i,j,k)].CoordY,Cells[lID(i,j,k)].CoordZ);
+        printf("    LWCells[%i] = (%f,%f,%f)\n",0,L_W_Cells[0].CoordX,L_W_Cells[0].CoordY,L_W_Cells[0].CoordZ);
+        printf("    WCells[%i] = (%f,%f,%f)\n",0,WCells[0].CoordX,WCells[0].CoordY,WCells[0].CoordZ);
+    }
+}
 void putCellsToWCells(){
-    if (MYTHREAD == 0 && iter == 25) {
-        int i = 1;
-        int j = 1;
-        int k = 1;
-        printf("******Before Fill\n");
-        printf("    lID(%i,%i,%i) = %i\n",i,j,k,lID(i,j,k));
-        printf("    C[%i] = (%f,%f,%f)\n",lID(i,j,k),Cells[lID(i,j,k)].CoordX,Cells[lID(i,j,k)].CoordY,Cells[lID(i,j,k)].CoordZ);
-        printf("    LWCells[%i] = (%f,%f,%f)\n",0,L_W_Cells[0].CoordX,L_W_Cells[0].CoordY,L_W_Cells[0].CoordZ);
-        printf("    WCells[%i] = (%f,%f,%f)\n",0,WCells[0].CoordX,WCells[0].CoordY,WCells[0].CoordZ);
-    }
+    printTest("Before Fill", 25);
     FillLocalWCells();
-    if (MYTHREAD == 0 && iter == 25) {
-        int i = 1;
-        int j = 1;
-        int k = 1;
-        printf("******After Fill\n");
-        printf("    lID(%i,%i,%i) = %i\n",i,j,k,lID(i,j,k));
-        printf("    C[%i] = (%f,%f,%f)\n",lID(i,j,k),Cells[lID(i,j,k)].CoordX,Cells[lID(i,j,k)].CoordY,Cells[lID(i,j,k)].CoordZ);
-        printf("    LWCells[%i] = (%f,%f,%f)\n",0,L_W_Cells[0].CoordX,L_W_Cells[0].CoordY,L_W_Cells[0].CoordZ);
-        printf("    WCells[%i] = (%f,%f,%f)\n",0,WCells[0].CoordX,WCells[0].CoordY,WCells[0].CoordZ);
-    }
+    printTest("After Fill", 25);
     upc_memput( &WCells[MYTHREAD * BLOCKSIZE_NEW], &L_W_Cells[0], BLOCKSIZE_NEW * sizeof(CellProps));
-    if (MYTHREAD == 0 && iter == 25) {
-        int i = 1;
-        int j = 1;
-        int k = 1;
-        printf("******After memput\n");
-        printf("    lID(%i,%i,%i) = %i\n",i,j,k,lID(i,j,k));
-        printf("    C[%i] = (%f,%f,%f)\n",lID(i,j,k),Cells[lID(i,j,k)].CoordX,Cells[lID(i,j,k)].CoordY,Cells[lID(i,j,k)].CoordZ);
-        printf("    LWCells[%i] = (%f,%f,%f)\n",0,L_W_Cells[0].CoordX,L_W_Cells[0].CoordY,L_W_Cells[0].CoordZ);
-        printf("    WCells[%i] = (%f,%f,%f)\n",0,WCells[0].CoordX,WCells[0].CoordY,WCells[0].CoordZ);
-    }
+    printTest("After memput", 25);
 }
 void FillLocalWCells(){
     int c_WC = 0;
@@ -935,9 +949,21 @@ void alloc_cells() {//////////////////////////////////////////////////////
     // New approach
     WCells = (shared_block(BLOCKSIZE_NEW)    CellProps*)upc_all_alloc(THREADS, BLOCKSIZE_NEW*sizeof(CellProps));
     BCells = (shared_block(B_CELLS_SIZE)     CellProps*)upc_all_alloc(THREADS, B_CELLS_SIZE*sizeof(CellProps));
-    Cells = (CellProps *)calloc(B_CELLS_SIZE + BLOCKSIZE_NEW,sizeof(CellProps));
-    L_B_Cells = (CellProps *)calloc(B_CELLS_SIZE,sizeof(CellProps));
-    L_W_Cells = (CellProps *)calloc(BLOCKSIZE_NEW,sizeof(CellProps));
+    //Cells = (CellProps*)calloc(B_CELLS_SIZE + BLOCKSIZE_NEW,sizeof(CellProps));
+    //L_B_Cells = (CellProps*)calloc(B_CELLS_SIZE,sizeof(CellProps));
+    //L_W_Cells = (CellProps*)calloc(BLOCKSIZE_NEW,sizeof(CellProps));
+    if (!Cells) {
+        printf("Cells mem failure, exiting \n");
+        exit(EXIT_FAILURE);
+    }
+    if (!L_B_Cells) {
+        printf("L_B_Cells mem failure, exiting \n");
+        exit(EXIT_FAILURE);
+    }
+    if (!L_W_Cells) {
+        printf("L_W_Cells mem failure, exiting \n");
+        exit(EXIT_FAILURE);
+    }
     //////////////////////////////////////////////////////
 
 }
@@ -1007,18 +1033,21 @@ void allocate_residuals() {// allocate residuals
 void free_vars() {
     //if (MYTHREAD == 0) {
     upc_free(Delta);
+    upc_barrier;
     upc_free(MaxInletCoordY);
     upc_free(MinInletCoordY);
     upc_free(NumInletNodes);
     upc_free(NumNodes);
     upc_free(NumConn);
     //}
+
+
     upc_all_free(WCells);
     upc_all_free(BCells);
 
-    free(Cells);
-    free(L_B_Cells);
-    free(L_W_Cells);
+    //free(Cells);
+    //free(L_B_Cells);
+    //free(L_W_Cells);
 
     free(w);
     free(cx);
