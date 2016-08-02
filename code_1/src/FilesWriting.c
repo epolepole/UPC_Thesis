@@ -47,9 +47,9 @@ void WriteResults(char* OutputFile, int* postproc_prog)
                 for (int j = 0; j < NM; j++) {
                     for (int i = 0; i < NL; i++) {
 
-                        int pos = i%LAT + (i/LAT)*LAT*LAT +
-                                (j%LAT)*LAT + (j/LAT)*LAT*LAT*NTDX +
-                                (k%LAT)*LAT*LAT + (k/LAT)*LAT*LAT*NTDX*NTDY;
+                        int pos = i%LAT + (i/LAT)*LAT*LAT*LAT +
+                                (j%LAT)*LAT + (j/LAT)*LAT*LAT*LAT*NTDX +
+                                (k%LAT)*LAT*LAT + (k/LAT)*LAT*LAT*LAT*NTDX*NTDY;
                         //printf("pos(%i,%i,%i)=%i\n",i,j,k,pos);
                         fprintf(fp1, "%f, %f, %f, %f, %f, %f, %f,",
                                 (WCells + pos)->CoordX, // x

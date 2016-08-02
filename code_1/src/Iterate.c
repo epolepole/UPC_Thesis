@@ -164,7 +164,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
         printf("\n:::: Initialization done! ::::\n");
 
 
-        //save_init_data(postproc_prog);
+        save_init_data(postproc_prog);
 
         // Open residuals file
         resid_file = fopen("Results/residuals.dat", "w");
@@ -200,10 +200,12 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     export_data(postproc_prog);
 
     upc_barrier;         // Synchronise
-    printf("Before freeing vars\n");
+    main_thread
+        printf("Before freeing vars\n");
     free_vars();
     upc_barrier;         // Synchronise
-    printf("After freeing vars\n");
+    main_thread
+        printf("After freeing vars\n");
 
 }
 
@@ -213,14 +215,23 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
 
     while ((Residuals[0] > ConvergenceCritVeloc || Residuals[1] > ConvergenceCritRho) && iter < (*Iterations))
     {
+        printTest("Begining",0);
+        SAVE_ITERATION;
+
+
+
+
 
 //////////////// COLLISION ////////////////
         init_measure_time;
         CollisionStep(CollisionModel); ////////////////////// !!!!!!!!!!!!!!!!! CX CY!
         end_measure_time(tCollision);
+        //SAVE_ITERATION;
         PRINTING
             printf("T%i: Collsision\n",MYTHREAD);
         upc_barrier;
+
+
         ////////////// UPDATE DISTR ///////////////
         init_measure_time;
         UpdateStep();
@@ -228,6 +239,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         PRINTING
             printf("T%i: UpdateF\n",MYTHREAD);
         upc_barrier;
+        //SAVE_ITERATION;
 
         //printTest("After UpdateF", 0);
         //printTest("After UpdateF", 1);
@@ -266,6 +278,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         end_measure_time(tBCells_NEW);
         PRINTING
             printf("T%i: getSharedToCells_NEW\n",MYTHREAD);
+
         upc_barrier;
 
 ////////////// STREAMING ///////////////
@@ -275,6 +288,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         PRINTING
             printf("T%i: StreamingStep\n",MYTHREAD);
         upc_barrier;
+        //SAVE_ITERATION;
 ////////////// BOUNDARIES ///////////////
         init_measure_time;
         HandleBoundariesStep(OutletProfile, CurvedBoundaries);
@@ -301,12 +315,13 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
             fprintf(resid_file,"%d %5.4e %5.4e %5.4e %f %f\n", iter, (iter+1.0)*(*Delta), Residuals[0], Residuals[1], Residuals[2], Residuals[3]);
 
         iter++; // update loop variable
-        SAVE_ITERATION;
 
 ////////////// Autosave ///////////////
         auto_save(AutosaveAfter, AutosaveEvery, postproc_prog);
     }
+    upc_barrier;
     putCellsToWCells();
+    upc_barrier;
 
 //////////////////////////////////////////////////////
 ////////////// END OF MAIN WHILE CYCLE ///////////////
@@ -365,31 +380,12 @@ void FillLocalBCells() {
     for (k = min; k < max+1; k = k + max - min) {
         for(j = min; j < max+1; j = j + max - min) {
             for(i = min; i < max+1; i = i + max - min) {
-                /*if (lID(i,j,k) == 818 && MYTHREAD == 0 && iter == 0) {
-                    char str[15];
-                    printf("c_BC = %i\n", c_BC);
-                    sprintf(str, "%i of %i", lID(i,j,k), BLOCKSIZE_NEW+B_CELLS_SIZE);
-                    printTest(str, 0);
-                }*/
+
                 L_B_Cells[c_BC] = Cells[lID(i,j,k)];
                 c_BC++;
-                /*if (lID(i,j,k) == 818 && MYTHREAD == 0 && iter == 0) {
-                    char str[15];
-                    printf("c_BC = %i\n", c_BC);
-                    sprintf(str, "%i of %i", lID(i,j,k), BLOCKSIZE_NEW+B_CELLS_SIZE);
-                    printTest(str, 0);
-                }*/
-                if (lID(i,j,k) == 818) {
-                    Cells[111].CoordX -= Cells[111].CoordX;
-                    Cells[111].CoordY -= Cells[111].CoordY;
-                    Cells[111].CoordZ -= Cells[111].CoordZ;
-                }
-                /*if (lID(i,j,k) == 818 && MYTHREAD == 0 && iter == 0) {
-                    char str[15];
-                    printf("c_BC = %i\n", c_BC);
-                    sprintf(str, "%i of %i", lID(i,j,k), BLOCKSIZE_NEW+B_CELLS_SIZE);
-                    printTest(str, 0);
-                }*/
+
+
+
             }
         }
     }
@@ -609,6 +605,7 @@ void getSharedToCells(){
 
     PRINTING
         printf("T%i: Finished what to get\n",MYTHREAD);
+    upc_barrier;
 
 
     int X[3];
@@ -661,9 +658,10 @@ void getSharedToCells(){
     }
     PRINTING
         printf("T%i: Got edges\n",MYTHREAD);
+    upc_barrier;
 
     for (int corner = 0; corner <12; corner ++) {
-        if(edges_to_get[corner] == 1) {
+        if(corners_to_get[corner] == 1) {
             int p[3];
             p[0] = getX_C(corner);
             p[1] = getY_C(corner);
@@ -683,6 +681,7 @@ void getSharedToCells(){
     }
     PRINTING
         printf("T%i: Got corners\n",MYTHREAD);
+    upc_barrier;
     FillCellsWithLBCells();
 }
 void FillCellsWithLBCells() {
@@ -701,11 +700,16 @@ void FillCellsWithLBCells() {
                 j=eq(Ax,1)*(min+(max-min))*Dir + eq(Ax,2)*b + eq(Ax,0)*a;
                 k=eq(Ax,2)*(min+(max-min))*Dir + eq(Ax,0)*b + eq(Ax,1)*a;
 
+                //PRINTING
+                    //printf("T%i: c_BC %i, lID(%i,%i,%i) = %i\n",MYTHREAD,c_BC,i,j,k,lID(i,j,k));
                 Cells[lID(i,j,k)] = L_B_Cells[c_BC];
                 c_BC++;
             }
         }
     }
+    PRINTING
+        printf("T%i: Copied Faces\n",MYTHREAD);
+    upc_barrier;
 
     //Edges
     for (int e = 0; e<12; e++){
@@ -720,6 +724,9 @@ void FillCellsWithLBCells() {
                 c_BC++;
             }
     }
+    PRINTING
+        printf("T%i: Copied Edges\n",MYTHREAD);
+    upc_barrier;
     //Corners
     for (k = min; k < max+1; k = k + max - min) {
         for(j = min; j < max+1; j = j + max - min) {
@@ -729,6 +736,9 @@ void FillCellsWithLBCells() {
             }
         }
     }
+    PRINTING
+        printf("T%i: Copied Corners\n",MYTHREAD);
+    upc_barrier;
 }
 
 void printTest(char * text,int it) {
@@ -737,18 +747,20 @@ void printTest(char * text,int it) {
         int j = 1;
         int k = 1;
         printf("******%s\n",text);
-        printf("    lID(%i,%i,%i) = %i\n",i,j,k,lID(i,j,k));
+        // printf("    lID(%i,%i,%i) = %i\n",i,j,k,lID(i,j,k));
         printf("    C[%i] = (%f,%f,%f)\n",lID(i,j,k),Cells[lID(i,j,k)].CoordX,Cells[lID(i,j,k)].CoordY,Cells[lID(i,j,k)].CoordZ);
-        printf("    LWCells[%i] = (%f,%f,%f)\n",0,L_W_Cells[0].CoordX,L_W_Cells[0].CoordY,L_W_Cells[0].CoordZ);
-        printf("    WCells[%i] = (%f,%f,%f)\n",0,WCells[0].CoordX,WCells[0].CoordY,WCells[0].CoordZ);
+        printf("    V[%i] = (%f,%f,%f)\n",lID(i,j,k),Cells[lID(i,j,k)].U,Cells[lID(i,j,k)].V,Cells[lID(i,j,k)].W);
+        printf("    rho[%i] = %f\n",lID(i,j,k),Cells[lID(i,j,k)].Rho);
+        //printf("    LWCells[%i] = (%f,%f,%f)\n",0,L_W_Cells[0].CoordX,L_W_Cells[0].CoordY,L_W_Cells[0].CoordZ);
+        //printf("    WCells[%i] = (%f,%f,%f)\n",0,WCells[0].CoordX,WCells[0].CoordY,WCells[0].CoordZ);
     }
 }
 void putCellsToWCells(){
-    printTest("Before Fill", 0);
+    //printTest("Before Fill", 0);
     FillLocalWCells();
-    printTest("After Fill", 0);
+    //printTest("After Fill", 0);
     upc_memput( &WCells[MYTHREAD * BLOCKSIZE_NEW], &L_W_Cells[0], BLOCKSIZE_NEW * sizeof(CellProps));
-    printTest("After memput", 0);
+    //printTest("After memput", 0);
 }
 void FillLocalWCells(){
     int c_WC = 0;
@@ -825,9 +837,10 @@ void StreamingStep(){
                 for (int l = 0; l < 19; l++) {
 
                     if (((Cells + lID(i,j,k))->StreamLattice[l]) == 1) {
-                        //PRINTING
-                        //if(lID(i,j,k) > (LAT)*(LAT)*LAT)
-                            //printf("T%i: (lID(%i,%i,%i) = %i) + (c[%i] = %i) = %i\n",MYTHREAD,i,j,k,lID(i,j,k),l,c[l],lID(i,j,k) + c[l]);
+                        PRINTING {
+                                printf("T%i: (lID(%i,%i,%i) = %i) + (c[%i] = %i) = %i\n", MYTHREAD, i, j, k,
+                                       lID(i, j, k), l, c[l], lID(i, j, k) + c[l]);
+                        };
                         (Cells + lID(i,j,k))->F[l] = (Cells + lID(i,j,k) + c[l])->METAF[l];
 
                     }
@@ -1176,10 +1189,14 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
 
 void save_iteration(int postproc_prog,int Iterations, int AutosaveEvery) {
 
-    if ((iter * 20)%AutosaveEvery == 0) {
+    //if ((iter * 20)%AutosaveEvery == 0) {
+    //if (iter < 10 || (iter%5 == 0 && iter < 100)) {
+    printTest("Before saving",0);
+    if (true) {
 
         if(MYTHREAD == 0)
             printf("Saving iteration %i, Rho residual = %lf\n",iter,Residuals[1]);
+        printTest("Before macro",0);
         UpdateMacroscopicStep(0);
         init_measure_time;
         switch (postproc_prog) {
@@ -1190,7 +1207,9 @@ void save_iteration(int postproc_prog,int Iterations, int AutosaveEvery) {
                 sprintf(IterationOutputFile, "Results/iterations/iter.dat.%i", iter_counter);
                 break;
         }
+        printTest("Before WCells",0);
         putCellsToWCells();
+        printTest("Before Writing",0);
         if (MYTHREAD == 0) // AUTOSAVE
             WriteResults(IterationOutputFile, ppp);
 
@@ -1200,6 +1219,7 @@ void save_iteration(int postproc_prog,int Iterations, int AutosaveEvery) {
 
         iter_counter++;
     }
+    printTest("After saving",0);
 }
 
 void write_boundary_cells_to_results(int postproc_prog) {
@@ -1221,7 +1241,7 @@ void save_init_data(int postproc_prog) {// Write Initialized data
     switch(postproc_prog)
     { case 1: sprintf(OutputFile, "Results/InitialData.csv");   break;
         case 2: sprintf(OutputFile, "Results/InitialData.dat");   break; }
-
+    putCellsToWCells();
     WriteResults(OutputFile, ppp);
     printf("\nInitialized data was written to %s\n", OutputFile);
 }
@@ -1279,7 +1299,7 @@ void export_data(int postproc_prog) {
             case 2: sprintf(FinalOutputFile, "Results/FinalData.dat"); break;
         }
 
-        putCellsToWCells();
+        //putCellsToWCells();
         WriteResults(FinalOutputFile,  ppp);
 
         // Write information for user
