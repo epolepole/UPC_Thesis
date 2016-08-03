@@ -72,7 +72,7 @@ int getX_C(int corner);
 int getC(int X, int Y, int Z);
 
 int getCubeID(int x, int y, int z);
-void getCubeCoords(int ID, int X[]);
+void getCubeCoords(int ID, int *X);
 
 int getIndex(const int x, const int y, const int z);
 int getThread(int index);

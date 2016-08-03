@@ -20,9 +20,17 @@
 #if __SAVE_ITER__ == 0
 #define SAVE_ITERATION
 #else //__SAVE_ITER__
-#define SAVE_ITERATION save_iteration(postproc_prog,Iterations,AutosaveEvery)
+#define SAVE_ITERATION save_iteration(postproc_prog, AutosaveEvery)
 #endif //__SAVE_ITER__
 
+#define c000 (0)
+#define c100 (NTDX-1)
+#define c010 (NTDX*(NTDY-1))
+#define c110 (NTDX*NTDY-1)
+#define c001 (NTDX*NTDY*(NTDZ-1))
+#define c101 (NTDX*NTDY*(NTDZ-1) + NTDX-1)
+#define c011 (NTDX*NTDY*(NTDZ-1) + NTDX*(NTDY-1))
+#define c111 (NTDX*NTDY*(NTDZ-1) + NTDX*NTDY-1)
 
 #define func_between_time(func,t_container) \
     tInstant1 = clock(); // Start measuring time\
@@ -55,9 +63,13 @@ int iter_counter;
 CellProps L_B_Cells[B_CELLS_SIZE];
 CellProps L_W_Cells[BLOCKSIZE_NEW];*/
 
-CellProps *Cells;                       // Pointer to Cells
+/*CellProps *Cells;                       // Pointer to Cells
 CellProps *L_B_Cells;
-CellProps *L_W_Cells;
+CellProps *L_W_Cells;*/
+
+CellProps Cells[(LAT+2)*(LAT+2)*(LAT+2)];                       // Pointer to Cells
+CellProps L_B_Cells[B_CELLS_SIZE];
+CellProps L_W_Cells[BLOCKSIZE_NEW];
 
 // Time measurement variables
 float tInitialization;          // Time measurement of Initialization
@@ -98,7 +110,23 @@ double **stmiv;         // variable for the MRT collision model
 
 //Init/Alloc/Free functions
 
+
+
+//Cube parameters
+
+
+int cur_corner;
+int cur_edge;
+int cur_face;
+
+int faces_to_get[6];
+int edges_to_get[12];
+int corners_to_get[8];
+
+
+
 void init_vars(int *postproc_prog);
+void init_cube_vars();
 void time_meas_vars_init();
 
 void alloc_cells();
@@ -124,7 +152,7 @@ void print_init_info_to_log(float Uavg, float Vavg, float Wavg, float rho_ini, f
 
 
 void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog);
-void save_iteration(int postproc_prog,int Iterations, int AutosaveEvery);
+void save_iteration(int postproc_prog, int AutosaveEvery);
 
 
 void write_boundary_cells_to_results(int postproc_prog);
@@ -136,10 +164,14 @@ void print_boundary_type(CellProps* Cells);
 void print_cell_line(FILE* file, const CellProps* Cell);
 
 
-void printTest(char * text, int it);
+void printTest(const char * text, int it);
 
 void putCellsToWCells();
 void putCellsToShared();
+
+
+void setCubeType();
+void setThingsToGet();
 void getSharedToCells();
 
 void FillLocalBCells();

@@ -5,7 +5,7 @@ scalar-vector-matrix allocation and this header includes the multifunctional
 #define SHELLFUNCTIONS_H
 
 #include "BlockSizeDefiner.h"
-#include "upc_relaxed.h"
+#include <upc_strict.h>
 
 #include <stdbool.h>  // bool variables
 #include <string.h>   // string handling
@@ -21,10 +21,19 @@ scalar-vector-matrix allocation and this header includes the multifunctional
 #define shared
 
 #define upc_barrier
-#define upc_forall(a) ();
+//#define upc_forall(a) ();
+
+#define UPUT(a,b,c)
+#define UGET(a,b,c)
+#define UFREE(a)
+#define UAFREE(a)
 
 #else
 #define shared_block(var) shared [var]
+#define UPUT(a,b,c) upc_memput(a,b,c)
+#define UGET(a,b,c) upc_memget(a,b,c)
+#define UFREE(a) upc_free(a)
+#define UAFREE(a) upc_all_free(a)
 #endif
 
 //#define main_thread(c) if (MYTHREAD == 0) { c }
@@ -84,6 +93,7 @@ typedef struct
 
 //shared [BLOCKSIZE+2*NN] CellProps  *SCells;
 shared_block(5)             double sResiduals[5*THREADS]; // variable to store residuals
+shared                      double shared_total_Residuals[5]; // variable to store residuals
 
 
 //New things
@@ -133,9 +143,11 @@ int lID(int i, int j, int k);
        __typeof__ (b) _b = (b); \
      _a < _b ? _a : _b; })
 
-#define eq(a,b) \
+/*#define eq(a,b) \
    ({ __typeof__ (a) _a = (a); \
        __typeof__ (b) _b = (b); \
-     _a == _b ? 1 : 0; })
+     _a == _b ? 1 : 0; })*/
+
+#define eq(a,b) (a == b)
 
 #endif

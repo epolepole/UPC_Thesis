@@ -1,6 +1,6 @@
 #include <stdio.h>   // for calloc();
 #include "math.h"
-#include <upc_relaxed.h>                 // Required for UPC
+#include <upc_strict.h>                 // Required for UPC
 
 #include "ShellFunctions.h"
 
@@ -41,7 +41,7 @@ void WriteResults(char* OutputFile, int* postproc_prog)
                         (WCells+i)->Fluid, // fluid or solid
                         (WCells+i)->ThreadNumber);  */
             fprintf(fp1, "Points:0,Points:1,Points:2,u,v,w,vel_mag,"\
-                         //"f00,f01,f02,f03,f04,f05,f06,f07,f08,f09,f10,f11,f12,f13,f14,f15,f16,f17,f18,"
+                         "f00,f01,f02,f03,f04,f05,f06,f07,f08,f09,f10,f11,f12,f13,f14,f15,f16,f17,f18,"
                     "rho\n");
             for (int k = 0; k < NN; k++) {
                 for (int j = 0; j < NM; j++) {
@@ -60,9 +60,9 @@ void WriteResults(char* OutputFile, int* postproc_prog)
                                 (WCells + pos)->W,      // w
                                 sqrt(pow((WCells + pos)->U, 2) + pow((WCells + pos)->V, 2) +
                                      pow((WCells + pos)->W, 2)));
-                        //for (int j = 0; j<19; j++) {
-                        //fprintf(fp1," %f,",(WCells+i)->F[j]);
-                        //}
+                        for (int l = 0; l<19; l++) {
+                        fprintf(fp1," %f,",(WCells+pos)->F[l]);
+                        }
 
                         fprintf(fp1, " %f\n", (WCells + pos)->Rho);    // density
                     }
@@ -94,6 +94,7 @@ void WriteResults(char* OutputFile, int* postproc_prog)
 
             fclose(fp1);
             break;
+        default: break;
     }
 
 
@@ -108,7 +109,9 @@ void WriteBCells(char* OutputFile, int* postproc_prog)
     switch(*postproc_prog)
     {
         case 1: // ParaView
-            fprintf(fp1, "x,y,z,u,v,w,vel_mag,rho,press,fluid,ThID\n");
+            fprintf(fp1, "x,y,z,u,v,w,vel_mag,"
+                    "f0,f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13,f14,f15,f16,f17,f18,"
+                    "rho,press,ThID,\n");
             for(i=0;i<(2*THREADS*LAYER);i++)
             {
                 fprintf(fp1, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %d\n",
@@ -118,10 +121,9 @@ void WriteBCells(char* OutputFile, int* postproc_prog)
                         (BCells+i)->U,      // u
                         (BCells+i)->V,      // v
                         (BCells+i)->W,      // w
-                        sqrt(pow((BCells+i)->U,2)+pow((BCells+i)->V,2)+pow((BCells+i)->W,2)), // velocity magnitude
+                        sqrt(pow((BCells+i)->U,2)+pow((BCells+i)->V,2)+pow((BCells+i)->W,2)),
                         (BCells+i)->Rho,    // density
                         ((BCells+i)->Rho)/3,  // pressure
-                        //(BCells+i)->Fluid, // fluid or solid
                         (BCells+i)->ThreadNumber);
             }
 
@@ -150,5 +152,6 @@ void WriteBCells(char* OutputFile, int* postproc_prog)
 
             fclose(fp1);
             break;
+        default: break;
     }
 }

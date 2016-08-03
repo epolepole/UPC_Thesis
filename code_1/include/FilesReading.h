@@ -4,9 +4,9 @@ read the two input files of the mesh and compute some basic parameter from them.
 #ifndef FILESREADING_H
 #define FILESREADING_H
 
-float **ReadNodes(char* NodeDataFile);
+float **ReadNodes(const char* NodeDataFile);
 
-float **ReadBCconn(char* BCconnectorDataFile);
+float **ReadBCconn(const char* BCconnectorDataFile);
 
 void CompDataNode(float **Nodes);
 

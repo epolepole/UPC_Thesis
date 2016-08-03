@@ -20,7 +20,7 @@ print_info=0
 
 if [ $1 == "R" ] ; then
     verbose_makefile=OFF
-    build_type=Release
+    build_type=Debug
     save_iter=0
     echo Running without iterations
 

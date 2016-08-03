@@ -3,7 +3,7 @@ echo "Running from"
 pwd
 cd build/bin
 if [ $1 == "R" ] ; then
-    upcrun -shared-heap 1024MB LBMSolver
+    upcrun -shared-heap 1024MB -backtrace LBMSolver
 elif [ $1 == "P" ] ; then
     upcrun -shared-heap 1024MB LBMSolver
 elif [ $1 == "I" ] ; then

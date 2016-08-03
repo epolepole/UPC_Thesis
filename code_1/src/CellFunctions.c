@@ -282,6 +282,7 @@ void CellIni(CellProps *Cells,
                 break;
             case 9: (Cells + index_Cell)->Boundary = 3;   break; // EDGE
             case 12: (Cells + index_Cell)->Boundary = 4;  break; // CORNER
+            default: break;
         }
 
         /*<--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -452,7 +453,7 @@ void CellIni(CellProps *Cells,
             {
                 (Cells + index_Cell)->StreamLattice[opp[j]]= 0 ;
 
-                /*if (MYTHREAD == 0 && i == 30) {
+                /*if (MYTHREAD == 0 && i == 1) {
                     printf("opp[%i] = %i\n", j, opp[j]);
                     printf("Str(%i): %i\n",opp[j],(Cells + index_Cell)->StreamLattice[opp[j]]);
                 }*/
@@ -490,6 +491,7 @@ void CellIni(CellProps *Cells,
                 (Cells + index_Cell)->Vo = Vavg;
                 (Cells + index_Cell)->Wo = Wavg;
                 break;
+            default: break;
 
         }
 
@@ -592,10 +594,10 @@ void CellIni_NEW(CellProps *Cells,
                 (Cells + index_Cell)->CoordX = Nod[ID][3];
                 (Cells + index_Cell)->CoordY = Nod[ID][4];
                 (Cells + index_Cell)->CoordZ = Nod[ID][5];
-                if ((MYTHREAD==0 && i_r==0 && j_r==0 && k_r ==0) ||
+                /*if ((MYTHREAD==0 && i_r==0 && j_r==0 && k_r ==0) ||
                     (MYTHREAD==THREADS && i_r==0 && j_r==0 && k_r ==LAT-1)){
-                    printf("Nod[%i] = (%f,%f,%f)\n",ID,Nod[ID][3],Nod[ID][4],Nod[ID][5]);
-                }
+                    //printf("Nod[%i] = (%f,%f,%f)\n",ID,Nod[ID][3],Nod[ID][4],Nod[ID][5]);
+                }*/
 
                 // CHECK FLUID OR NOT
                 //(Cells + index_Cell)->Fluid  = (int) Nod[i][6];
@@ -639,6 +641,7 @@ void CellIni_NEW(CellProps *Cells,
                     (Cells + index_Cell)->BC_ID[l]= 0  ; // IT IS NOT BOUNDARY LATTICE
                     (Cells + index_Cell)->Q[l]    = 0.5;
                 }
+
 
                 //SEARCH FOR BC TYPE, BOUNDARY ID AND DISTANCES IN THE LATTICE
                 for(l = 0; l < *NumConn; l++)
@@ -714,10 +717,12 @@ void CellIni_NEW(CellProps *Cells,
                         break;
                     case 9: (Cells + index_Cell)->Boundary = 3;   break; // EDGE
                     case 12: (Cells + index_Cell)->Boundary = 4;  break; // CORNER
+                    default: break;
                 }
 
                 // INITIALIZE STREAMING (STREAM EVERYWHERE)
-                for(l = 0; l < 19; l++)
+                (Cells + index_Cell)->StreamLattice[0] = 0;
+                for(l = 1; l < 19; l++)
                 {
                     (Cells + index_Cell)->StreamLattice[l] = 1;
                 }
@@ -730,6 +735,10 @@ void CellIni_NEW(CellProps *Cells,
                     if ((Cells + index_Cell)->BC_ID[l]!=0)
                     {
                         (Cells + index_Cell)->StreamLattice[opp[l]]= 0 ;
+                        /*if (MYTHREAD == 0 && lID == 1) {
+                            printf("opp[%i] = %i\n", l, opp[l]);
+                            printf("Str(%i): %i\n",opp[l],(Cells + index_Cell)->StreamLattice[opp[l]]);
+                        }*/
 
                     }
                 }
@@ -755,6 +764,7 @@ void CellIni_NEW(CellProps *Cells,
                         (Cells + index_Cell)->Vo = Vavg;
                         (Cells + index_Cell)->Wo = Wavg;
                         break;
+                    default: break;
 
                 }
                 //For lid driven initialize uper nodes
@@ -900,23 +910,23 @@ void D3Q19Vars()
 
     c[0]  =          0              ;
     c[1]  = -1                      ; // (i-1)
-    c[2]  = +1                      ; // (i+1)
+    c[2]  =  1                      ; // (i+1)
     c[3]  =     -1*moveY            ; //         (j-1)
-    c[4]  =     +1*moveY            ; //         (j+1)
+    c[4]  =      1*moveY            ; //         (j+1)
     c[5]  =                 -1*moveZ; //                 (k-1)
-    c[6]  =                 +1*moveZ; //                 (k+1)
+    c[6]  =                  1*moveZ; //                 (k+1)
     c[7]  = -1  -1*moveY            ; // (i-1)   (j-1)
-    c[8]  = +1  -1*moveY            ; // (i+1)   (j-1)
+    c[8]  =  1  -1*moveY            ; // (i+1)   (j-1)
     c[9]  = -1  +1*moveY            ; // (i-1)   (j+1)
-    c[10] = +1  +1*moveY            ; // (i+1)   (j+1)
+    c[10] =  1  +1*moveY            ; // (i+1)   (j+1)
     c[11] = -1              -1*moveZ; // (i-1)           (k-1)
-    c[12] = +1              -1*moveZ; // (i+1)           (k-1)
+    c[12] =  1              -1*moveZ; // (i+1)           (k-1)
     c[13] = -1              +1*moveZ; // (i-1)           (k+1)
-    c[14] = +1              +1*moveZ; // (i+1)           (k+1)
+    c[14] =  1              +1*moveZ; // (i+1)           (k+1)
     c[15] =     -1*moveY    -1*moveZ; //         (j-1)   (k-1)
-    c[16] =     +1*moveY    -1*moveZ; //         (j+1)   (k-1)
+    c[16] =      1*moveY    -1*moveZ; //         (j+1)   (k-1)
     c[17] =     -1*moveY    +1*moveZ; //         (j-1)   (k+1)
-    c[18] =     +1*moveY    +1*moveZ; //         (j+1)   (k+1)
+    c[18] =      1*moveY    +1*moveZ; //         (j+1)   (k+1)
 
 
 
@@ -1033,10 +1043,10 @@ void TRT(CellProps *Cells, int i, double* w, int* cx, int* cy, int* opp, double 
     float F_p[9],Feq_p[9],F_m[9],Feq_m[9];
     for (k=0; k<9; k++)
     {
-        F_p[k]   = 0.5*( (Cells +i)->F[k]   + (Cells +i)->F[opp[k]]   );
-        Feq_p[k] = 0.5*( (Cells +i)->Feq[k] + (Cells +i)->Feq[opp[k]] );
-        F_m[k]   = 0.5*( (Cells +i)->F[k]   - (Cells +i)->F[opp[k]]   );
-        Feq_m[k] = 0.5*( (Cells +i)->Feq[k] - (Cells +i)->Feq[opp[k]] );
+        F_p[k]   = (float) (0.5*( (Cells +i)->F[k]   + (Cells +i)->F[opp[k]]));
+        Feq_p[k] = (float) (0.5*( (Cells +i)->Feq[k] + (Cells +i)->Feq[opp[k]] ));
+        F_m[k]   = (float) (0.5*( (Cells +i)->F[k]   - (Cells +i)->F[opp[k]]   ));
+        Feq_m[k] = (float) (0.5*( (Cells +i)->Feq[k] - (Cells +i)->Feq[opp[k]] ));
 
         (Cells +i)->METAF[k] = (Cells +i)->F[k] -
                                (F_p[k]-Feq_p[k])*Omega -
@@ -1187,7 +1197,7 @@ int getCubeID(int x, int y, int z) {
     return x + y*NTDX + z*NTDX*NTDY;
 }
 
-void getCubeCoords(int ID, int X[]) {
+void getCubeCoords(int ID, int *X) {
     X[2] = ID/(NTDX*NTDY);
     X[1] = (ID - X[2] * NTDX*NTDY) / NTDX;
     //printf("(%i - %i * %i * %i)/%i = %i\n",ID, X[2],NTDX,NTDY,NTDX,3/NTDX);

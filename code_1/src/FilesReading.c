@@ -11,7 +11,7 @@
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 
-float **ReadNodes(char* NodeDataFile)
+float **ReadNodes(const char* NodeDataFile)
 {
     //printf("Thread %i of %i running ReadNodes function\n", MYTHREAD, THREADS);
 
@@ -93,7 +93,7 @@ float **ReadNodes(char* NodeDataFile)
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 
-float **ReadBCconn(char* BCconnectorDataFile)
+float **ReadBCconn(const char* BCconnectorDataFile)
 {
 
     ////////////////////////////////////////////////////
@@ -202,7 +202,8 @@ void CompDataNode(float **Nodes)
     ////////////////////////////////////////////////////
 
     int i; // variable for the loop
-    float DeltaP1, DeltaP2; // local grid spacing
+    float DeltaP1 = 0;
+    float DeltaP2 = 0; // local grid spacing
 
     for(i=0;i<*NumNodes;i++)
     {

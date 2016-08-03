@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <upc_relaxed.h>                 // Required for UPC
 
 #include "ComputeResiduals.h"
 #include "tests.h"
@@ -72,11 +71,11 @@ void ComputeResiduals(CellProps *Cells, double* Residuals,
     ResDragY  = 0;
     ResLift  = 0;
 
-    upc_memput( &sResiduals[0+5*MYTHREAD] , &PUTtmp[0],  5*sizeof(double) );
+    UPUT( &sResiduals[0+5*MYTHREAD] , &PUTtmp[0],  5*sizeof(double) );
 //  tInstant1 = clock(); // Start measuring time
     upc_barrier;
 //  tInstant2 = clock(); // End of time measuremet
-    upc_memget( &GETtmp[0] , &sResiduals[0] , (THREADS*5)*sizeof(double) );
+    UGET( &GETtmp[0] , &sResiduals[0] , (THREADS*5)*sizeof(double) );
 //  *tSendRcv =  (tInstant2-tInstant1) ;
 
     //printf("iter %d TH%d Res Synced\n", iter, MYTHREAD);
@@ -191,9 +190,11 @@ void ComputeResiduals(CellProps *Cells, double* Residuals, double* sumVel0, doub
 
     upc_barrier;
 
-    //printf("iter %d TH%d Res Synced\n", iter, MYTHREAD);
+    //printf("iter %d TH%d Res Synced\n", *iter, MYTHREAD);
 
-    //if(MYTHREAD==0) {
+    upc_barrier;
+
+    if(MYTHREAD==0) {
         //printf("Th%d residualcalc\n",MYTHREAD);
         for (int i = 0; i < THREADS; i++)
         {
@@ -212,13 +213,33 @@ void ComputeResiduals(CellProps *Cells, double* Residuals, double* sumVel0, doub
         Residuals[2] = ResDrag;
         Residuals[3] = ResLift;
 
-    //}
-
+    }
+    upc_barrier;
+    if(MYTHREAD == 0) {
+        shared_total_Residuals[0] = ResVel;
+        shared_total_Residuals[1] = ResRho;
+        shared_total_Residuals[2] = ResDrag;
+        shared_total_Residuals[2] = ResDrag;
+        shared_total_Residuals[3] = ResLift;
+    }
+    upc_barrier;
     /*if ((MYTHREAD == 0 && *iter%50 == 0) || ResRho != ResRho){
         printf("SumRho0 = %f\n",*sumRho0);
         printf("SumRho1 = %f\n",*sumRho1);
         printf("ResRho = %f\n",ResRho);
     }*/
+
+    /*if (*iter==367){
+        for (int t=0;t<THREADS;t++) {
+            if (t==MYTHREAD) {
+                printf("T%i: Vr=%8.8f , Rr=%8.8f\n", t, Residuals[0], Residuals[1]);
+                printf("T%i: sVr=%8.8f , sRr=%8.8f\n", t, shared_total_Residuals[0], shared_total_Residuals[1]);
+            }
+            for (int i=0;i<10000;i++)
+            upc_barrier;
+        }
+    }*/
+    upc_barrier;
 
     if(ResRho!=ResRho) // if density residuals are NaN
     {
