@@ -40,6 +40,6 @@
 #define CELL_TOT_SIZE (int)((LAT+2)*(LAT+2)*(LAT+2))
         //                 Faces       Edges    Corners
 #define B_CELLS_SIZE (int)(6*LAT*LAT + 12*LAT)
-
+#define OS  ((LAT + 2)*(LAT + 2) + LAT + 3)    //Offset for geting local from real local id
 
 #endif

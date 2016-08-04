@@ -130,6 +130,7 @@ void ComputeResiduals(CellProps *Cells, double* Residuals,
 
 #include <stdio.h>
 #include <math.h>
+#include <CellFunctions.h>
 
 #include "ShellFunctions.h"
 
@@ -151,12 +152,10 @@ void ComputeResiduals(CellProps *Cells, double* Residuals, double* sumVel0, doub
     *sumRho1 = 0;
     // sum up velocity and density
 
-    for (int k = 1; k < LAT+1; k++) {
-        for (int j = 1; j < LAT + 1; j++) {
-            for (int i = 1; i < LAT + 1; i++) {
-                int ID = i + j * (LAT + 2) + k * (LAT + 2) * (LAT + 2);
-                *sumVel1 = *sumVel1 + sqrt(pow((Cells + ID)->U, 2) + pow((Cells + ID)->V, 2) + pow((Cells + ID)->W, 2));
-                *sumRho1 = *sumRho1 + (Cells + ID)->Rho;
+    for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++){
+                int lID = getLocalID_LocRealID(l_rID);
+                *sumVel1 = *sumVel1 + sqrt(pow((Cells + lID)->U, 2) + pow((Cells + lID)->V, 2) + pow((Cells + lID)->W, 2));
+                *sumRho1 = *sumRho1 + (Cells + lID)->Rho;
                 /*if ((Cells+i)->Rho < 0) {
                     printf("Iteration %i\n",*iter);
                     printf("T=%i, rho[%i] = %f\n",MYTHREAD,i+LAYER+MYTHREAD*BLOCKSIZE,(Cells+i)->Rho);
@@ -170,12 +169,8 @@ void ComputeResiduals(CellProps *Cells, double* Residuals, double* sumVel0, doub
                   ResDrag += (Cells+i)->DragF;
                   ResLift += (Cells+i)->LiftF;
                 }*/
-            }
-        }
 
     }
-
-    upc_barrier;
 
     sResiduals[0+5*MYTHREAD] = *sumVel1;
     sResiduals[1+5*MYTHREAD] = *sumRho1;
@@ -188,7 +183,6 @@ void ComputeResiduals(CellProps *Cells, double* Residuals, double* sumVel0, doub
     ResDrag  = 0;
     ResLift  = 0;
 
-    upc_barrier;
 
     //printf("iter %d TH%d Res Synced\n", *iter, MYTHREAD);
 
@@ -214,7 +208,9 @@ void ComputeResiduals(CellProps *Cells, double* Residuals, double* sumVel0, doub
         Residuals[3] = ResLift;
 
     }
+
     upc_barrier;
+
     if(MYTHREAD == 0) {
         shared_total_Residuals[0] = ResVel;
         shared_total_Residuals[1] = ResRho;
@@ -222,7 +218,6 @@ void ComputeResiduals(CellProps *Cells, double* Residuals, double* sumVel0, doub
         shared_total_Residuals[2] = ResDrag;
         shared_total_Residuals[3] = ResLift;
     }
-    upc_barrier;
     /*if ((MYTHREAD == 0 && *iter%50 == 0) || ResRho != ResRho){
         printf("SumRho0 = %f\n",*sumRho0);
         printf("SumRho1 = %f\n",*sumRho1);

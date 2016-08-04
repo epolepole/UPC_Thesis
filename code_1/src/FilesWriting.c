@@ -42,7 +42,7 @@ void WriteResults(char* OutputFile, int* postproc_prog)
                         (WCells+i)->Fluid, // fluid or solid
                         (WCells+i)->ThreadNumber);  */
             fprintf(fp1, "Points:0,Points:1,Points:2,u,v,w,vel_mag,"\
-                        // "f00,f01,f02,f03,f04,f05,f06,f07,f08,f09,f10,f11,f12,f13,f14,f15,f16,f17,f18,"
+                         "f00,"//f01,f02,f03,f04,f05,f06,f07,f08,f09,f10,f11,f12,f13,f14,f15,f16,f17,f18,"
                     "rho\n");
             for (int k = 0; k < NN; k++) {
                 for (int j = 0; j < NM; j++) {
@@ -57,7 +57,7 @@ void WriteResults(char* OutputFile, int* postproc_prog)
                         getCubeCoords_TotIndex(&tX[0],&CX[0]);
                         getLocalIndex_TotIndex(&tX[0],&lX[0]);
                         cubeID = getCubeID(CX[0],CX[1],CX[2]);
-                        locID = lID(lX[0],lX[1],lX[2]);
+                        locID = getLocalID_LocalIndex(lX[0], lX[1], lX[2]);
 
 
 
@@ -78,9 +78,9 @@ void WriteResults(char* OutputFile, int* postproc_prog)
                                 (WCells + pos)->W,      // w
                                 sqrt(pow((WCells + pos)->U, 2) + pow((WCells + pos)->V, 2) +
                                      pow((WCells + pos)->W, 2)));
-                        /*for (int l = 0; l<19; l++) {
-                        fprintf(fp1," %f,",(WCells+pos)->F[l]);
-                        }*/
+                        //for (int l = 0; l<19; l++) {
+                        fprintf(fp1," %f,",(WCells+pos)->F[1]);
+                        //}
 
                         fprintf(fp1, " %f\n", (WCells + pos)->Rho);    // density
                     }

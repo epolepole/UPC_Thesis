@@ -550,240 +550,256 @@ void CellIni_NEW(CellProps *Cells,
     Qlat[17] = (float)sqrt(2);
     Qlat[18] = (float)sqrt(2);
 
-    int index_Cell;         //Local global index inside a block
-    int lID;          //Local real index inside a block
-    for (int k = 1; k < LAT+1; k++) {
+
+    int ID = 0;             //Real ID of the cube
+    int lID = 0;            //Local ID inside a block
+    int l_rID = 0;          //Local real ID inside a block
+    int lrX[3];         //Local real index inside cube
+    int lX[3];          //Local index inside cube
+    int tID;            //Global ID
+
+    int lM[3];          //Local move for ID
+    int GM_i = (MYTHREAD % NTDX) * LAT;
+    int GM_j = ((MYTHREAD / NTDX) % NTDY) * NTDX * LAT * LAT;
+    int GM_k = (MYTHREAD / (NTDX * NTDY)) * NTDX * NTDY * LAT * LAT * LAT;
+
+
+    /*for (int k = 1; k < LAT+1; k++) {
         for (int j = 1; j< LAT+1; j++) {
-            for (int i = 1; i< LAT+1; i++) {
-                i_r = i-1;
-                j_r = j-1;
-                k_r = k-1;
+            for (int i = 1; i< LAT+1; i++) {*/
+    for (l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++){
+        //getLocalRealIndex_LocRealID(l_rID,&lrX[0]);
+        //getLocalIndex_LocRealIndex(&lrX[0],&lX[0]);
+        //lID = getLocalID_LocalIndex(lX[0],lX[1],lX[2]);
+        lID = getLocalID_LocRealID(l_rID);
 
 
-                index_Cell = i + j*(LAT+2) + k*(LAT+2)*(LAT+2);
-                lID = i_r + j_r*(LAT) + k_r*(LAT)*(LAT);
+        ID =
+                l_rID%LAT +
+                ((l_rID/LAT)%LAT)*NN +
+                (l_rID/(LAT*LAT))*NN*NM +
+                GM_i + GM_j + GM_k;
 
-                //local move
-                int l_i = lID%LAT;
-                int l_j = ((lID/LAT)%LAT)*NN;
-                int l_k = (lID/(LAT*LAT))*NN*NM;
+        /*//local move
+        //lM[0] = l_rID%LAT;
+        //lM[1] = ((l_rID/LAT)%LAT)*NN;
+        //lM[2] = (l_rID/(LAT*LAT))*NN*NM;
 
-                //global move
-                int g_i = (MYTHREAD%NTDX)*LAT;
-                int g_j = ((MYTHREAD/NTDX)%NTDY)*NTDX*LAT*LAT;
-                int g_k = (MYTHREAD/(NTDX*NTDY))*NTDX*NTDY*LAT*LAT*LAT;
+        //global move
 
 
-                int ID  = l_i + l_j + l_k + g_i + g_j + g_k;
-                printf("ID = %i\n",ID);
+        //ID  = lM[0] + lM[1] + lM[2] + GM[0] + GM[1] + GM[2];
 
-                /*if (MYTHREAD == 0) {
-                    printf("(%i,%i,%i), (%i,%i,%i), index_Cell = %i, lID = %i\n",
-                           i, j, k, i_r, j_r, k_r, index_Cell, lID);
-                    printf("%i + %i + %i + %i + %i + %i = %i\n",
-                           l_i, l_j, l_k, g_i, g_j, g_k, ID);
+
+        //printf("ID = %i\n",ID);
+
+        if (MYTHREAD == 0) {
+            printf("(%i,%i,%i), (%i,%i,%i), lID = %i, lID = %i\n",
+                   i, j, k, i_r, j_r, k_r, lID, lID);
+            printf("%i + %i + %i + %i + %i + %i = %i\n",
+                   l_i, l_j, l_k, g_i, g_j, g_k, ID);
+        }*/
+        //lID = LAYER - MYTHREAD * BLOCKSIZE + i;
+
+        // FIND ID of the actual cell
+        (Cells + lID)->ID = ID;
+
+
+
+        // FIND X, Y and Z of the actual cell
+        (Cells + lID)->CoordX = Nod[ID][3];
+        (Cells + lID)->CoordY = Nod[ID][4];
+        (Cells + lID)->CoordZ = Nod[ID][5];
+        /*if ((MYTHREAD==0 && i_r==0 && j_r==0 && k_r ==0) ||
+            (MYTHREAD==THREADS && i_r==0 && j_r==0 && k_r ==LAT-1)){
+            //printf("Nod[%i] = (%f,%f,%f)\n",ID,Nod[ID][3],Nod[ID][4],Nod[ID][5]);
+        }
+        //printf("T%i;  ID = %4i\n",MYTHREAD,ID);
+        // CHECK FLUID OR NOT
+        //(Cells + lID)->Fluid  = (int) Nod[i][6];
+
+        // Which thread does it belongs to*/
+        (Cells + lID)->ThreadNumber = MYTHREAD;
+
+        // INITIALIZE VARIABLEs
+        (Cells + lID)->U   = Uavg;
+        (Cells + lID)->V   = Vavg;
+        (Cells + lID)->W   = Wavg;
+        (Cells + lID)->Rho = rho_ini;
+
+        // REMEMBER BCCONNECTOR FILE
+        //  _________________________________________________________________________________________________________________
+        // |        0      |       1      |       2      |     3     |    4    |    5     |    6     |    7     |      8     |
+        // |  node index i | node index j | node index k | latticeID | BC type | x coord  | y coord  | z coord  | Boundary ID|
+        // |_______________|______________|______________|___________|_________|__________|__________|__________|____________|
+        //
+        // lattice ID is based on the following speed model and it depends on the BC
+        //  ID lattice
+        //
+        //   |       xy - plane          |       xz - plane          |       yz - plane          |
+        //   |                           |                           |                           |
+        //   |     8       3       7     |     12      5      11     |     16      5       15    |
+        //   |       \     |     /       |       \     |     /       |       \     |     /       |
+        //   |         \   |   /         |         \   |   /         |         \   |   /         |
+        //   |           \ | /           |           \ | /           |           \ | /           |
+        //   |     2 - - - 0 - - - 1     |     2 - - - 0 - - - 1     |     4 - - - 0 - - - 3     |
+        //   |           / | \           |           / | \           |           / | \           |
+        //   |         /   |   \         |         /   |   \         |         /   |   \         |
+        //   |       /     |     \       |       /     |     \       |       /     |     \       |
+        //   |     10      4       9     |     14      6      13     |     18      6       17    |
+
+        // BC types: *1->wall; *2->inlet; *3->outlet
+
+        (Cells + lID)->BoundaryID = 0;  // IT IS NOT BOUNDARY NODE
+
+        for(l = 0; l < 19; l++)
+        {
+            (Cells + lID)->BC_ID[l]= 0  ; // IT IS NOT BOUNDARY LATTICE
+            (Cells + lID)->Q[l]    = 0.5;
+        }
+
+
+        //SEARCH FOR BC TYPE, BOUNDARY ID AND DISTANCES IN THE LATTICE
+        for(l = 0; l < *NumConn; l++)
+        {
+
+            //When current cell is on the con iteration
+            if (    (int)Con[l][0] == (int)Nod[ID][0]
+                    && (int)Con[l][1] == (int)Nod[ID][1]
+                    && (int)Con[l][2] == (int)Nod[ID][2]  )
+            {
+                for(n = 1; n < 19; n++)
+                {
+
+                    //Checks the direction cell it connects to
+                    if ( Con[l][3] == n )
+                    {
+                        (Cells + lID)->BC_ID[n]   = (int) Con[l][4];         //Gets the connection type(1:static, 2:mobile)
+                        (Cells + lID)->BoundaryID = (int) Con[l][8];         //Sets the direction as boundary node
+
+                        // find distance from the boundary
+                        (Cells + lID)->Q[n] = sqrt(
+                                pow(Con[l][5]- ((Cells + lID)->CoordX),2)
+                                + pow(Con[l][6]-((Cells + lID)->CoordY),2)
+                                + pow(Con[l][7]-((Cells + lID)->CoordZ),2)) / ((*Delta)*Qlat[n]);
+                    }
+                }
+
+            }
+
+        }
+
+
+        //////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////
+        //////////WITH THE ACTUAL MESH THERE ARE NO CORNERS///////////////
+        //////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////
+
+        // CORNER DETERMINATION
+        (Cells + lID)->Boundary = 0;  // IT IS NOT BOUNDARY NODE   (0->Fluid / 1-> Wall / 2->Inlet or outlet / 3-> Edge / 4-> Corner
+
+        int number_solid_lattices;
+        number_solid_lattices = 0;
+        int boundary;
+        boundary = 0;
+
+        for (l = 0; l < 19; ++l)
+        {
+
+            if ((Cells + lID)->BC_ID[l]!=0)
+            {
+                boundary = (Cells + lID)->BC_ID[l];
+                ++number_solid_lattices;
+            }
+        }
+
+        switch(number_solid_lattices)
+        {
+            case 5:
+                if (boundary == 1)                    // SOLID PLANE
+                {
+                    (Cells + lID)->Boundary = 1;
+                }
+                else if (boundary ==2)                // FLOW PLANE
+                {
+                    (Cells + lID)->Boundary = 2;
+                }
+                else
+                {
+                    printf("Attention! Node %i is not in a wall nor an inlet/outlet!! (See CellFunctions.c, CORNER DETERMINATION)\n", (Cells + lID)->ID);
+                }
+                break;
+            case 9: (Cells + lID)->Boundary = 3;   break; // EDGE
+            case 12: (Cells + lID)->Boundary = 4;  break; // CORNER
+            default: break;
+        }
+
+        // INITIALIZE STREAMING (STREAM EVERYWHERE)
+        (Cells + lID)->StreamLattice[0] = 0;
+        for(l = 1; l < 19; l++)
+        {
+            (Cells + lID)->StreamLattice[l] = 1;
+        }
+
+
+        // DON'T STREAM TO SOLIDS
+        for(l = 0; l < 19; l++)
+        {
+
+            if ((Cells + lID)->BC_ID[l]!=0)
+            {
+                (Cells + lID)->StreamLattice[opp[l]]= 0 ;
+                /*if (MYTHREAD == 0 && getLocalID_LocalIndex == 1) {
+                    printf("opp[%i] = %i\n", l, opp[l]);
+                    printf("Str(%i): %i\n",opp[l],(Cells + lID)->StreamLattice[opp[l]]);
                 }*/
-                upc_barrier;
-                //index_Cell = LAYER - MYTHREAD * BLOCKSIZE + i;
-
-                // FIND ID of the actual cell
-                (Cells + index_Cell)->ID = ID;
-
-
-
-                // FIND X, Y and Z of the actual cell
-                (Cells + index_Cell)->CoordX = Nod[ID][3];
-                (Cells + index_Cell)->CoordY = Nod[ID][4];
-                (Cells + index_Cell)->CoordZ = Nod[ID][5];
-                /*if ((MYTHREAD==0 && i_r==0 && j_r==0 && k_r ==0) ||
-                    (MYTHREAD==THREADS && i_r==0 && j_r==0 && k_r ==LAT-1)){
-                    //printf("Nod[%i] = (%f,%f,%f)\n",ID,Nod[ID][3],Nod[ID][4],Nod[ID][5]);
-                }*/
-
-                // CHECK FLUID OR NOT
-                //(Cells + index_Cell)->Fluid  = (int) Nod[i][6];
-
-                // Which thread does it belongs to
-                (Cells + index_Cell)->ThreadNumber = MYTHREAD;
-
-                // INITIALIZE VARIABLEs
-                (Cells + index_Cell)->U   = Uavg;
-                (Cells + index_Cell)->V   = Vavg;
-                (Cells + index_Cell)->W   = Wavg;
-                (Cells + index_Cell)->Rho = rho_ini;
-
-                // REMEMBER BCCONNECTOR FILE
-                //  _________________________________________________________________________________________________________________
-                // |        0      |       1      |       2      |     3     |    4    |    5     |    6     |    7     |      8     |
-                // |  node index i | node index j | node index k | latticeID | BC type | x coord  | y coord  | z coord  | Boundary ID|
-                // |_______________|______________|______________|___________|_________|__________|__________|__________|____________|
-                //
-                // lattice ID is based on the following speed model and it depends on the BC
-                //  ID lattice
-                //
-                //   |       xy - plane          |       xz - plane          |       yz - plane          |
-                //   |                           |                           |                           |
-                //   |     8       3       7     |     12      5      11     |     16      5       15    |
-                //   |       \     |     /       |       \     |     /       |       \     |     /       |
-                //   |         \   |   /         |         \   |   /         |         \   |   /         |
-                //   |           \ | /           |           \ | /           |           \ | /           |
-                //   |     2 - - - 0 - - - 1     |     2 - - - 0 - - - 1     |     4 - - - 0 - - - 3     |
-                //   |           / | \           |           / | \           |           / | \           |
-                //   |         /   |   \         |         /   |   \         |         /   |   \         |
-                //   |       /     |     \       |       /     |     \       |       /     |     \       |
-                //   |     10      4       9     |     14      6      13     |     18      6       17    |
-
-                // BC types: *1->wall; *2->inlet; *3->outlet
-
-                (Cells + index_Cell)->BoundaryID = 0;  // IT IS NOT BOUNDARY NODE
-
-                for(l = 0; l < 19; l++)
-                {
-                    (Cells + index_Cell)->BC_ID[l]= 0  ; // IT IS NOT BOUNDARY LATTICE
-                    (Cells + index_Cell)->Q[l]    = 0.5;
-                }
-
-
-                //SEARCH FOR BC TYPE, BOUNDARY ID AND DISTANCES IN THE LATTICE
-                for(l = 0; l < *NumConn; l++)
-                {
-
-                    //When current cell is on the con iteration
-                    if (
-                            ( (int)Con[l][0] == (int)Nod[ID][0] )\
-                            && ( (int)Con[l][1] == (int)Nod[ID][1] )\
-                            && ( (int)Con[l][2] == (int)Nod[ID][2] ) )
-                    {
-                        for(n = 1; n < 19; n++)
-                        {
-
-                            //Checks the direction cell it connects to
-                            if ( Con[l][3] == n )
-                            {
-                                (Cells + index_Cell)->BC_ID[n]   = (int) Con[l][4];         //Gets the connection type(1:static, 2:mobile)
-                                (Cells + index_Cell)->BoundaryID = (int) Con[l][8];         //Sets the direction as boundary node
-
-                                // find distance from the boundary
-                                (Cells + index_Cell)->Q[n] = sqrt(
-                                        pow(Con[l][5]- ((Cells + index_Cell)->CoordX),2)\
-                                + pow(Con[l][6]-((Cells + index_Cell)->CoordY),2)\
-                                + pow(Con[l][7]-((Cells + index_Cell)->CoordZ),2)) / ((*Delta)*Qlat[n]);
-                            }
-                        }
-                    }
-                }
-
-
-                //////////////////////////////////////////////////////////////////
-                //////////////////////////////////////////////////////////////////
-                //////////////////////////////////////////////////////////////////
-                //////////WITH THE ACTUAL MESH THERE ARE NO CORNERS///////////////
-                //////////////////////////////////////////////////////////////////
-                //////////////////////////////////////////////////////////////////
-                //////////////////////////////////////////////////////////////////
-
-                // CORNER DETERMINATION
-                (Cells + index_Cell)->Boundary = 0;  // IT IS NOT BOUNDARY NODE   (0->Fluid / 1-> Wall / 2->Inlet or outlet / 3-> Edge / 4-> Corner
-
-                int number_solid_lattices;
-                number_solid_lattices = 0;
-                int boundary;
-                boundary = 0;
-
-                for (l = 0; l < 19; ++l)
-                {
-
-                    if ((Cells + index_Cell)->BC_ID[l]!=0)
-                    {
-                        boundary = (Cells + index_Cell)->BC_ID[l];
-                        ++number_solid_lattices;
-                    }
-                }
-
-                switch(number_solid_lattices)
-                {
-                    case 5:
-                        if (boundary == 1)                    // SOLID PLANE
-                        {
-                            (Cells + index_Cell)->Boundary = 1;
-                        }
-                        else if (boundary ==2)                // FLOW PLANE
-                        {
-                            (Cells + index_Cell)->Boundary = 2;
-                        }
-                        else
-                        {
-                            printf("Attention! Node %i is not in a wall nor an inlet/outlet!! (See CellFunctions.c, CORNER DETERMINATION)\n", (Cells + index_Cell)->ID);
-                        }
-                        break;
-                    case 9: (Cells + index_Cell)->Boundary = 3;   break; // EDGE
-                    case 12: (Cells + index_Cell)->Boundary = 4;  break; // CORNER
-                    default: break;
-                }
-
-                // INITIALIZE STREAMING (STREAM EVERYWHERE)
-                (Cells + index_Cell)->StreamLattice[0] = 0;
-                for(l = 1; l < 19; l++)
-                {
-                    (Cells + index_Cell)->StreamLattice[l] = 1;
-                }
-
-
-                // DON'T STREAM TO SOLIDS
-                for(l = 0; l < 19; l++)
-                {
-
-                    if ((Cells + index_Cell)->BC_ID[l]!=0)
-                    {
-                        (Cells + index_Cell)->StreamLattice[opp[l]]= 0 ;
-                        if (MYTHREAD == 0 && lID == 1) {
-                            printf("opp[%i] = %i\n", l, opp[l]);
-                            printf("Str(%i): %i\n",opp[l],(Cells + index_Cell)->StreamLattice[opp[l]]);
-                        }
-
-                    }
-                }
-
-
-                // INLET VELOCITY // THIS IS CRAPPY, NOT USED!
-                switch(InletProfile)
-                {
-                    case 1:
-                        ////////////////////////////////////////////////////////////////////
-                        ////////////////////////////////////////////////////////////////////
-                        ////////////////////////TO DEVELOPE/////////////////////////////////
-                        ////////////////////////////////////////////////////////////////////
-                        ////////////////////////////////////////////////////////////////////
-                        //Uo=1.5*Uavg*(1-4*(pow((CoordY-MinInletCoordY-0.5*(MaxInletCoordY-MinInletCoordY)),2)));
-                        //Uo=4*1.5*Uavg*CoordY*(41-CoordY)/(41*41);
-                        //(Cells + index_Cell)->Uo = 4*1.5*Uavg*(((Cells + index_Cell)->CoordY)-(*MinInletCoordY))*(((*MaxInletCoordY)-(*MinInletCoordY))-(((Cells + index_Cell)->CoordY)-(*MinInletCoordY)))/(((*MaxInletCoordY)-(*MinInletCoordY))*((*MaxInletCoordY)-(*MinInletCoordY)));
-                        //(Cells + index_Cell)->Vo = Vavg;
-                        //(Cells + index_Cell)->Wo = ?????????
-                        break;
-                    case 2:
-                        (Cells + index_Cell)->Uo = Uavg;
-                        (Cells + index_Cell)->Vo = Vavg;
-                        (Cells + index_Cell)->Wo = Wavg;
-                        break;
-                    default: break;
-
-                }
-                //For lid driven initialize uper nodes
-                if((Cells + index_Cell)->CoordZ==1) {
-
-                    (Cells + index_Cell)->U = (Cells + index_Cell)->Uo;
-                    (Cells + index_Cell)->V = (Cells + index_Cell)->Vo;
-                    (Cells + index_Cell)->W = (Cells + index_Cell)->Wo;
-                }
-                else {
-                    (Cells + index_Cell)->U = 0;
-                    (Cells + index_Cell)->V = 0;
-                    (Cells + index_Cell)->W = 0;
-                }
-
 
             }
         }
+
+
+        // INLET VELOCITY // THIS IS CRAPPY, NOT USED!
+        switch(InletProfile)
+        {
+            case 1:
+                ////////////////////////////////////////////////////////////////////
+                ////////////////////////////////////////////////////////////////////
+                ////////////////////////TO DEVELOPE/////////////////////////////////
+                ////////////////////////////////////////////////////////////////////
+                ////////////////////////////////////////////////////////////////////
+                //Uo=1.5*Uavg*(1-4*(pow((CoordY-MinInletCoordY-0.5*(MaxInletCoordY-MinInletCoordY)),2)));
+                //Uo=4*1.5*Uavg*CoordY*(41-CoordY)/(41*41);
+                //(Cells + lID)->Uo = 4*1.5*Uavg*(((Cells + lID)->CoordY)-(*MinInletCoordY))*(((*MaxInletCoordY)-(*MinInletCoordY))-(((Cells + lID)->CoordY)-(*MinInletCoordY)))/(((*MaxInletCoordY)-(*MinInletCoordY))*((*MaxInletCoordY)-(*MinInletCoordY)));
+                //(Cells + lID)->Vo = Vavg;
+                //(Cells + lID)->Wo = ?????????
+                break;
+            case 2:
+                (Cells + lID)->Uo = Uavg;
+                (Cells + lID)->Vo = Vavg;
+                (Cells + lID)->Wo = Wavg;
+                break;
+            default: break;
+
+        }
+        //For lid driven initialize uper nodes
+        if((Cells + lID)->CoordZ==1) {
+
+            (Cells + lID)->U = (Cells + lID)->Uo;
+            (Cells + lID)->V = (Cells + lID)->Vo;
+            (Cells + lID)->W = (Cells + lID)->Wo;
+        }
+        else {
+            (Cells + lID)->U = 0;
+            (Cells + lID)->V = 0;
+            (Cells + lID)->W = 0;
+        }
+
+
+        //}
+        //}
     } // END OF for LOOP
 } // END OF FUNCTION
 
@@ -1212,10 +1228,33 @@ void getLocalIndex_TotIndex(int *tX, int *X) {
 void getCubeCoords_CubeID(int ID, int *X) {
     X[2] = ID/(NTDX*NTDY);
     X[1] = (ID - X[2] * NTDX*NTDY) / NTDX;
-    X[0] = ID - X[1]*NTDX - X[2] * NTDX*NTDY;
+    X[0] = ID - X[1]*NTDX - X[2]*NTDX*NTDY;
+}
+void getLocalRealIndex_LocRealID(int ID, int *X) {
+    X[2] = ID/(LAT*LAT);
+    X[1] = (ID - X[2]*LAT*LAT)/LAT;
+    X[0] = ID - X[1]*LAT - X[2]*LAT*LAT;
+}
+void getLocalIndex_LocRealIndex(int *lrX,int *lX) {
+    lX[0] = lrX[0] + 1;
+    lX[1] = lrX[1] + 1;
+    lX[2] = lrX[2] + 1;
+}
+void getLocalRealIndex_LocIndex(int *lX,int *lrX) {
+    lrX[0] = lX[0] - 1;
+    lrX[1] = lX[1] - 1;
+    lrX[2] = lX[2] - 1;
+}
+int getLocalID_LocRealID(int l_rID) {
+    return OS +
+    l_rID%LAT +
+    ((l_rID/LAT)%LAT)*(LAT+2) +
+    ((l_rID/(LAT*LAT))%LAT)*(LAT+2)*(LAT+2);
 }
 
-
+int getLocalID_LocalIndex(int i, int j, int k) {
+    return i + j*(LAT+2) + k*(LAT+2)*(LAT+2);
+}
 
 int getThread(int index) {
     return index/BLOCKSIZE;

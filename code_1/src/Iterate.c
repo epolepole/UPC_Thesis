@@ -241,7 +241,6 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         end_measure_time(tCollision);
         PRINTING
             printf("T%i: Collsision\n",MYTHREAD);
-        upc_barrier;
 
 
         ////////////// UPDATE DISTR ///////////////
@@ -253,13 +252,6 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         upc_barrier;
         SAVE_ITERATION;
 
-//////////////// PUT THREAD-BOUNDARY CELLS TO SHARED ////////////////
-        init_measure_time;
-        //putCellsToShared();
-        end_measure_time(tBCells);
-        PRINTING
-            printf("T%i: putCellsToShared\n",MYTHREAD);
-        upc_barrier;
 
 //////////////// PUT THREAD-BOUNDARY CELLS TO SHARED WITH CUBES ////////////////
         init_measure_time;
@@ -269,14 +261,6 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
             printf("T%i: putCellsToShared_NEW\n",MYTHREAD);
         upc_barrier;
 
-//////////////// COPY SHARED BCELLS TO CELLS ////////////////
-        init_measure_time;
-        //getSharedToCells();
-        end_measure_time(tBCells);
-        PRINTING
-            printf("T%i: getSharedToCells\n",MYTHREAD);
-
-        upc_barrier;
 
 //////////////// COPY SHARED BCELLS TO CELLS WITH CUBES////////////////
         init_measure_time;
@@ -284,7 +268,6 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         end_measure_time(tBCells_NEW);
         PRINTING
             printf("T%i: getSharedToCells_NEW\n",MYTHREAD);
-        upc_barrier;
 
 ////////////// STREAMING ///////////////
         init_measure_time;
@@ -293,7 +276,6 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         PRINTING
             printf("T%i: StreamingStep\n",MYTHREAD);
         SAVE_ITERATION;
-        upc_barrier;
 
 ////////////// BOUNDARIES ///////////////
         init_measure_time;
@@ -302,14 +284,14 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         PRINTING
             printf("T%i: HandleBoundariesStep\n",MYTHREAD);
         SAVE_ITERATION;
-        upc_barrier;
+
 // UPDATE VELOCITY AND DENSITY
         init_measure_time;
         UpdateMacroscopicStep(CalculateDragLift);
         end_measure_time(tUpdateMacro);
         PRINTING
             printf("T%i: UpdateMacroscopicStep\n",MYTHREAD);
-        upc_barrier;
+
 ////////////// Residuals ///////////////
         init_measure_time;
         ComputeResiduals(Cells, Residuals, sumVel0, sumVel1, sumRho0, sumRho1, CalculateDragLift, &iter, Iterations);
@@ -349,81 +331,132 @@ void putCellsToShared(){
 //                     DESTINATION                           SOURCE                            SIZE
     UPUT( &BCells[MYTHREAD*B_CELLS_SIZE],&L_B_Cells[0],    B_CELLS_SIZE*sizeof(CellProps));
     //printf (" C[%i].F[1] = %f\n",lID(2,1,1),Cells[lID(2,1,1)].F[1]);
-    if (MYTHREAD == 0 && iter == 0)
-    printf (" SBC[%i].F[1] = %f\n",4,BCells[4].F[1]);
+    //if (MYTHREAD == 0 && iter == 0)
+    //printf (" SBC[%i].F[1] = %f\n",4,BCells[4].F[1]);
 }
 void FillLocalBCells() {
-    int i, j, k;
+    int i,j,k;
+
     int c_BC = 0;         //Local BCells counter
     int min=1;
     int max=LAT;
 
+    int f, e;
+    int Ax, Dir, Pos;
+    int a,b,c;
+
     //printTest("0", 0);
     //Faces
-    for (int f = 0; f<6; f++){
-        int Ax=getAx_F(f);
-        int Dir=getDir_F(f);
+    for (f = 0; f<6; f++){
+        Ax=getAx_F(f);
+        Dir=getDir_F(f);
 
+        a = (min+(max-min)*Dir);
         /*if (MYTHREAD == 1 && iter ==0) {
             printf(" F=%i,Ax=%i,Dir=%i\n", f, Ax, Dir);
         }*/
+        /*i = eq(Ax,0)*a;
+        j = eq(Ax,1)*a;
+        k = eq(Ax,2)*a;*/
+        /*if (Ax==0) { i=a; }
+        else if (Ax==1){ j=a; }
+        else if (Ax==2){ k=a; }*/
 
-        for (int b=1; b<LAT+1;b++) {
-            for (int a=1; a<LAT+1;a++){
-                i=eq(Ax,0)*(min+(max-min)*Dir) + eq(Ax,1)*b + eq(Ax,2)*a;
+        for (c=1; c<LAT+1;c++) {
+            for (b=1; b<LAT+1;b++){
+
+                /*Change this for IF
+                /*i=eq(Ax,0)*(min+(max-min)*Dir) + eq(Ax,1)*b + eq(Ax,2)*a;
                 j=eq(Ax,1)*(min+(max-min)*Dir) + eq(Ax,2)*b + eq(Ax,0)*a;
-                k=eq(Ax,2)*(min+(max-min)*Dir) + eq(Ax,0)*b + eq(Ax,1)*a;
+                k=eq(Ax,2)*(min+(max-min)*Dir) + eq(Ax,0)*b + eq(Ax,1)*a;*/
 
+                /*if (Ax==0) {
+                    j=b;
+                    k=c; }
+                else if (Ax==1){
+                    k=b;
+                    i=c; }
+                else if (Ax==2){
+                    i=b;
+                    j=c; }*/
+                i = eq(Ax,0)*a + eq(Ax,1)*c + eq(Ax,2)*b;
+                j = eq(Ax,1)*a + eq(Ax,2)*c + eq(Ax,0)*b;
+                k = eq(Ax,2)*a + eq(Ax,0)*c + eq(Ax,1)*b;
+                /*PRINTING*/
+                /*if (iter == 0)
+                printf("T%i: c_BC %i, lID(%i,%i,%i) = %i,(a,b,c) = (%i,%i,%i)\n",
+                       MYTHREAD,c_BC,i,j,k,getLocalID_LocalIndex(i,j,k),a,b,c);*/
 
-                /*PRINTING
-                //printf("T%i: c_BC %i, lID(%i,%i,%i) = %i\n",MYTHREAD,c_BC,i,j,k,lID(i,j,k));*/
+                L_B_Cells[c_BC] = Cells[getLocalID_LocalIndex(i, j, k)];
+                /*L_B_Cells[c_BC].F[1] = Cells[lID(i,j,k)].F[1];
 
-                L_B_Cells[c_BC] = Cells[lID(i,j,k)];
-                //L_B_Cells[c_BC].F[1] = Cells[lID(i,j,k)].F[1];
-
-                /*(L_B_Cells + c_BC) = *(Cells +lID(i,j,k));
+                (L_B_Cells + c_BC) = *(Cells +lID(i,j,k));
                 //memcpy(&L_B_Cells[c_BC],&Cells[lID(i,j,k)],sizeof(CellProps));
-                //L_B_Cells[c_BC].ID = Cells[lID(i,j,k)].ID;*/
-                if(MYTHREAD==0 && lID(i,j,k)==lID(2,1,1) && iter==0 && c_BC == 4) {
-                    printf (" C[%i].F[1] = %f\n",lID(i,j,k),Cells[lID(i,j,k)].F[1]);
+                //L_B_Cells[c_BC].ID = Cells[lID(i,j,k)].ID;
+                /*if(MYTHREAD==1 && getLocalID_LocalIndex(i, j, k)== getLocalID_LocalIndex(2, 1, 1) && iter==0 && c_BC == 4) {
+                    printf (" C[%i].F[1] = %f\n", getLocalID_LocalIndex(i, j, k),Cells[getLocalID_LocalIndex(i, j, k)].F[1]);
                     //Cells[lID(i,j,k)].F[1] = 15;
                     printf (" LBC[%i].F[1] = %f\n",c_BC,L_B_Cells[c_BC].F[1]);
-                }
+                }*/
 
                 c_BC++;
             }
         }
     }
 
-    //printTest("1", 0);
+
     //Edges
-    for (int e = 0; e<12; e++){
-        int Ax=getAx_E(e);
-        int Pos=getPos_E(e);
-        for (int a=1; a<LAT+1;a++){
-            i=eq(Ax,0)*a + eq(Ax,1)*(min + (max-min)*(Pos/2)) + eq(Ax,2)*(min + (max-min)*(Pos%2));
+    for (e = 0; e<12; e++){
+        Ax=getAx_E(e);
+        Pos=getPos_E(e);
+
+        b = (min + (max-min)*(Pos%2));
+        c = (min + (max-min)*(Pos/2));
+
+        /*if (Ax==0) {
+            j=b;
+            k=c;
+        }
+        else if (Ax==1){
+            k=b;
+            i=c;
+        }
+        else if (Ax==2){
+            i=b;
+            j=c;
+        }*/
+        /*i=eq(Ax,1)*c + eq(Ax,2)*b;
+        j=eq(Ax,2)*c + eq(Ax,0)*b;
+        k=eq(Ax,0)*c + eq(Ax,1)*b;*/
+
+        for (a=1; a<LAT+1;a++){
+            /*i=eq(Ax,0)*a + eq(Ax,1)*(min + (max-min)*(Pos/2)) + eq(Ax,2)*(min + (max-min)*(Pos%2));
             j=eq(Ax,1)*a + eq(Ax,2)*(min + (max-min)*(Pos/2)) + eq(Ax,0)*(min + (max-min)*(Pos%2));
-            k=eq(Ax,2)*a + eq(Ax,0)*(min + (max-min)*(Pos/2)) + eq(Ax,1)*(min + (max-min)*(Pos%2));
+            k=eq(Ax,2)*a + eq(Ax,0)*(min + (max-min)*(Pos/2)) + eq(Ax,1)*(min + (max-min)*(Pos%2));*/
+
+            i= eq(Ax,1)*c + eq(Ax,2)*b + eq(Ax,0)*a;
+            j= eq(Ax,2)*c + eq(Ax,0)*b + eq(Ax,1)*a;
+            k= eq(Ax,0)*c + eq(Ax,1)*b + eq(Ax,2)*a;
+            /*if (Ax==0) { i=a; }
+            else if (Ax==1){ j=a; }
+            else if (Ax==2){ k=a; }
 
             if (MYTHREAD == 0 && iter == 0) {
                 //printf("e%i: (%i,%i,%i)\n",e,i,j,k);
             }
 
-            if (MYTHREAD == 0 && iter == 0 && lID(i,j,k) == 818) {
+            if (MYTHREAD == 0 && iter == 0 && getLocalID_LocalIndex(i, j, k) == 818) {
                 //printf("c_BC[818] = %i\n",c_BC);
-            }
-            L_B_Cells[c_BC] = Cells[lID(i,j,k)];
+            }*/
+            L_B_Cells[c_BC] = Cells[getLocalID_LocalIndex(i, j, k)];
             c_BC++;
         }
     }
-    //printTest("2", 0);
+    /*printTest("2", 0);
     //Corners
-    /*for (k = min; k < max+1; k = k + max - min) {
-        for(j = min; j < max+1; j = j + max - min) {
-            for(i = min; i < max+1; i = i + max - min) {*/
 
     //Corners
-    /*for (int c = 0; c < 2; c++) {
+    for (int c = 0; c < 2; c++) {
         for(int b = 0; b < 2; b++) {
             for(int a = 0; a < 2; a++) {
 
@@ -440,8 +473,8 @@ void FillLocalBCells() {
 
             }
         }
-    }*/
-    //printTest("After fill local", 0);
+    }
+    //printTest("After fill local", 0);*/
 }
 
 
@@ -540,7 +573,8 @@ void setCubeType(){
 
     }
 
-    /*upc_barrier;
+    upc_barrier;
+
     printf("T=%2i ->  ",MYTHREAD);
     if(cur_corner != -1)
         printf("Corner %2i",cur_corner);
@@ -549,9 +583,9 @@ void setCubeType(){
     else if(cur_face != -1)
         printf("Face   %2i",cur_face);
     else
-        printf("Interior",cur_face);
+        printf("Interior");
 
-    printf("\n");*/
+    printf("\n");
 
     //PRINTING
     //printf("T%i: Finished cube type\n",MYTHREAD);
@@ -572,7 +606,8 @@ void setThingsToGet(){
         faces_to_get[getF(0,1-X)] = 1;
         faces_to_get[getF(1,1-Y)] = 1;
         faces_to_get[getF(2,1-Z)] = 1;
-    }
+    }//Checked
+
     else if(cur_edge!=-1) {
 
         int Ax = getAx_E(cur_edge);
@@ -582,44 +617,43 @@ void setThingsToGet(){
             int X[3];
             for (int r=0;r<3;r++){
                 X[r] = eq(Ax,r)*t +
-                       eq(Ax,(r+1)%3)*((3 - Pos)%3) +
-                       eq(Ax,(r+2)%3)*((3 - Pos)/3);
+                       eq(Ax,(r+1)%3)*(1-Pos/2) +
+                       eq(Ax,(r+2)%3)*(1-Pos%2);
             }
-            corners_to_get[getC(X[0],X[1],X[2])] = 1;
-        }
 
-        edges_to_get[getE(Ax,1-Pos)] = 1;
+            corners_to_get[getC(X[0],X[1],X[2])] = 1;
+        }//Checked
+
+        edges_to_get[getE(Ax,3-Pos)] = 1;
         edges_to_get[getE((Ax+1)%3 , 3-Pos/2)] = 1;
         edges_to_get[getE((Ax+1)%3 , 1-Pos/2)] = 1;
-        printf("I am here\n");
-        printf("T%i: Ax = %i, Pos = %i\n",MYTHREAD,Ax , Pos);
-        printf("T%i: getE(%i,%i) = %i\n",MYTHREAD,(Ax+2)%3,3-2*(Pos%2) ,getE((Ax+2)%3 , 3-2*(Pos%2)));
-        //printf("T%i: %i\n",MYTHREAD,getE((Ax+2)%3 , 3-2*(Pos%2)));
         edges_to_get[getE((Ax+2)%3 , 3-2*(Pos%2))] = 1;
         edges_to_get[getE((Ax+2)%3 , 2-2*(Pos%2))] = 1;
+        //Checked
 
         for (int f = 0;f<6;f++) {
             if (f!=getF((Ax+1)%3 , Pos%2) && f!=getF((Ax+2)%3 , Pos/2)){
                 faces_to_get[f] = 1;
             }
-        }
+        }//Checked
     }
 
     else if(cur_face!=-1) {
         int Ax = getAx_F(cur_face);
         int Dir = getDir_F(cur_face);
 
-        for (int a=0;a<2;a++){
-            for(int b=0;b<2;b++) {
+        for (int b=0;b<2;b++){
+            for(int a=0;a<2;a++) {
                 int X[3];
                 for(int r=0; r<3;r++){
                     X[r] = eq(Ax,r)*(1-Dir) +
                            eq(Ax,(r+2)%3)*a +
                            eq(Ax,(r+1)%3)*b;
                 }
+
                 corners_to_get[getC(X[0],X[1],X[2])] = 1;
             }
-        }
+        }//Checked
 
         for (int e = 0; e<12; e++) {
             if(e!=getE((Ax+1)%3 , 2*Dir + 0) &&
@@ -629,7 +663,7 @@ void setThingsToGet(){
 
                 edges_to_get[e] = 1;
             }
-        }
+        }//Checked
 
         for (int f = 0; f<6; f++) {
             if(f!=getF(Ax, Dir)){
@@ -650,10 +684,21 @@ void setThingsToGet(){
         }
     }
 
-    /*upc_barrier;
+    upc_barrier;
     for (int mt=0; mt<THREADS;mt++){
         if (MYTHREAD == mt) {
-            printf("T=%2i  \n", MYTHREAD);
+
+            printf("T=%2i ->  ",MYTHREAD);
+            if(cur_corner != -1)
+                printf("Corner %2i",cur_corner);
+            else if(cur_edge != -1)
+                printf("Edge   %2i",cur_edge);
+            else if(cur_face != -1)
+                printf("Face   %2i",cur_face);
+            else
+                printf("Interior");
+
+            printf("\n");
             printf("    Corners: \n    ");
             for (int count = 0; count < 8; count++)
                 if (corners_to_get[count] == 1)
@@ -670,10 +715,10 @@ void setThingsToGet(){
             for (int count = 0; count < 6; count++)
                 if (faces_to_get[count] == 1)
                     printf(" %2i ", count);
-            printf("\n");
+            printf("\n\n");
         }
         upc_barrier;
-    }*/
+    }
 
     //PRINTING
     //printf("T%i: Finished what to get\n",MYTHREAD);
@@ -713,7 +758,6 @@ void getSharedToCells() {
                 printf("L_B_Cells[%i].F[1] = %f\n",pos_local,L_B_Cells[pos_local].F[1]);
             }*/
 
-            upc_barrier;
 
             UGET(&L_B_Cells[pos_local],
                  &BCells[pos_shared],
@@ -731,7 +775,6 @@ void getSharedToCells() {
     }
     PRINTING
         printf("T%i: Got faces\n",MYTHREAD);
-    upc_barrier;
 
     for (int edge = 0; edge <12; edge ++) {
         if(edges_to_get[edge] == 1) {
@@ -753,7 +796,6 @@ void getSharedToCells() {
                              *B_CELLS_SIZE + 6*LAT*LAT + op*LAT;
 
 
-            upc_barrier;
             UGET(&L_B_Cells[pos_local],
                  &BCells[pos_shared],
                  LAT*sizeof(CellProps));
@@ -761,7 +803,6 @@ void getSharedToCells() {
     }
     PRINTING
         printf("T%i: Got edges\n",MYTHREAD);
-    upc_barrier;
 
     /*for (int corner = 0; corner <8; corner ++) {
         if(corners_to_get[corner] == 1) {
@@ -793,53 +834,110 @@ void getSharedToCells() {
 
 
     //if (MYTHREAD == 1 && iter == 0)
-        //printf (" LBC[%i].F[1] = %f\n",0,L_B_Cells[0].F[1]);
+    //printf (" LBC[%i].F[1] = %f\n",0,L_B_Cells[0].F[1]);
     //printTest("Between upc_memget from shared and fill C with LB",0);
 
     FillCellsWithLBCells();
 }
 void FillCellsWithLBCells() {
-    int i, j, k;
+    int i,j,k;
     int c_BC = 0;         //Local BCells counter
     int min=0;
     int max=LAT+1;
 
-    //Faces
-    for (int f = 0; f<6; f++){
-        int Ax=getAx_F(f);
-        int Dir=getDir_F(f);
-        for (int b=1; b<LAT+1;b++) {
-            for (int a=1; a<LAT+1;a++){
-                i=eq(Ax,0)*(min+(max-min)*Dir) + eq(Ax,1)*b + eq(Ax,2)*a;
-                j=eq(Ax,1)*(min+(max-min)*Dir) + eq(Ax,2)*b + eq(Ax,0)*a;
-                k=eq(Ax,2)*(min+(max-min)*Dir) + eq(Ax,0)*b + eq(Ax,1)*a;
+    int f, e;
+    int Ax, Dir, Pos;
+    int a, b, c;
 
-                //PRINTING
-                /*if (MYTHREAD == 0 && iter == 0 && lID(i,j,k) == 23){
+    for (f = 0; f<6; f++){
+        Ax=getAx_F(f);
+        Dir=getDir_F(f);
+
+        a = (min+(max-min)*Dir);
+        /*if (Ax==0) {
+            i=a;
+        }
+        else if (Ax==1){
+            j=a;
+        }
+        else if (Ax==2){
+            k=a;
+        }*/
+
+        /*i = eq(Ax,0)*a;
+        j = eq(Ax,1)*a;
+        k = eq(Ax,2)*a;*/
+
+        for (c=1; c<LAT+1;c++) {
+            for (b=1; b<LAT+1;b++){
+
+                /*if (Ax==0) {
+                    j=b;
+                    k=c;
+                }
+                else if (Ax==1){
+                    k=b;
+                    i=c;
+                }
+                else if (Ax==2){
+                    i=b;
+                    j=c;
+                }*/
+                //Faces
+                i = eq(Ax,0)*a + eq(Ax,1)*c + eq(Ax,2)*b;
+                j = eq(Ax,1)*a + eq(Ax,2)*c + eq(Ax,0)*b;
+                k = eq(Ax,2)*a + eq(Ax,0)*c + eq(Ax,1)*b;
+                /*PRINTING
+                if (MYTHREAD == 0 && iter == 0 && lID(i,j,k) == 23){
                     printf( "*****HERE*****    c_BC = %i\n",c_BC);
                     //printf("T%i: c_BC %i, lID(%i,%i,%i) = %i\n",MYTHREAD,c_BC,i,j,k,lID(i,j,k));
-                }*/
-                //printf("T%i: c_BC %i, lID(%i,%i,%i) = %i\n",MYTHREAD,c_BC,i,j,k,lID(i,j,k));
-                Cells[lID(i,j,k)] = L_B_Cells[c_BC];
+                }
+                 //printf("T%i: c_BC %i, lID(%i,%i,%i) = %i\n",MYTHREAD,c_BC,i,j,k,lID(i,j,k));*/
+                 Cells[getLocalID_LocalIndex(i, j, k)] = L_B_Cells[c_BC];
                 c_BC++;
             }
         }
     }
+
     //printf("T%i: c_BC = %i\n",MYTHREAD,c_BC);
     PRINTING
         printf("T%i: Copied Faces\n",MYTHREAD);
-    upc_barrier;
 
     //Edges
-    for (int e = 0; e<12; e++){
-        int Ax=getAx_E(e);
-        int Pos=getPos_E(e);
-        for (int a=1; a<LAT+1;a++){
-            i=eq(Ax,0)*a + eq(Ax,1)*(min + (max-min)*(Pos/2)) + eq(Ax,2)*(min + (max-min)*(Pos%2));
-            j=eq(Ax,1)*a + eq(Ax,2)*(min + (max-min)*(Pos/2)) + eq(Ax,0)*(min + (max-min)*(Pos%2));
-            k=eq(Ax,2)*a + eq(Ax,0)*(min + (max-min)*(Pos/2)) + eq(Ax,1)*(min + (max-min)*(Pos%2));
+    for (e = 0; e<12; e++){
+        Ax=getAx_E(e);
+        Pos=getPos_E(e);
 
-            Cells[lID(i,j,k)] = L_B_Cells[c_BC];
+        b = (min + (max-min)*(Pos%2));
+        c = (min + (max-min)*(Pos/2));
+
+        /*if (Ax==0) {
+            j=b;
+            k=c;
+        }
+        else if (Ax==1){
+            k=b;
+            i=c;
+        }
+        else if (Ax==2){
+            i=b;
+            j=c;
+        }*/
+
+        /*i=eq(Ax,1)*c + eq(Ax,2)*b;
+        j=eq(Ax,2)*c + eq(Ax,0)*b;
+        k=eq(Ax,0)*c + eq(Ax,1)*b;*/
+
+        for (a=1; a<LAT+1;a++){
+            i= i=eq(Ax,1)*c + eq(Ax,2)*b + eq(Ax,0)*a;
+            j= j=eq(Ax,2)*c + eq(Ax,0)*b + eq(Ax,1)*a;
+            k= k=eq(Ax,0)*c + eq(Ax,1)*b + eq(Ax,2)*a;
+
+            /*if (Ax==0) { i=a; }
+            else if (Ax==1){ j=a; }
+            else if (Ax==2){ k=a; }*/
+
+            Cells[getLocalID_LocalIndex(i, j, k)] = L_B_Cells[c_BC];
             //if (MYTHREAD == 1)
             //printf("T%i: lID(%i,%i,%i) = %i\n",MYTHREAD,i,j,k,lID(i,j,k));
             c_BC++;
@@ -848,28 +946,24 @@ void FillCellsWithLBCells() {
     //printf("T%i: c_BC = %i\n",MYTHREAD,c_BC);
     PRINTING
         printf("T%i: Copied Edges\n",MYTHREAD);
-    upc_barrier;
 
-    /*for (int c = 0; c < 2; c++) {
-        for(int b = 0; b < 2; b++) {
-            for(int a = 0; a < 2; a++) {
+/*for (int c = 0; c < 2; c++) {
+    for(int b = 0; b < 2; b++) {
+        for(int a = 0; a < 2; a++) {
 
-                int i = min + (max - min)*a;
-                int j = min + (max - min)*b;
-                int k = min + (max - min)*b;
-                //if (MYTHREAD == 1)
-                //printf("T%i: lID(%i,%i,%i) = %i\n",MYTHREAD,i,j,k,lID(i,j,k));
-                Cells[lID(i,j,k)] = L_B_Cells[c_BC];
-                c_BC++;
-            }
+            int i = min + (max - min)*a;
+            int j = min + (max - min)*b;
+            int k = min + (max - min)*b;
+            //if (MYTHREAD == 1)
+            //printf("T%i: lID(%i,%i,%i) = %i\n",MYTHREAD,i,j,k,lID(i,j,k));
+            Cells[lID(i,j,k)] = L_B_Cells[c_BC];
+            c_BC++;
         }
-    }*/
-    //if (MYTHREAD == 1 && iter == 0)
-        //printf (" C[%i].F[1] = %f\n",lID(0,1,1),Cells[lID(0,1,1)].F[1]);
-    //printf("T%i: c_BC = %i\n",MYTHREAD,c_BC);
-    PRINTING
-        printf("T%i: Copied Corners\n",MYTHREAD);
-    upc_barrier;
+    }
+}
+//if (MYTHREAD == 1 && iter == 0)
+//printf (" C[%i].F[1] = %f\n",lID(0,1,1),Cells[lID(0,1,1)].F[1]);
+//printf("T%i: c_BC = %i\n",MYTHREAD,c_BC);*/
 }
 
 void printTest(const char * text,int it) {
@@ -880,7 +974,7 @@ void printTest(const char * text,int it) {
     upc_barrier;
     if (MYTHREAD == 1 && iter == it) {
         printf("  Face (0,0,0)\n");
-        int Cpos = lID(1,1,1);
+        int Cpos = getLocalID_LocalIndex(1, 1, 1);
         int LBpos = 0;
         int Shpos = MYTHREAD*B_CELLS_SIZE + LBpos;
 
@@ -891,7 +985,7 @@ void printTest(const char * text,int it) {
     upc_barrier;
 
     if (MYTHREAD == 0 && iter == it) {
-        int Cpos = lID(3,1,1);
+        int Cpos = getLocalID_LocalIndex(3, 1, 1);
         int LBpos = 16;
         printf("    L_B_%i[%i]->ID = %i\n", MYTHREAD, LBpos, L_B_Cells[LBpos].ID);
         printf("    C_%i[%i]->ID = %i\n", MYTHREAD, Cpos, Cells[Cpos].ID);
@@ -990,15 +1084,13 @@ void printTest(const char * text,int it) {
 void putCellsToWCells(){
     //printTest("Before Fill", 0);
     //FillLocalWCells();
-    upc_barrier;
     //main_thread
-        //printf("Local cells filled\n");
+    //printf("Local cells filled\n");
     //printTest("After Fill", 0);
     UPUT( &WCells[MYTHREAD * CELL_TOT_SIZE], &Cells[0], CELL_TOT_SIZE * sizeof(CellProps));
     //UPUT( &WCells[MYTHREAD * BLOCKSIZE_NEW], &L_W_Cells[0], BLOCKSIZE_NEW * sizeof(CellProps));
-    upc_barrier;
     //main_thread
-        //printf("Shared cells filled\n");
+    //printf("Shared cells filled\n");
     //printTest("After memput", 0);
 }
 void FillLocalWCells(){
@@ -1077,20 +1169,20 @@ void StreamingStep(){
                     printf("\n\n(%i,%i,%i)\n",i,j,k);
                 }*/
 
-                if ( iter==0 && MYTHREAD ==0 && lID(i,j,k) == lID(2,1,1)){
+                /*if ( iter==0 && MYTHREAD ==0 && getLocalID_LocalIndex(i, j, k) == getLocalID_LocalIndex(2, 1, 1)){
                     printf("\n(%i,%i,%i)\n",i,j,k);
-                    printf ("T0: C[%i]->F[1] = %3.3f\n",lID(2,1,1),(Cells + lID(2,1,1))->METAF[1]);
+                    printf ("T0: C[%i]->F[1] = %3.3f\n", getLocalID_LocalIndex(2, 1, 1),(Cells + getLocalID_LocalIndex(2, 1, 1))->METAF[1]);
 
                 }
-                if ( iter==0 && MYTHREAD ==1 && lID(i,j,k) == lID(1,1,1)){
+                if ( iter==0 && MYTHREAD ==1 && getLocalID_LocalIndex(i, j, k) == getLocalID_LocalIndex(1, 1, 1)){
                     printf("\n(%i,%i,%i)\n",i,j,k);
-                    printf ("T1: C[%i]->F[1] = %3.3f\n\n\n",lID(0,1,1),(Cells + lID(0,1,1))->METAF[1]);
-                    printf ("T1: C[%i]->F[1] = %3.3f\n\n\n",lID(1,1,1),(Cells + lID(1,1,1))->F[1]);
+                    printf ("T1: C[%i]->F[1] = %3.3f\n\n\n", getLocalID_LocalIndex(0, 1, 1),(Cells + getLocalID_LocalIndex(0, 1, 1))->METAF[1]);
+                    printf ("T1: C[%i]->F[1] = %3.3f\n\n\n", getLocalID_LocalIndex(1, 1, 1),(Cells + getLocalID_LocalIndex(1, 1, 1))->F[1]);
 
-                }
+                }*/
                 for (int l = 0; l < 19; l++) {
 
-                    if (((Cells + lID(i,j,k))->StreamLattice[l]) == 1 && MYTHREAD==1) {
+                    if (((Cells + getLocalID_LocalIndex(i, j, k))->StreamLattice[l]) == 1 && MYTHREAD==1) {
                         /*if (iter == 0 && MYTHREAD == 1 && i ==1) {
                             printf("\nl = %2i", l);
                             printf("    T%i C[%2i].ID = %2i (%3.3f,%3.3f,%3.3f) // C[%2i].ID = %2i  (%3.3f,%3.3f,%3.3f)\n",
@@ -1114,12 +1206,12 @@ void StreamingStep(){
                         }*/
                     }
 
-                    if (((Cells + lID(i,j,k))->StreamLattice[l]) == 1) {
+                    if (((Cells + getLocalID_LocalIndex(i, j, k))->StreamLattice[l]) == 1) {
                         /*PRINTING {
                             printf("T%i: (lID(%i,%i,%i) = %i) + (c[%i] = %i) = %i\n", MYTHREAD, i, j, k,
                                    lID(i, j, k), l, c[l], lID(i, j, k) + c[l]);
                         };*/
-                        (Cells + lID(i,j,k))->F[l] = (Cells + lID(i,j,k) + c[l])->METAF[l];
+                        (Cells + getLocalID_LocalIndex(i, j, k))->F[l] = (Cells + getLocalID_LocalIndex(i, j, k) + c[l])->METAF[l];
 
                     }
 

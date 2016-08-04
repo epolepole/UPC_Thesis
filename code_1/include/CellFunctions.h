@@ -76,6 +76,11 @@ int getCubeID(int x, int y, int z);
 void getCubeCoords_TotIndex(int *tX, int *X);
 void getLocalIndex_TotIndex(int *tX, int *X);
 void getCubeCoords_CubeID(int ID, int *X);
+void getLocalRealIndex_LocRealID(int ID, int *X);
+void getLocalIndex_LocRealIndex(int *lrX,int *lX);
+void getLocalRealIndex_LocIndex(int *lX,int *lrX);
+int getLocalID_LocalIndex(int i, int j, int k);
+int getLocalID_LocRealID(int l_rID);
 
 int getIndex(const int x, const int y, const int z);
 int getThread(int index);

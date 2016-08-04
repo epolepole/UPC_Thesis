@@ -130,7 +130,7 @@ void CreateDirectory(char* MainWorkDir);
 
 void StringAddition(char* first, char* second, char* result);
 
-int lID(int i, int j, int k);
+
 
 
 #define max(a,b) \
