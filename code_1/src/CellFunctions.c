@@ -575,6 +575,7 @@ void CellIni_NEW(CellProps *Cells,
 
 
                 int ID  = l_i + l_j + l_k + g_i + g_j + g_k;
+                printf("ID = %i\n",ID);
 
                 /*if (MYTHREAD == 0) {
                     printf("(%i,%i,%i), (%i,%i,%i), index_Cell = %i, lID = %i\n",
@@ -735,10 +736,10 @@ void CellIni_NEW(CellProps *Cells,
                     if ((Cells + index_Cell)->BC_ID[l]!=0)
                     {
                         (Cells + index_Cell)->StreamLattice[opp[l]]= 0 ;
-                        /*if (MYTHREAD == 0 && lID == 1) {
+                        if (MYTHREAD == 0 && lID == 1) {
                             printf("opp[%i] = %i\n", l, opp[l]);
                             printf("Str(%i): %i\n",opp[l],(Cells + index_Cell)->StreamLattice[opp[l]]);
-                        }*/
+                        }
 
                     }
                 }
@@ -1197,11 +1198,20 @@ int getCubeID(int x, int y, int z) {
     return x + y*NTDX + z*NTDX*NTDY;
 }
 
-void getCubeCoords(int ID, int *X) {
+void getCubeCoords_TotIndex(int *tX, int *X) {
+    X[0] = tX[0]/LAT;
+    X[1] = tX[1]/LAT;
+    X[2] = tX[2]/LAT;
+}
+
+void getLocalIndex_TotIndex(int *tX, int *X) {
+    X[0] = 1 + tX[0]%LAT;
+    X[1] = 1 + tX[1]%LAT;
+    X[2] = 1 + tX[2]%LAT;
+}
+void getCubeCoords_CubeID(int ID, int *X) {
     X[2] = ID/(NTDX*NTDY);
     X[1] = (ID - X[2] * NTDX*NTDY) / NTDX;
-    //printf("(%i - %i * %i * %i)/%i = %i\n",ID, X[2],NTDX,NTDY,NTDX,3/NTDX);
-    //printf("3/%i = %i\n",NTDX,100/NTDX);
     X[0] = ID - X[1]*NTDX - X[2] * NTDX*NTDY;
 }
 

@@ -1,6 +1,7 @@
 #include <stdio.h>   // for calloc();
 #include "math.h"
 #include <upc_strict.h>                 // Required for UPC
+#include <CellFunctions.h>
 
 #include "ShellFunctions.h"
 
@@ -41,15 +42,32 @@ void WriteResults(char* OutputFile, int* postproc_prog)
                         (WCells+i)->Fluid, // fluid or solid
                         (WCells+i)->ThreadNumber);  */
             fprintf(fp1, "Points:0,Points:1,Points:2,u,v,w,vel_mag,"\
-                         "f00,f01,f02,f03,f04,f05,f06,f07,f08,f09,f10,f11,f12,f13,f14,f15,f16,f17,f18,"
+                        // "f00,f01,f02,f03,f04,f05,f06,f07,f08,f09,f10,f11,f12,f13,f14,f15,f16,f17,f18,"
                     "rho\n");
             for (int k = 0; k < NN; k++) {
                 for (int j = 0; j < NM; j++) {
                     for (int i = 0; i < NL; i++) {
+                        int tX[3] = {i,j,k}; //Global index
 
-                        int pos = i%LAT + (i/LAT)*LAT*LAT*LAT +
+                        int CX[3];  //Cube index
+                        int lX[3];  //local index
+                        int cubeID;
+                        int locID;
+
+                        getCubeCoords_TotIndex(&tX[0],&CX[0]);
+                        getLocalIndex_TotIndex(&tX[0],&lX[0]);
+                        cubeID = getCubeID(CX[0],CX[1],CX[2]);
+                        locID = lID(lX[0],lX[1],lX[2]);
+
+
+
+                        int pos = CELL_TOT_SIZE*cubeID + locID;
+
+
+
+                        /*int pos = i%LAT + (i/LAT)*LAT*LAT*LAT +
                                 (j%LAT)*LAT + (j/LAT)*LAT*LAT*LAT*NTDX +
-                                (k%LAT)*LAT*LAT + (k/LAT)*LAT*LAT*LAT*NTDX*NTDY;
+                                (k%LAT)*LAT*LAT + (k/LAT)*LAT*LAT*LAT*NTDX*NTDY;*/
                         //printf("pos(%i,%i,%i)=%i\n",i,j,k,pos);
                         fprintf(fp1, "%f, %f, %f, %f, %f, %f, %f,",
                                 (WCells + pos)->CoordX, // x
@@ -60,9 +78,9 @@ void WriteResults(char* OutputFile, int* postproc_prog)
                                 (WCells + pos)->W,      // w
                                 sqrt(pow((WCells + pos)->U, 2) + pow((WCells + pos)->V, 2) +
                                      pow((WCells + pos)->W, 2)));
-                        for (int l = 0; l<19; l++) {
+                        /*for (int l = 0; l<19; l++) {
                         fprintf(fp1," %f,",(WCells+pos)->F[l]);
-                        }
+                        }*/
 
                         fprintf(fp1, " %f\n", (WCells + pos)->Rho);    // density
                     }

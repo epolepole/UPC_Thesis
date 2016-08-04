@@ -67,9 +67,9 @@ CellProps L_W_Cells[BLOCKSIZE_NEW];*/
 CellProps *L_B_Cells;
 CellProps *L_W_Cells;*/
 
-CellProps Cells[(LAT+2)*(LAT+2)*(LAT+2)];                       // Pointer to Cells
+CellProps Cells[CELL_TOT_SIZE];                       // Pointer to Cells
 CellProps L_B_Cells[B_CELLS_SIZE];
-CellProps L_W_Cells[BLOCKSIZE_NEW];
+//CellProps L_W_Cells[BLOCKSIZE_NEW];
 
 // Time measurement variables
 float tInitialization;          // Time measurement of Initialization

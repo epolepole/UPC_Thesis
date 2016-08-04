@@ -423,7 +423,7 @@ void FillLocalBCells() {
             for(i = min; i < max+1; i = i + max - min) {*/
 
     //Corners
-    for (int c = 0; c < 2; c++) {
+    /*for (int c = 0; c < 2; c++) {
         for(int b = 0; b < 2; b++) {
             for(int a = 0; a < 2; a++) {
 
@@ -440,7 +440,7 @@ void FillLocalBCells() {
 
             }
         }
-    }
+    }*/
     //printTest("After fill local", 0);
 }
 
@@ -591,6 +591,10 @@ void setThingsToGet(){
         edges_to_get[getE(Ax,1-Pos)] = 1;
         edges_to_get[getE((Ax+1)%3 , 3-Pos/2)] = 1;
         edges_to_get[getE((Ax+1)%3 , 1-Pos/2)] = 1;
+        printf("I am here\n");
+        printf("T%i: Ax = %i, Pos = %i\n",MYTHREAD,Ax , Pos);
+        printf("T%i: getE(%i,%i) = %i\n",MYTHREAD,(Ax+2)%3,3-2*(Pos%2) ,getE((Ax+2)%3 , 3-2*(Pos%2)));
+        //printf("T%i: %i\n",MYTHREAD,getE((Ax+2)%3 , 3-2*(Pos%2)));
         edges_to_get[getE((Ax+2)%3 , 3-2*(Pos%2))] = 1;
         edges_to_get[getE((Ax+2)%3 , 2-2*(Pos%2))] = 1;
 
@@ -679,7 +683,7 @@ void getSharedToCells() {
 
     int X[3];
     int dX[3];
-    getCubeCoords(MYTHREAD,&X[0]);
+    getCubeCoords_CubeID(MYTHREAD,&X[0]);
 
     for (int face=0; face<6; face++) {
         if (faces_to_get[face] == 1){
@@ -700,14 +704,14 @@ void getSharedToCells() {
             int pos_shared = getCubeID(X[0] + dX[0],
                                        X[1] + dX[1],
                                        X[2] + dX[2])*B_CELLS_SIZE + op*(LAT*LAT);
-            if (MYTHREAD == 1 && iter==0 && pos_local == 0) {
+            /*if (MYTHREAD == 1 && iter==0 && pos_local == 0) {
 
                 printf("\n\nBefore memget\n");
                 printf("BCells[%i].ID = %i\n",pos_shared,BCells[pos_shared].ID);
                 printf("BCells[%i].F[1] = %f\n",pos_shared,BCells[pos_shared].F[1]);
                 printf("L_B_Cells[%i].ID = %i\n",pos_local,L_B_Cells[pos_local].ID);
                 printf("L_B_Cells[%i].F[1] = %f\n",pos_local,L_B_Cells[pos_local].F[1]);
-            }
+            }*/
 
             upc_barrier;
 
@@ -715,13 +719,13 @@ void getSharedToCells() {
                  &BCells[pos_shared],
                  (LAT*LAT)*sizeof(CellProps));
 
-            if (MYTHREAD == 1 && iter==0 && pos_local == 0) {
+            /*if (MYTHREAD == 1 && iter==0 && pos_local == 0) {
                 printf("\n\nAfter memget\n");
                 printf("BCells[%i].ID = %i\n",pos_shared,BCells[pos_shared].ID);
                 printf("BCells[%i].F[1] = %f\n",pos_shared,BCells[pos_shared].F[1]);
                 printf("L_B_Cells[%i].ID = %i\n",pos_local,L_B_Cells[pos_local].ID);
                 printf("L_B_Cells[%i].F[1] = %f\n",pos_local,L_B_Cells[pos_local].F[1]);
-            }
+            }*/
 
         }
     }
@@ -749,6 +753,7 @@ void getSharedToCells() {
                              *B_CELLS_SIZE + 6*LAT*LAT + op*LAT;
 
 
+            upc_barrier;
             UGET(&L_B_Cells[pos_local],
                  &BCells[pos_shared],
                  LAT*sizeof(CellProps));
@@ -758,7 +763,7 @@ void getSharedToCells() {
         printf("T%i: Got edges\n",MYTHREAD);
     upc_barrier;
 
-    for (int corner = 0; corner <8; corner ++) {
+    /*for (int corner = 0; corner <8; corner ++) {
         if(corners_to_get[corner] == 1) {
             int p[3];
             p[0] = getX_C(corner);
@@ -784,11 +789,11 @@ void getSharedToCells() {
     }
     PRINTING
         printf("T%i: Got corners\n",MYTHREAD);
-    upc_barrier;
+    upc_barrier;*/
 
 
-    if (MYTHREAD == 1 && iter == 0)
-        printf (" LBC[%i].F[1] = %f\n",0,L_B_Cells[0].F[1]);
+    //if (MYTHREAD == 1 && iter == 0)
+        //printf (" LBC[%i].F[1] = %f\n",0,L_B_Cells[0].F[1]);
     //printTest("Between upc_memget from shared and fill C with LB",0);
 
     FillCellsWithLBCells();
@@ -845,7 +850,7 @@ void FillCellsWithLBCells() {
         printf("T%i: Copied Edges\n",MYTHREAD);
     upc_barrier;
 
-    for (int c = 0; c < 2; c++) {
+    /*for (int c = 0; c < 2; c++) {
         for(int b = 0; b < 2; b++) {
             for(int a = 0; a < 2; a++) {
 
@@ -858,9 +863,9 @@ void FillCellsWithLBCells() {
                 c_BC++;
             }
         }
-    }
-    if (MYTHREAD == 1 && iter == 0)
-        printf (" C[%i].F[1] = %f\n",lID(0,1,1),Cells[lID(0,1,1)].F[1]);
+    }*/
+    //if (MYTHREAD == 1 && iter == 0)
+        //printf (" C[%i].F[1] = %f\n",lID(0,1,1),Cells[lID(0,1,1)].F[1]);
     //printf("T%i: c_BC = %i\n",MYTHREAD,c_BC);
     PRINTING
         printf("T%i: Copied Corners\n",MYTHREAD);
@@ -984,12 +989,13 @@ void printTest(const char * text,int it) {
 }
 void putCellsToWCells(){
     //printTest("Before Fill", 0);
-    FillLocalWCells();
+    //FillLocalWCells();
     upc_barrier;
     //main_thread
         //printf("Local cells filled\n");
     //printTest("After Fill", 0);
-    UPUT( &WCells[MYTHREAD * BLOCKSIZE_NEW], &L_W_Cells[0], BLOCKSIZE_NEW * sizeof(CellProps));
+    UPUT( &WCells[MYTHREAD * CELL_TOT_SIZE], &Cells[0], CELL_TOT_SIZE * sizeof(CellProps));
+    //UPUT( &WCells[MYTHREAD * BLOCKSIZE_NEW], &L_W_Cells[0], BLOCKSIZE_NEW * sizeof(CellProps));
     upc_barrier;
     //main_thread
         //printf("Shared cells filled\n");
@@ -1000,7 +1006,7 @@ void FillLocalWCells(){
     for (int k = 1; k < LAT+1; k++) {
         for (int j = 1; j < LAT + 1; j++) {
             for (int i = 1; i < LAT + 1; i++) {
-                L_W_Cells[c_WC] = Cells[lID(i,j,k)];
+                //L_W_Cells[c_WC] = Cells[lID(i,j,k)];
                 c_WC++;
             }
         }
@@ -1257,9 +1263,10 @@ void alloc_cells() {//////////////////////////////////////////////////////
     // Allocate structure for the cell properties (see ShellFunctions.h)
 
     // New approach
-    WCells = (shared_block(BLOCKSIZE_NEW)    CellProps*)upc_all_alloc(THREADS, BLOCKSIZE_NEW*sizeof(CellProps));
-    BCells = (shared_block(B_CELLS_SIZE)     CellProps*)upc_all_alloc(THREADS, B_CELLS_SIZE*sizeof(CellProps));
-    //Cells = (CellProps*)calloc(B_CELLS_SIZE + BLOCKSIZE_NEW,sizeof(CellProps));
+    WCells = (shared_block(CELL_TOT_SIZE)    CellProps*) upc_all_alloc(THREADS, CELL_TOT_SIZE*sizeof(CellProps));
+    //WCells = (shared_block(BLOCKSIZE_NEW)    CellProps*)upc_all_alloc(THREADS, BLOCKSIZE_NEW*sizeof(CellProps));
+    BCells = (shared_block(B_CELLS_SIZE)     CellProps*) upc_all_alloc(THREADS, B_CELLS_SIZE*sizeof(CellProps));
+    //Cells = (CellProps*)calloc(CELL_TOT_SIZE,sizeof(CellProps));
     //L_B_Cells = (CellProps*)calloc(B_CELLS_SIZE,sizeof(CellProps));
     //L_W_Cells = (CellProps*)calloc(BLOCKSIZE_NEW,sizeof(CellProps));
     if (!Cells) {
@@ -1270,10 +1277,10 @@ void alloc_cells() {//////////////////////////////////////////////////////
         printf("L_B_Cells mem failure, exiting \n");
         exit(EXIT_FAILURE);
     }
-    if (!L_W_Cells) {
+    /*if (!L_W_Cells) {
         printf("L_W_Cells mem failure, exiting \n");
         exit(EXIT_FAILURE);
-    }
+    }*/
     //////////////////////////////////////////////////////
 
 }

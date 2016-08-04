@@ -97,7 +97,7 @@ shared                      double shared_total_Residuals[5]; // variable to sto
 
 
 //New things
-shared_block(BLOCKSIZE_NEW) CellProps  *WCells; // Writing Cells: cells to write data
+shared_block(CELL_TOT_SIZE) CellProps  *WCells; // Writing Cells: cells to write data
 shared_block(B_CELLS_SIZE)  CellProps  *BCells; // Boundary cells
 
 shared  int    *NumNodes;       // This will store the number of lines of the read files

@@ -37,8 +37,9 @@
 
 
 #define BLOCKSIZE_NEW (int)(LAT*LAT*LAT)
+#define CELL_TOT_SIZE (int)((LAT+2)*(LAT+2)*(LAT+2))
         //                 Faces       Edges    Corners
-#define B_CELLS_SIZE (int)(6*LAT*LAT + 12*LAT + 8)
+#define B_CELLS_SIZE (int)(6*LAT*LAT + 12*LAT)
 
 
 #endif
