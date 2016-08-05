@@ -1356,11 +1356,9 @@ void alloc_cells() {//////////////////////////////////////////////////////
 
     // New approach
     WCells = (shared_block(CELL_TOT_SIZE)    CellProps*) upc_all_alloc(THREADS, CELL_TOT_SIZE*sizeof(CellProps));
-    //WCells = (shared_block(BLOCKSIZE_NEW)    CellProps*)upc_all_alloc(THREADS, BLOCKSIZE_NEW*sizeof(CellProps));
     BCells = (shared_block(B_CELLS_SIZE)     CellProps*) upc_all_alloc(THREADS, B_CELLS_SIZE*sizeof(CellProps));
-    //Cells = (CellProps*)calloc(CELL_TOT_SIZE,sizeof(CellProps));
-    //L_B_Cells = (CellProps*)calloc(B_CELLS_SIZE,sizeof(CellProps));
-    //L_W_Cells = (CellProps*)calloc(BLOCKSIZE_NEW,sizeof(CellProps));
+    Cells = (CellProps*)calloc(CELL_TOT_SIZE,sizeof(CellProps));
+    L_B_Cells = (CellProps*)calloc(B_CELLS_SIZE,sizeof(CellProps));
     if (!Cells) {
         printf("Cells mem failure, exiting \n");
         exit(EXIT_FAILURE);
@@ -1456,8 +1454,8 @@ void free_vars() {
     UAFREE(WCells);
     UAFREE(BCells);
 
-    //free(Cells);
-    //free(L_B_Cells);
+    free(Cells);
+    free(L_B_Cells);
     //free(L_W_Cells);
 
     free(w);
