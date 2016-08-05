@@ -210,7 +210,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     upc_barrier;         // Synchronise
 
     end_tests();
-    export_data(postproc_prog);
+    export_data(postproc_prog, AutosaveEvery);
 
     upc_barrier;         // Synchronise
     main_thread
@@ -352,52 +352,14 @@ void FillLocalBCells() {
         Dir=getDir_F(f);
 
         a = (min+(max-min)*Dir);
-        /*if (MYTHREAD == 1 && iter ==0) {
-            printf(" F=%i,Ax=%i,Dir=%i\n", f, Ax, Dir);
-        }*/
-        /*i = eq(Ax,0)*a;
-        j = eq(Ax,1)*a;
-        k = eq(Ax,2)*a;*/
-        /*if (Ax==0) { i=a; }
-        else if (Ax==1){ j=a; }
-        else if (Ax==2){ k=a; }*/
 
         for (c=1; c<LAT+1;c++) {
             for (b=1; b<LAT+1;b++){
-
-                /*Change this for IF
-                /*i=eq(Ax,0)*(min+(max-min)*Dir) + eq(Ax,1)*b + eq(Ax,2)*a;
-                j=eq(Ax,1)*(min+(max-min)*Dir) + eq(Ax,2)*b + eq(Ax,0)*a;
-                k=eq(Ax,2)*(min+(max-min)*Dir) + eq(Ax,0)*b + eq(Ax,1)*a;*/
-
-                /*if (Ax==0) {
-                    j=b;
-                    k=c; }
-                else if (Ax==1){
-                    k=b;
-                    i=c; }
-                else if (Ax==2){
-                    i=b;
-                    j=c; }*/
                 i = eq(Ax,0)*a + eq(Ax,1)*c + eq(Ax,2)*b;
                 j = eq(Ax,1)*a + eq(Ax,2)*c + eq(Ax,0)*b;
                 k = eq(Ax,2)*a + eq(Ax,0)*c + eq(Ax,1)*b;
-                /*PRINTING*/
-                /*if (iter == 0)
-                printf("T%i: c_BC %i, lID(%i,%i,%i) = %i,(a,b,c) = (%i,%i,%i)\n",
-                       MYTHREAD,c_BC,i,j,k,getLocalID_LocalIndex(i,j,k),a,b,c);*/
 
                 L_B_Cells[c_BC] = Cells[getLocalID_LocalIndex(i, j, k)];
-                /*L_B_Cells[c_BC].F[1] = Cells[lID(i,j,k)].F[1];
-
-                (L_B_Cells + c_BC) = *(Cells +lID(i,j,k));
-                //memcpy(&L_B_Cells[c_BC],&Cells[lID(i,j,k)],sizeof(CellProps));
-                //L_B_Cells[c_BC].ID = Cells[lID(i,j,k)].ID;
-                /*if(MYTHREAD==1 && getLocalID_LocalIndex(i, j, k)== getLocalID_LocalIndex(2, 1, 1) && iter==0 && c_BC == 4) {
-                    printf (" C[%i].F[1] = %f\n", getLocalID_LocalIndex(i, j, k),Cells[getLocalID_LocalIndex(i, j, k)].F[1]);
-                    //Cells[lID(i,j,k)].F[1] = 15;
-                    printf (" LBC[%i].F[1] = %f\n",c_BC,L_B_Cells[c_BC].F[1]);
-                }*/
 
                 c_BC++;
             }
@@ -413,68 +375,16 @@ void FillLocalBCells() {
         b = (min + (max-min)*(Pos%2));
         c = (min + (max-min)*(Pos/2));
 
-        /*if (Ax==0) {
-            j=b;
-            k=c;
-        }
-        else if (Ax==1){
-            k=b;
-            i=c;
-        }
-        else if (Ax==2){
-            i=b;
-            j=c;
-        }*/
-        /*i=eq(Ax,1)*c + eq(Ax,2)*b;
-        j=eq(Ax,2)*c + eq(Ax,0)*b;
-        k=eq(Ax,0)*c + eq(Ax,1)*b;*/
 
         for (a=1; a<LAT+1;a++){
-            /*i=eq(Ax,0)*a + eq(Ax,1)*(min + (max-min)*(Pos/2)) + eq(Ax,2)*(min + (max-min)*(Pos%2));
-            j=eq(Ax,1)*a + eq(Ax,2)*(min + (max-min)*(Pos/2)) + eq(Ax,0)*(min + (max-min)*(Pos%2));
-            k=eq(Ax,2)*a + eq(Ax,0)*(min + (max-min)*(Pos/2)) + eq(Ax,1)*(min + (max-min)*(Pos%2));*/
 
             i= eq(Ax,1)*c + eq(Ax,2)*b + eq(Ax,0)*a;
             j= eq(Ax,2)*c + eq(Ax,0)*b + eq(Ax,1)*a;
             k= eq(Ax,0)*c + eq(Ax,1)*b + eq(Ax,2)*a;
-            /*if (Ax==0) { i=a; }
-            else if (Ax==1){ j=a; }
-            else if (Ax==2){ k=a; }
-
-            if (MYTHREAD == 0 && iter == 0) {
-                //printf("e%i: (%i,%i,%i)\n",e,i,j,k);
-            }
-
-            if (MYTHREAD == 0 && iter == 0 && getLocalID_LocalIndex(i, j, k) == 818) {
-                //printf("c_BC[818] = %i\n",c_BC);
-            }*/
             L_B_Cells[c_BC] = Cells[getLocalID_LocalIndex(i, j, k)];
             c_BC++;
         }
     }
-    /*printTest("2", 0);
-    //Corners
-
-    //Corners
-    for (int c = 0; c < 2; c++) {
-        for(int b = 0; b < 2; b++) {
-            for(int a = 0; a < 2; a++) {
-
-                int i = min + (max - min)*a;
-                int j = min + (max - min)*b;
-                int k = min + (max - min)*b;
-
-
-                //printf("T%i: c_BC = %i, lID(%i,%i,%i) = %i\n",MYTHREAD,c_BC,i,j,k,lID(i,j,k));
-                L_B_Cells[c_BC] = Cells[lID(i,j,k)];
-                c_BC++;
-
-
-
-            }
-        }
-    }
-    //printTest("After fill local", 0);*/
 }
 
 
@@ -685,40 +595,7 @@ void setThingsToGet(){
     }
 
     upc_barrier;
-    for (int mt=0; mt<THREADS;mt++){
-        if (MYTHREAD == mt) {
 
-            printf("T=%2i ->  ",MYTHREAD);
-            if(cur_corner != -1)
-                printf("Corner %2i",cur_corner);
-            else if(cur_edge != -1)
-                printf("Edge   %2i",cur_edge);
-            else if(cur_face != -1)
-                printf("Face   %2i",cur_face);
-            else
-                printf("Interior");
-
-            printf("\n");
-            printf("    Corners: \n    ");
-            for (int count = 0; count < 8; count++)
-                if (corners_to_get[count] == 1)
-                    printf(" %2i ", count);
-            printf("\n");
-
-            printf("    Edges: \n    ");
-            for (int count = 0; count < 12; count++)
-                if (edges_to_get[count] == 1)
-                    printf(" %2i ", count);
-            printf("\n");
-
-            printf("    Faces: \n    ");
-            for (int count = 0; count < 6; count++)
-                if (faces_to_get[count] == 1)
-                    printf(" %2i ", count);
-            printf("\n\n");
-        }
-        upc_barrier;
-    }
 
     //PRINTING
     //printf("T%i: Finished what to get\n",MYTHREAD);
@@ -741,35 +618,17 @@ void getSharedToCells() {
                 dX[r] = eq(Ax,r)*(2*Dir-1);
             }
 
-            /*if (MYTHREAD == 1 && iter==0) {
-                printf("face %i: X[%i] = (%i,%i,%i), dX = (%i,%i,%i)\n",face,MYTHREAD,X[0],X[1],X[2],dX[0],dX[1],dX[2]);
-            }*/
 
             int pos_local = face*(LAT*LAT);
             int pos_shared = getCubeID(X[0] + dX[0],
                                        X[1] + dX[1],
                                        X[2] + dX[2])*B_CELLS_SIZE + op*(LAT*LAT);
-            /*if (MYTHREAD == 1 && iter==0 && pos_local == 0) {
-
-                printf("\n\nBefore memget\n");
-                printf("BCells[%i].ID = %i\n",pos_shared,BCells[pos_shared].ID);
-                printf("BCells[%i].F[1] = %f\n",pos_shared,BCells[pos_shared].F[1]);
-                printf("L_B_Cells[%i].ID = %i\n",pos_local,L_B_Cells[pos_local].ID);
-                printf("L_B_Cells[%i].F[1] = %f\n",pos_local,L_B_Cells[pos_local].F[1]);
-            }*/
 
 
             UGET(&L_B_Cells[pos_local],
                  &BCells[pos_shared],
                  (LAT*LAT)*sizeof(CellProps));
 
-            /*if (MYTHREAD == 1 && iter==0 && pos_local == 0) {
-                printf("\n\nAfter memget\n");
-                printf("BCells[%i].ID = %i\n",pos_shared,BCells[pos_shared].ID);
-                printf("BCells[%i].F[1] = %f\n",pos_shared,BCells[pos_shared].F[1]);
-                printf("L_B_Cells[%i].ID = %i\n",pos_local,L_B_Cells[pos_local].ID);
-                printf("L_B_Cells[%i].F[1] = %f\n",pos_local,L_B_Cells[pos_local].F[1]);
-            }*/
 
         }
     }
@@ -785,11 +644,6 @@ void getSharedToCells() {
             for (int r = 0; r<3; r++) {
                 dX[r] = eq(Ax , (r+2)%3)*(2*(Pos%2) - 1) +  eq(Ax , (r+1)%3)*(2*(Pos/2) - 1);
             }
-            /*PRINTING {
-                printf("T%i, edge %i, Ax %i, Pos %i, CubeID[X(%i,%i,%i) + dX(%i,%i,%i) = %i ]\n",
-                       MYTHREAD, edge, Ax, Pos, X[0], X[1], X[2], dX[0], dX[1], dX[2] ,
-                       getCubeID(X[0] + dX[0], X[1] + dX[1], X[2] + dX[2]));
-            };*/
 
             int pos_local = 6*LAT*LAT + edge*LAT;
             int pos_shared = getCubeID(X[0] + dX[0], X[1] + dX[1], X[2] + dX[2])
@@ -804,38 +658,6 @@ void getSharedToCells() {
     PRINTING
         printf("T%i: Got edges\n",MYTHREAD);
 
-    /*for (int corner = 0; corner <8; corner ++) {
-        if(corners_to_get[corner] == 1) {
-            int p[3];
-            p[0] = getX_C(corner);
-            p[1] = getY_C(corner);
-            p[2] = getZ_C(corner);
-
-            int op = corner-1;
-
-            for (int r = 0; r<3; r++) {
-                dX[r] = 2*p[r] - 1;
-            }
-            int pos_local = 6*LAT*LAT + 12*LAT + corner;
-            int pos_shared = getCubeID(X[0] + dX[0],
-                                       X[1] + dX[1],
-                                       X[2] + dX[2])
-                             *B_CELLS_SIZE + 6*LAT*LAT + 12*LAT + op;
-
-
-            UGET(&L_B_Cells[pos_local],
-                 &BCells[pos_shared],
-                 sizeof(CellProps));
-        }
-    }
-    PRINTING
-        printf("T%i: Got corners\n",MYTHREAD);
-    upc_barrier;*/
-
-
-    //if (MYTHREAD == 1 && iter == 0)
-    //printf (" LBC[%i].F[1] = %f\n",0,L_B_Cells[0].F[1]);
-    //printTest("Between upc_memget from shared and fill C with LB",0);
 
     FillCellsWithLBCells();
 }
@@ -854,52 +676,19 @@ void FillCellsWithLBCells() {
         Dir=getDir_F(f);
 
         a = (min+(max-min)*Dir);
-        /*if (Ax==0) {
-            i=a;
-        }
-        else if (Ax==1){
-            j=a;
-        }
-        else if (Ax==2){
-            k=a;
-        }*/
-
-        /*i = eq(Ax,0)*a;
-        j = eq(Ax,1)*a;
-        k = eq(Ax,2)*a;*/
 
         for (c=1; c<LAT+1;c++) {
             for (b=1; b<LAT+1;b++){
 
-                /*if (Ax==0) {
-                    j=b;
-                    k=c;
-                }
-                else if (Ax==1){
-                    k=b;
-                    i=c;
-                }
-                else if (Ax==2){
-                    i=b;
-                    j=c;
-                }*/
                 //Faces
                 i = eq(Ax,0)*a + eq(Ax,1)*c + eq(Ax,2)*b;
                 j = eq(Ax,1)*a + eq(Ax,2)*c + eq(Ax,0)*b;
                 k = eq(Ax,2)*a + eq(Ax,0)*c + eq(Ax,1)*b;
-                /*PRINTING
-                if (MYTHREAD == 0 && iter == 0 && lID(i,j,k) == 23){
-                    printf( "*****HERE*****    c_BC = %i\n",c_BC);
-                    //printf("T%i: c_BC %i, lID(%i,%i,%i) = %i\n",MYTHREAD,c_BC,i,j,k,lID(i,j,k));
-                }
-                 //printf("T%i: c_BC %i, lID(%i,%i,%i) = %i\n",MYTHREAD,c_BC,i,j,k,lID(i,j,k));*/
-                 Cells[getLocalID_LocalIndex(i, j, k)] = L_B_Cells[c_BC];
+                Cells[getLocalID_LocalIndex(i, j, k)] = L_B_Cells[c_BC];
                 c_BC++;
             }
         }
     }
-
-    //printf("T%i: c_BC = %i\n",MYTHREAD,c_BC);
     PRINTING
         printf("T%i: Copied Faces\n",MYTHREAD);
 
@@ -911,59 +700,19 @@ void FillCellsWithLBCells() {
         b = (min + (max-min)*(Pos%2));
         c = (min + (max-min)*(Pos/2));
 
-        /*if (Ax==0) {
-            j=b;
-            k=c;
-        }
-        else if (Ax==1){
-            k=b;
-            i=c;
-        }
-        else if (Ax==2){
-            i=b;
-            j=c;
-        }*/
-
-        /*i=eq(Ax,1)*c + eq(Ax,2)*b;
-        j=eq(Ax,2)*c + eq(Ax,0)*b;
-        k=eq(Ax,0)*c + eq(Ax,1)*b;*/
 
         for (a=1; a<LAT+1;a++){
             i= i=eq(Ax,1)*c + eq(Ax,2)*b + eq(Ax,0)*a;
             j= j=eq(Ax,2)*c + eq(Ax,0)*b + eq(Ax,1)*a;
             k= k=eq(Ax,0)*c + eq(Ax,1)*b + eq(Ax,2)*a;
 
-            /*if (Ax==0) { i=a; }
-            else if (Ax==1){ j=a; }
-            else if (Ax==2){ k=a; }*/
 
             Cells[getLocalID_LocalIndex(i, j, k)] = L_B_Cells[c_BC];
-            //if (MYTHREAD == 1)
-            //printf("T%i: lID(%i,%i,%i) = %i\n",MYTHREAD,i,j,k,lID(i,j,k));
             c_BC++;
         }
     }
-    //printf("T%i: c_BC = %i\n",MYTHREAD,c_BC);
     PRINTING
         printf("T%i: Copied Edges\n",MYTHREAD);
-
-/*for (int c = 0; c < 2; c++) {
-    for(int b = 0; b < 2; b++) {
-        for(int a = 0; a < 2; a++) {
-
-            int i = min + (max - min)*a;
-            int j = min + (max - min)*b;
-            int k = min + (max - min)*b;
-            //if (MYTHREAD == 1)
-            //printf("T%i: lID(%i,%i,%i) = %i\n",MYTHREAD,i,j,k,lID(i,j,k));
-            Cells[lID(i,j,k)] = L_B_Cells[c_BC];
-            c_BC++;
-        }
-    }
-}
-//if (MYTHREAD == 1 && iter == 0)
-//printf (" C[%i].F[1] = %f\n",lID(0,1,1),Cells[lID(0,1,1)].F[1]);
-//printf("T%i: c_BC = %i\n",MYTHREAD,c_BC);*/
 }
 
 void printTest(const char * text,int it) {
@@ -992,106 +741,9 @@ void printTest(const char * text,int it) {
     }
 
     upc_barrier;
-
-    //EDGE
-    /*if (MYTHREAD == 0 && iter == it) {
-        printf("  Edge (7,0,7)\n");
-        int Cpos = lID(8,1,8);
-        int LBpos = 440;
-        int Shpos = MYTHREAD*B_CELLS_SIZE + LBpos;
-
-        printf("    C_%i[%i]->ID = %i\n", MYTHREAD, Cpos, Cells[Cpos].ID);
-        printf("    L_B_%i[%i]->ID = %i\n", MYTHREAD, LBpos, L_B_Cells[LBpos].ID);
-        printf("    SH[%i]->ID = %i\n",Shpos, BCells[Shpos].ID);
-    }
-    upc_barrier;
-
-    if (MYTHREAD == 5 && iter == it) {
-        int Cpos = lID(0,1,0);
-        int LBpos = 416;
-        printf("    L_B_%i[%i]->ID = %i\n", MYTHREAD, LBpos, L_B_Cells[LBpos].ID);
-        printf("    C_%i[%i]->ID = %i\n", MYTHREAD, Cpos, Cells[Cpos].ID);
-    }
-
-
-    upc_barrier;
-
-    //CORNER
-    if (MYTHREAD == 0 && iter == it) {
-        printf("  Corner (7,7,7)\n");
-        int Cpos = lID(8,8,8);
-        int LBpos = 487;
-        int Shpos = MYTHREAD*B_CELLS_SIZE + LBpos;
-
-        printf("    C_%i[%i]->ID = %i\n", MYTHREAD, Cpos, Cells[Cpos].ID);
-        printf("    L_B_%i[%i]->ID = %i\n", MYTHREAD, LBpos, L_B_Cells[LBpos].ID);
-        printf("    SH[%i]->ID = %i\n",Shpos, BCells[Shpos].ID);
-    }
-    upc_barrier;
-
-    if (MYTHREAD == 7 && iter == it) {
-        int Cpos = lID(0,0,0);
-        int LBpos = 480;
-        printf("    L_B_%i[%i]->ID = %i\n", MYTHREAD, LBpos, L_B_Cells[LBpos].ID);
-        printf("    C_%i[%i]->ID = %i\n", MYTHREAD, Cpos, Cells[Cpos].ID);
-    }*/
-
-
-    upc_barrier;
-
-    /*if (MYTHREAD == 0 && iter == it) {
-        printf("  Face (0,0,7)\n");
-        int i = 1;
-        int j = 1;
-        int k = 7;
-        int LBpos_Face = LAT*LAT + (j-1) + (k-1)*LAT;
-
-        printf("    T%i: C[%i]->ID = %i\n", MYTHREAD, lID(i, j, k), Cells[lID(i, j, k)].ID);
-        printf("    T%i: L_B_Cells[%i]->ID = %i\n", MYTHREAD, LBpos_Face, L_B_Cells[LBpos_Face].ID);
-        printf("    BCells[%i]->ID = %i\n",MYTHREAD*B_CELLS_SIZE + LBpos_Face, BCells[MYTHREAD*B_CELLS_SIZE + LBpos_Face].ID);
-    }
-
-    upc_barrier;
-
-    if (MYTHREAD == 1 && iter == it) {
-        int i = 0;
-        int j = 4;
-        int k = 4;
-        int LBpos_Face = j + (k-1)*LAT;
-
-        printf("    T%i: C[%i]->ID = %i\n", MYTHREAD, lID(i, j, k), Cells[lID(i, j, k)].ID);
-        printf("    T%i: L_B_Cells[%i]->ID = %i\n", MYTHREAD, LBpos_Face, L_B_Cells[LBpos_Face].ID);
-    }
-      if (MYTHREAD == 0 && iter == it) {
-        int i = LAT;
-        int j = 1;
-        int k = 1;
-
-
-
-        // printf("    lID(%i,%i,%i) = %i\n",i,j,k,lID(i,j,k));
-        //printf("    C[%i] = (%f,%f,%f)\n", lID(i, j, k), Cells[lID(i, j, k)].CoordX, Cells[lID(i, j, k)].CoordY, Cells[lID(i, j, k)].CoordZ);
-        //printf("    V[%i] = (%f,%f,%f)\n", lID(i, j, k), Cells[lID(i, j, k)].U, Cells[lID(i, j, k)].V, Cells[lID(i, j, k)].W);
-        //printf("    rho[%i] = %f\n", lID(i, j, k), Cells[lID(i, j, k)].Rho);
-        printf("    T%i: C[%i]->ID = %i\n", MYTHREAD, lID(i, j, k), Cells[lID(i, j, k)].ID);
-        printf("    T%i: L_B_Cells[%i]->ID = %i\n", MYTHREAD, 6*LAT*LAT+12*LAT, L_B_Cells[6*LAT*LAT+12*LAT + 1].ID);
-        printf("    T%i: BCells[%i]->ID = %i\n",MYTHREAD*B_CELLS_SIZE + 6*LAT*LAT+12*LAT+1,
-               BCells[MYTHREAD*B_CELLS_SIZE + 6*LAT*LAT+12*LAT+1].ID);
-        //printf("    LWCells[%i] = (%f,%f,%f)\n",0,L_W_Cells[0].CoordX,L_W_Cells[0].CoordY,L_W_Cells[0].CoordZ);
-        //printf("    WCells[%i] = (%f,%f,%f)\n",0,WCells[0].CoordX,WCells[0].CoordY,WCells[0].CoordZ);
-    }*/
 }
 void putCellsToWCells(){
-    //printTest("Before Fill", 0);
-    //FillLocalWCells();
-    //main_thread
-    //printf("Local cells filled\n");
-    //printTest("After Fill", 0);
     UPUT( &WCells[MYTHREAD * CELL_TOT_SIZE], &Cells[0], CELL_TOT_SIZE * sizeof(CellProps));
-    //UPUT( &WCells[MYTHREAD * BLOCKSIZE_NEW], &L_W_Cells[0], BLOCKSIZE_NEW * sizeof(CellProps));
-    //main_thread
-    //printf("Shared cells filled\n");
-    //printTest("After memput", 0);
 }
 void FillLocalWCells(){
     int c_WC = 0;
@@ -1112,14 +764,11 @@ void CollisionStep(int CollisionModel){
     {
         // BGKW
         case 1:
-            for (int k = 1; k < LAT+1; k++) {
-                for (int j = 1; j < LAT + 1; j++) {
-                    for (int i = 1; i < LAT + 1; i++) {
-                        int ID = i + j*(LAT+2) + k*(LAT+2)*(LAT+2);
+            for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++){
 
-                        BGKW(ID, Omega);
-                    }
-                }
+                BGKW(LocalID[l_rID], Omega);
+                //}
+                //}
             }
 
             // TRT
@@ -1151,89 +800,35 @@ void CollisionStep(int CollisionModel){
 }
 
 void UpdateStep(){
-    for (int k = 1; k < LAT+1; k++) {
-        for (int j = 1; j < LAT + 1; j++) {
-            for (int i = 1; i < LAT + 1; i++) {
-                int ID = i + j * (LAT + 2) + k * (LAT + 2) * (LAT + 2);
-                UpdateF(Cells, ID);
-            }
-        }
+    for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++){
+        UpdateF(Cells, LocalID[l_rID]);
+        //}
+        //}
     }
 }
 
 void StreamingStep(){
-    for (int k = 1; k < LAT+1; k++) {
-        for (int j = 1; j < LAT + 1; j++) {
-            for (int i = 1; i < LAT + 1; i++) {
-                /*if (iter == 0 && MYTHREAD == 1 && i ==1){
-                    printf("\n\n(%i,%i,%i)\n",i,j,k);
-                }*/
+    for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++){
+        int lID = LocalID[l_rID];
+        for (int l = 0; l < 19; l++) {
 
-                /*if ( iter==0 && MYTHREAD ==0 && getLocalID_LocalIndex(i, j, k) == getLocalID_LocalIndex(2, 1, 1)){
-                    printf("\n(%i,%i,%i)\n",i,j,k);
-                    printf ("T0: C[%i]->F[1] = %3.3f\n", getLocalID_LocalIndex(2, 1, 1),(Cells + getLocalID_LocalIndex(2, 1, 1))->METAF[1]);
-
-                }
-                if ( iter==0 && MYTHREAD ==1 && getLocalID_LocalIndex(i, j, k) == getLocalID_LocalIndex(1, 1, 1)){
-                    printf("\n(%i,%i,%i)\n",i,j,k);
-                    printf ("T1: C[%i]->F[1] = %3.3f\n\n\n", getLocalID_LocalIndex(0, 1, 1),(Cells + getLocalID_LocalIndex(0, 1, 1))->METAF[1]);
-                    printf ("T1: C[%i]->F[1] = %3.3f\n\n\n", getLocalID_LocalIndex(1, 1, 1),(Cells + getLocalID_LocalIndex(1, 1, 1))->F[1]);
-
-                }*/
-                for (int l = 0; l < 19; l++) {
-
-                    if (((Cells + getLocalID_LocalIndex(i, j, k))->StreamLattice[l]) == 1 && MYTHREAD==1) {
-                        /*if (iter == 0 && MYTHREAD == 1 && i ==1) {
-                            printf("\nl = %2i", l);
-                            printf("    T%i C[%2i].ID = %2i (%3.3f,%3.3f,%3.3f) // C[%2i].ID = %2i  (%3.3f,%3.3f,%3.3f)\n",
-                                   MYTHREAD,
-                                   lID(i, j, k), (Cells + lID(i, j, k))->ID,
-                                   (Cells + lID(i, j, k))->CoordX,
-                                   (Cells + lID(i, j, k))->CoordY,
-                                   (Cells + lID(i, j, k))->CoordZ,
-                                   lID(i, j, k) + c[l],
-                                   (Cells + lID(i, j, k) + c[l])->ID,
-                                   (Cells + lID(i, j, k) + c[l])->CoordX,
-                                   (Cells + lID(i, j, k) + c[l])->CoordY,
-                                   (Cells + lID(i, j, k) + c[l])->CoordZ);
-                        }*/
-
-                        /*if (iter == 0 && MYTHREAD == 1 && i ==1) {
-                            printf("\nl = %2i", l);
-                            printf("    T%i %3.3f\n",
-                                   MYTHREAD,
-                                   (Cells + lID(i,j,k))->F[l] - (Cells + lID(i,j,k) + c[l])->METAF[l]);
-                        }*/
-                    }
-
-                    if (((Cells + getLocalID_LocalIndex(i, j, k))->StreamLattice[l]) == 1) {
-                        /*PRINTING {
-                            printf("T%i: (lID(%i,%i,%i) = %i) + (c[%i] = %i) = %i\n", MYTHREAD, i, j, k,
-                                   lID(i, j, k), l, c[l], lID(i, j, k) + c[l]);
-                        };*/
-                        (Cells + getLocalID_LocalIndex(i, j, k))->F[l] = (Cells + getLocalID_LocalIndex(i, j, k) + c[l])->METAF[l];
-
-                    }
-
-                }
+            if (((Cells + lID)->StreamLattice[l]) == 1) {
+                (Cells + lID)->F[l] = (Cells + lID + c[l])->METAF[l];
             }
+
         }
     }
 }
 
 void HandleBoundariesStep(int OutletProfile, int CurvedBoundaries){
 
-    for (int k = 1; k < LAT+1; k++) {
-        for (int j = 1; j < LAT + 1; j++) {
-            for (int i = 1; i < LAT + 1; i++) {
-                int ID = i + j * (LAT + 2) + k * (LAT + 2) * (LAT + 2);
-                // INLET
-                InletBC(Cells, ID);
-                WallBC(Cells, ID, opp);
-                EdgeBC(Cells, ID);
-                CornerBC(Cells, ID);
-            }
-        }
+    // INLET
+    for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++){
+        int lID = LocalID[l_rID];
+        InletBC(Cells, lID);
+        WallBC(Cells, lID, opp);
+        EdgeBC(Cells, lID);
+        CornerBC(Cells, lID);
     }
 
     // OUTLET
@@ -1248,48 +843,13 @@ void HandleBoundariesStep(int OutletProfile, int CurvedBoundaries){
 
             // OPEN BOUNDARY
         case 2 :
-            /*if ((Cells +j*(*n)+i)->BC_ID[1]==3)
-            {
-
-                (Cells +j*(*n)+i)->F[1] = 2*( (Cells+(*n)*(j)+i-1)->F[1] ) - (Cells+(*n)*(j)+i-2)->F[1];
-                (Cells +j*(*n)+i)->F[5] = 2*( (Cells+(*n)*(j)+i-1)->F[5] ) - (Cells+(*n)*(j)+i-2)->F[5];
-                (Cells +j*(*n)+i)->F[8] = 2*( (Cells+(*n)*(j)+i-1)->F[8] ) - (Cells+(*n)*(j)+i-2)->F[8];
-
-                // C++ code
-                //Cells[j][i].setF(2*Cells[j][i-1].getF()[1]-Cells[j][i-2].getF()[1],1);
-                //Cells[j][i].setF(2*Cells[j][i-1].getF()[5]-Cells[j][i-2].getF()[5],5);
-                //Cells[j][i].setF(2*Cells[j][i-1].getF()[8]-Cells[j][i-2].getF()[8],8);
-
-            }*/
-            /* !!!!  THIS IS NOT NECESSARY !!!!
-            if ((Cells +j*(*n)+i)->BC_ID[2]==3)
-            {
-              // FILL!!
-            }
-
-            if ((Cells +j*(*n)+i)->BC_ID[3]==3)
-            {
-              // FILL!!
-            }
-
-            if ((Cells +j*(*n)+i)->BC_ID[4]==3)
-            {
-              // FILL!!
-            }
-            */
             break;
         default: break;
     }
 }
 void UpdateMacroscopicStep(int CalculateDragLift){
-    for (int k = 1; k < LAT+1; k++) {
-        for (int j = 1; j < LAT + 1; j++) {
-            for (int i = 1; i < LAT + 1; i++) {
-                int ID = i + j * (LAT + 2) + k * (LAT + 2) * (LAT + 2);
-                //if ((Cells+i)->Fluid == 1)
-                UpdateMacroscopic(Cells, ID, CalculateDragLift);
-            }
-        }
+    for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++){
+        UpdateMacroscopic(Cells, LocalID[l_rID], CalculateDragLift);
     }
 }
 
@@ -1313,10 +873,11 @@ void init_vars(int *postproc_prog) {
     shared_total_Residuals[3] = 100;
     shared_total_Residuals[4] = 100;
 
+    allocate_vars();
 
     time_meas_vars_init();
     init_cube_vars();
-    allocate_vars();
+    init_localID();
     upc_barrier;
 }
 void init_cube_vars(){
@@ -1350,6 +911,11 @@ void time_meas_vars_init() {// Time measurement variables
     tBCells_NEW          = 0.0; // Time measurement of handling boundaries
 
 }
+void init_localID(){
+    for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++) {
+        LocalID[l_rID] = getLocalID_LocRealID(l_rID);
+    }
+}
 
 void alloc_cells() {//////////////////////////////////////////////////////
     // Allocate structure for the cell properties (see ShellFunctions.h)
@@ -1367,10 +933,6 @@ void alloc_cells() {//////////////////////////////////////////////////////
         printf("L_B_Cells mem failure, exiting \n");
         exit(EXIT_FAILURE);
     }
-    /*if (!L_W_Cells) {
-        printf("L_W_Cells mem failure, exiting \n");
-        exit(EXIT_FAILURE);
-    }*/
     //////////////////////////////////////////////////////
 
 }
@@ -1397,6 +959,7 @@ void allocate_shared() {////////////////////////////
 }
 void allocate_lattice_vars() {// D2Q9 Variables of the lattice
     w  = Create1DArrayDouble(19); // weight values for the directions
+
     c  = Create1DArrayInt(19);    //
     cx  = Create1DArrayInt(19);    // x coordinate of the discrete lattice directions
     cy  = Create1DArrayInt(19);    // y coordinate of the discrete lattice directions
@@ -1404,6 +967,9 @@ void allocate_lattice_vars() {// D2Q9 Variables of the lattice
     opp = Create1DArrayInt(19);    // opposite vector
     norm = Create2DArrayInt(3,6);
     j_wall_unknown = Create2DArrayInt(5,6);
+
+    LocalID = Create1DArrayInt(BLOCKSIZE_NEW);
+
 }
 void allocate_residuals() {// allocate residuals
     sumVel0   = Create1DArrayDouble(1);
@@ -1413,41 +979,15 @@ void allocate_residuals() {// allocate residuals
     Residuals = Create1DArrayDouble(5);
 }
 
-/*void InitOrderedCells() {
-    int i_r, j_r, k_r;
-    int ID;
-    //int lID;
-
-
-    for (int k = 1; k < LAT+1; k++) {
-        for (int j = 1; j < LAT + 1; j++) {
-            for (int i = 1; i < LAT + 1; i++) {
-                i_r = i - 1;
-                j_r = j - 1;
-                k_r = k - 1;
-
-
-                //lID = i + j * (LAT + 2) + k * (LAT + 2) * (LAT + 2);
-                ID = i_r + j_r * (LAT) + k_r * (LAT) * (LAT);
-                PRINTING
-                        printf("T%i, LWCells[(%i,%i,%i) = %i] = Cells[(%i,%i,%i) = %i]\n",MYTHREAD,i_r,j_r,k_r,ID,i,j,k,lID(i,j,k));
-                Local_WCells_NEW[ID] = &Cells_NEW[lID(i,j,k)];
-            }
-        }
-    }
-}*/
 
 void free_vars() {
     upc_barrier;
-    //printf("Reached with T%i\n",MYTHREAD);
-    //if (MYTHREAD == 0) {
     UFREE(Delta);
     UFREE(MaxInletCoordY);
     UFREE(MinInletCoordY);
     UFREE(NumInletNodes);
     UFREE(NumNodes);
     UFREE(NumConn);
-    //}
 
     upc_barrier;
 
@@ -1456,7 +996,7 @@ void free_vars() {
 
     free(Cells);
     free(L_B_Cells);
-    //free(L_W_Cells);
+
 
     free(w);
     free(cx);
@@ -1586,6 +1126,10 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
                 WriteResults(AutosaveOutputFile, ppp);
             end_measure_time(tWriting);
         }
+        char AutosaveTime [50];
+
+        sprintf(AutosaveTime, "Results/ParallelTimeMeasuerment_iter%05d.dat", iter);
+        print_times(AutosaveTime,AutosaveEvery);
     }
 }
 
@@ -1655,7 +1199,7 @@ void save_init_data(int postproc_prog) {// Write Initialized data
     WriteResults(OutputFile, ppp);
     printf("\nInitialized data was written to %s\n", OutputFile);
 }
-void export_data(int postproc_prog) {
+void export_data(int postproc_prog, int AutosaveEvery) {
     if(MYTHREAD == 0) // EXPORT DATA, TIME MEASUREMENT RESULTS
     {
         // Close residuals file
@@ -1685,23 +1229,7 @@ void export_data(int postproc_prog) {
         fprintf(log_file,"\n:::: Iterations done! ::::\n");
         fclose(log_file);
 
-        TimeMeasurementFile = fopen("Results/ParallelTimeMeasuerment.dat","w");
-        fprintf(TimeMeasurementFile,"tOverall %f\n",        tOverall);
-        fprintf(TimeMeasurementFile,"tIteration %f\n",      tIteration);
-        fprintf(TimeMeasurementFile,"tCellsInitialization %f\n", tCellsInitialization);
-        fprintf(TimeMeasurementFile,"tCellsInitialization_with_CUBES %f\n", tCellsInitialization_NEW);
-        fprintf(TimeMeasurementFile,"tInitialization %f\n", tInitialization);
-        fprintf(TimeMeasurementFile,"tCollision %f\n",      tCollision);
-        fprintf(TimeMeasurementFile,"tUpdateF %f\n",        tUpdateF);
-        fprintf(TimeMeasurementFile,"tStreaming %f\n",      tStreaming);
-        fprintf(TimeMeasurementFile,"tBoundaries %f\n",     tBoundaries);
-        fprintf(TimeMeasurementFile,"tUpdateMacro %f\n",    tUpdateMacro);
-        fprintf(TimeMeasurementFile,"tResiduals %f\n",      tResiduals);
-        fprintf(TimeMeasurementFile,"tWriting %f\n",        tWriting);
-        fprintf(TimeMeasurementFile,"tBCells %f\n",         tBCells);
-        fprintf(TimeMeasurementFile,"tBCells_with_CUBES %f\n",         tBCells_NEW);
-        fprintf(TimeMeasurementFile,"THREADS %d\n",         THREADS);
-        fclose(TimeMeasurementFile);
+        print_times("Results/ParallelTimeMeasuerment.dat",AutosaveEvery);
 
         // Write final data
         switch(postproc_prog){
@@ -1728,6 +1256,49 @@ void export_data(int postproc_prog) {
 
 
 }
+void print_times(const char* fname, int AutosaveEvery) {
+
+
+
+    clock_t tEnd = clock();
+    float tOverall = (float)(tEnd - tStart) / CLOCKS_PER_SEC; // Calculate elapsed time
+
+    TimeMeasurementFile = fopen(fname,"w");
+
+    fprintf(TimeMeasurementFile,"Total times");
+    fprintf(TimeMeasurementFile,"tOverall %f\n",        tOverall);
+    fprintf(TimeMeasurementFile,"tIteration %f\n",      tIteration);
+    fprintf(TimeMeasurementFile,"tCellsInitialization_with_CUBES %f\n", tCellsInitialization_NEW);
+    fprintf(TimeMeasurementFile,"tInitialization %f\n", tInitialization);
+    fprintf(TimeMeasurementFile,"tCollision %f\n",      tCollision);
+    fprintf(TimeMeasurementFile,"tUpdateF %f\n",        tUpdateF);
+    fprintf(TimeMeasurementFile,"tStreaming %f\n",      tStreaming);
+    fprintf(TimeMeasurementFile,"tBoundaries %f\n",     tBoundaries);
+    fprintf(TimeMeasurementFile,"tUpdateMacro %f\n",    tUpdateMacro);
+    fprintf(TimeMeasurementFile,"tResiduals %f\n",      tResiduals);
+    fprintf(TimeMeasurementFile,"tWriting %f\n",        tWriting);
+    fprintf(TimeMeasurementFile,"tBCells_with_CUBES %f\n\n\n",         tBCells_NEW);
+
+
+    fprintf(TimeMeasurementFile,"Per Iteration");
+    fprintf(TimeMeasurementFile,"tIteration %f\n",      tIteration/iter);
+    fprintf(TimeMeasurementFile,"tCollision %f\n",      tCollision/iter);
+    fprintf(TimeMeasurementFile,"tUpdateF %f\n",        tUpdateF/iter);
+    fprintf(TimeMeasurementFile,"tStreaming %f\n",      tStreaming/iter);
+    fprintf(TimeMeasurementFile,"tBoundaries %f\n",     tBoundaries/iter);
+    fprintf(TimeMeasurementFile,"tUpdateMacro %f\n",    tUpdateMacro/iter);
+    fprintf(TimeMeasurementFile,"tResiduals %f\n",      tResiduals/iter);
+    fprintf(TimeMeasurementFile,"tWriting %f\n",        tWriting/AutosaveEvery);
+    fprintf(TimeMeasurementFile,"tBCells_with_CUBES %f\n\n\n",         tBCells_NEW/iter);
+
+
+    fprintf(TimeMeasurementFile,"THREADS %d\n",         THREADS);
+    fclose(TimeMeasurementFile);
+
+}
+
+
+
 
 void print_cells_info(CellProps* Cells) {
     upc_barrier;

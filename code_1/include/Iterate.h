@@ -128,6 +128,7 @@ int corners_to_get[8];
 void init_vars(int *postproc_prog);
 void init_cube_vars();
 void time_meas_vars_init();
+void init_localID();
 
 void alloc_cells();
 void allocate_vars();
@@ -157,7 +158,8 @@ void save_iteration(int postproc_prog, int AutosaveEvery);
 
 void write_boundary_cells_to_results(int postproc_prog);
 void save_init_data(int postproc_prog);
-void export_data(int postproc_prog);
+void export_data(int postproc_prog, int AutosaveEvery);
+void print_times(const char* fname, int AutosaveEvery);
 
 void print_cells_info(CellProps* Cells);
 void print_boundary_type(CellProps* Cells);

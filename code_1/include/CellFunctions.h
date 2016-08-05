@@ -19,6 +19,7 @@ int** j_wall_unknown;
 
 //void D3Q19Vars(double* w, int* cx, int* cy, int* cz, int* opp, int* c);
 void D3Q19Vars();
+int* LocalID;
 
 void MRTInitializer(double** tm, double** stmiv, double Omega);
 

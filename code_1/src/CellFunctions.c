@@ -571,7 +571,7 @@ void CellIni_NEW(CellProps *Cells,
         //getLocalRealIndex_LocRealID(l_rID,&lrX[0]);
         //getLocalIndex_LocRealIndex(&lrX[0],&lX[0]);
         //lID = getLocalID_LocalIndex(lX[0],lX[1],lX[2]);
-        lID = getLocalID_LocRealID(l_rID);
+        lID = LocalID[l_rID];
 
 
         ID =
