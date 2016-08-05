@@ -131,6 +131,7 @@ void ComputeResiduals(CellProps *Cells, double* Residuals,
 #include <stdio.h>
 #include <math.h>
 #include <CellFunctions.h>
+//#include <Iterate.h>
 
 #include "ShellFunctions.h"
 
@@ -153,7 +154,7 @@ void ComputeResiduals(CellProps *Cells, double* Residuals, double* sumVel0, doub
     // sum up velocity and density
 
     for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++){
-                int lID = getLocalID_LocRealID(l_rID);
+                int lID = LocalID[l_rID];
                 *sumVel1 = *sumVel1 + sqrt(pow((Cells + lID)->U, 2) + pow((Cells + lID)->V, 2) + pow((Cells + lID)->W, 2));
                 *sumRho1 = *sumRho1 + (Cells + lID)->Rho;
                 /*if ((Cells+i)->Rho < 0) {
