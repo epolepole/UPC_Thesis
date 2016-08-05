@@ -96,8 +96,19 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     upc_barrier;         // Synchronise
 
     init_measure_time;
+    /*CellIni( Cells,
+             Nodes,            // Nodes
+             BCconn,           // BCconn
+             Uavg,             // INPUT PARAMETER
+             Vavg,             // INPUT PARAMETER
+             Wavg,             // INPUT PARAMETER
+             InletProfile,     // INPUT PARAMETER
+             CollisionModel,   // INPUT PARAMETER
+             opp,              // Opposite direction
+             rho_ini);         // Initial density*/
     end_measure_time(tCellsInitialization);
 
+    upc_barrier;
 
     init_measure_time;
     CellIni_NEW( Cells,
@@ -114,32 +125,45 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
 
     main_thread
         printf("Cell intialization completed\n");
+    upc_barrier;
 
+    /*
+    print_cells_info(Cells);
+    upc_barrier;
+    print_boundary_type(Cells);
+    upc_barrier;
+    */
 
     tInitialization = tInitialization + (float)(clock()-tStart) / CLOCKS_PER_SEC;
+    //end_measure_time(tInitialization);
 
-
+    upc_barrier;         // Synchronise
     if (MYTHREAD == 0)
     {
         printf("Size of Cells = %i\n", (int)sizeof(CellProps));
     }
 
+
     setCubeType();
     setThingsToGet();
-    putCellsToShared();
 
     upc_barrier;
-
+    // PUT INITIALIZED DATA TO BOUNDARIES
+    //printTest("Before put",0);
+    putCellsToShared();
+    upc_barrier;
+    //printTest("After put/Before get",0);
     getSharedToCells();
-
-
+    upc_barrier;
+    //printTest("After get",0);
+    upc_barrier;
+    // COPY CELLS TO WCELLS (writing cells) TO WRITE DATA
     putCellsToWCells();
-
-
+    upc_barrier;
     //write_cells_to_results(postproc_prog);
 
 
-    free_mesh_data_matrices();  //BCNode
+    //free_mesh_data_matrices();  //BCNode
 
     upc_barrier;         // Synchronise
 
@@ -225,7 +249,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         end_measure_time(tUpdateF);
         PRINTING
             printf("T%i: UpdateF\n",MYTHREAD);
-
+        upc_barrier;
         SAVE_ITERATION;
 
 
@@ -235,7 +259,6 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         end_measure_time(tBCells_NEW);
         PRINTING
             printf("T%i: putCellsToShared_NEW\n",MYTHREAD);
-
         upc_barrier;
 
 
@@ -282,7 +305,6 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         iter++; // update loop variable
 
 ////////////// Autosave ///////////////
-        upc_barrier;
         auto_save(AutosaveAfter, AutosaveEvery, postproc_prog);
         SAVE_ITERATION;
     }
@@ -291,6 +313,10 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
     putCellsToWCells();
 
     upc_barrier;
+
+    //printf("Reached with T%i, after putCellsToWCells\n",MYTHREAD);
+    upc_barrier;
+
 //////////////////////////////////////////////////////
 ////////////// END OF MAIN WHILE CYCLE ///////////////
 //////////////////////////////////////////////////////
@@ -301,8 +327,12 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
 
 void putCellsToShared(){
     FillLocalBCells();
+    //printTest("Between Fill Local and upc_memput to shared",0);
 //                     DESTINATION                           SOURCE                            SIZE
     UPUT( &BCells[MYTHREAD*B_CELLS_SIZE],&L_B_Cells[0],    B_CELLS_SIZE*sizeof(CellProps));
+    //printf (" C[%i].F[1] = %f\n",lID(2,1,1),Cells[lID(2,1,1)].F[1]);
+    //if (MYTHREAD == 0 && iter == 0)
+    //printf (" SBC[%i].F[1] = %f\n",4,BCells[4].F[1]);
 }
 void FillLocalBCells() {
     int i,j,k;
@@ -322,15 +352,15 @@ void FillLocalBCells() {
         Dir=getDir_F(f);
 
         a = (min+(max-min)*Dir);
-
+        
         for (c=1; c<LAT+1;c++) {
             for (b=1; b<LAT+1;b++){
                 i = eq(Ax,0)*a + eq(Ax,1)*c + eq(Ax,2)*b;
                 j = eq(Ax,1)*a + eq(Ax,2)*c + eq(Ax,0)*b;
                 k = eq(Ax,2)*a + eq(Ax,0)*c + eq(Ax,1)*b;
-
+               
                 L_B_Cells[c_BC] = Cells[getLocalID_LocalIndex(i, j, k)];
-
+                
                 c_BC++;
             }
         }
@@ -344,17 +374,18 @@ void FillLocalBCells() {
 
         b = (min + (max-min)*(Pos%2));
         c = (min + (max-min)*(Pos/2));
-        for (a=1; a<LAT+1;a++){
 
+
+        for (a=1; a<LAT+1;a++){
+ 
             i= eq(Ax,1)*c + eq(Ax,2)*b + eq(Ax,0)*a;
             j= eq(Ax,2)*c + eq(Ax,0)*b + eq(Ax,1)*a;
             k= eq(Ax,0)*c + eq(Ax,1)*b + eq(Ax,2)*a;
-
             L_B_Cells[c_BC] = Cells[getLocalID_LocalIndex(i, j, k)];
             c_BC++;
         }
     }
-}
+    }
 
 
 void setCubeType(){
@@ -451,6 +482,23 @@ void setCubeType(){
     else {
 
     }
+
+    upc_barrier;
+
+    printf("T=%2i ->  ",MYTHREAD);
+    if(cur_corner != -1)
+        printf("Corner %2i",cur_corner);
+    else if(cur_edge != -1)
+        printf("Edge   %2i",cur_edge);
+    else if(cur_face != -1)
+        printf("Face   %2i",cur_face);
+    else
+        printf("Interior");
+
+    printf("\n");
+
+    //PRINTING
+    //printf("T%i: Finished cube type\n",MYTHREAD);
 }  //Checked
 void setThingsToGet(){
 
@@ -545,6 +593,12 @@ void setThingsToGet(){
             faces_to_get[f] = 1;
         }
     }
+
+    upc_barrier;
+
+
+    //PRINTING
+    //printf("T%i: Finished what to get\n",MYTHREAD);
     upc_barrier;
 } //Checked
 void getSharedToCells() {
@@ -563,10 +617,13 @@ void getSharedToCells() {
             for (int r = 0; r<3; r++) {
                 dX[r] = eq(Ax,r)*(2*Dir-1);
             }
+
+
             int pos_local = face*(LAT*LAT);
             int pos_shared = getCubeID(X[0] + dX[0],
                                        X[1] + dX[1],
                                        X[2] + dX[2])*B_CELLS_SIZE + op*(LAT*LAT);
+
 
             UGET(&L_B_Cells[pos_local],
                  &BCells[pos_shared],
@@ -587,6 +644,7 @@ void getSharedToCells() {
             for (int r = 0; r<3; r++) {
                 dX[r] = eq(Ax , (r+2)%3)*(2*(Pos%2) - 1) +  eq(Ax , (r+1)%3)*(2*(Pos/2) - 1);
             }
+
             int pos_local = 6*LAT*LAT + edge*LAT;
             int pos_shared = getCubeID(X[0] + dX[0], X[1] + dX[1], X[2] + dX[2])
                              *B_CELLS_SIZE + 6*LAT*LAT + op*LAT;
@@ -599,6 +657,7 @@ void getSharedToCells() {
     }
     PRINTING
         printf("T%i: Got edges\n",MYTHREAD);
+
 
     FillCellsWithLBCells();
 }
@@ -617,19 +676,19 @@ void FillCellsWithLBCells() {
         Dir=getDir_F(f);
 
         a = (min+(max-min)*Dir);
-
+    
         for (c=1; c<LAT+1;c++) {
             for (b=1; b<LAT+1;b++){
+
                 //Faces
                 i = eq(Ax,0)*a + eq(Ax,1)*c + eq(Ax,2)*b;
                 j = eq(Ax,1)*a + eq(Ax,2)*c + eq(Ax,0)*b;
                 k = eq(Ax,2)*a + eq(Ax,0)*c + eq(Ax,1)*b;
-                Cells[getLocalID_LocalIndex(i, j, k)] = L_B_Cells[c_BC];
+                  Cells[getLocalID_LocalIndex(i, j, k)] = L_B_Cells[c_BC];
                 c_BC++;
             }
         }
     }
-
     PRINTING
         printf("T%i: Copied Faces\n",MYTHREAD);
 
@@ -641,20 +700,19 @@ void FillCellsWithLBCells() {
         b = (min + (max-min)*(Pos%2));
         c = (min + (max-min)*(Pos/2));
 
-
+   
         for (a=1; a<LAT+1;a++){
             i= i=eq(Ax,1)*c + eq(Ax,2)*b + eq(Ax,0)*a;
             j= j=eq(Ax,2)*c + eq(Ax,0)*b + eq(Ax,1)*a;
             k= k=eq(Ax,0)*c + eq(Ax,1)*b + eq(Ax,2)*a;
 
+
             Cells[getLocalID_LocalIndex(i, j, k)] = L_B_Cells[c_BC];
-            c_BC++;
+                        c_BC++;
         }
     }
-    //printf("T%i: c_BC = %i\n",MYTHREAD,c_BC);
     PRINTING
         printf("T%i: Copied Edges\n",MYTHREAD);
-
 }
 
 void printTest(const char * text,int it) {
@@ -686,7 +744,7 @@ void printTest(const char * text,int it) {
 }
 void putCellsToWCells(){
     UPUT( &WCells[MYTHREAD * CELL_TOT_SIZE], &Cells[0], CELL_TOT_SIZE * sizeof(CellProps));
-}
+  }
 void FillLocalWCells(){
     int c_WC = 0;
     for (int k = 1; k < LAT+1; k++) {
@@ -715,29 +773,32 @@ void CollisionStep(int CollisionModel){
 
             // TRT
         case 2:
-            for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++){
-                int lID = getLocalID_LocRealID(l_rID);
+            for (int k = 1; k < LAT+1; k++) {
+                for (int j = 1; j < LAT + 1; j++) {
+                    for (int i = 1; i < LAT + 1; i++) {
 
-                TRT (Cells, lID, w, cx, cy, opp, Omega, OmegaA);
-                //}
-                //}
+                        TRT (Cells, i, w, cx, cy, opp, Omega, OmegaA);
+                    }
+                }
             }
             break;
 
             // MRT
         case 3:
-            for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++){
-                int lID = getLocalID_LocRealID(l_rID);
+            for (int k = 1; k < LAT+1; k++) {
+                for (int j = 1; j < LAT + 1; j++) {
+                    for (int i = 1; i < LAT + 1; i++) {
 
-                MRT(Cells, lID, tm, stmiv);
-                //}
-                //}
+                        MRT(Cells, i, tm, stmiv);
+                    }
+                }
             }
             break;
         default:
             break;
     }
 }
+
 void UpdateStep(){
     for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++){
         UpdateF(Cells, LocalID[l_rID]);
@@ -745,27 +806,45 @@ void UpdateStep(){
         //}
     }
 }
+
 void StreamingStep(){
     for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++){
         int lID = LocalID[l_rID];
-        for (int l = 0; l < 19; l++) {
+                for (int l = 0; l < 19; l++) {
+
             if (((Cells + lID)->StreamLattice[l]) == 1) {
                 (Cells + lID)->F[l] = (Cells + lID + c[l])->METAF[l];
-            }
+                    }
+
         }
     }
 }
+
 void HandleBoundariesStep(int OutletProfile, int CurvedBoundaries){
 
-    // INLET
+                // INLET
     for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++){
         int lID = LocalID[l_rID];
         InletBC(Cells, lID);
         WallBC(Cells, lID, opp);
         EdgeBC(Cells, lID);
         CornerBC(Cells, lID);
-        //}
-        //}
+    }
+
+    // OUTLET
+    int i = 0;
+    int j = 0;
+    switch(OutletProfile)
+    {
+        // set profile in outlet
+        case 1:
+            OutletBoundaries(Cells, j, i);
+            break;
+
+            // OPEN BOUNDARY
+        case 2 :
+            break;
+        default: break;
     }
 }
 void UpdateMacroscopicStep(int CalculateDragLift){
@@ -794,11 +873,11 @@ void init_vars(int *postproc_prog) {
     shared_total_Residuals[3] = 100;
     shared_total_Residuals[4] = 100;
 
+    allocate_vars();
 
     time_meas_vars_init();
     init_cube_vars();
     init_localID();
-    allocate_vars();
     upc_barrier;
 }
 void init_cube_vars(){
@@ -814,12 +893,6 @@ void init_cube_vars(){
     }
     for (int i=0;i<8;i++) {
         corners_to_get[i] = 0;
-    }
-}
-
-void init_localID(){
-    for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++) {
-        LocalID[l_rID] = getLocalID_LocRealID(l_rID);
     }
 }
 void time_meas_vars_init() {// Time measurement variables
@@ -838,6 +911,11 @@ void time_meas_vars_init() {// Time measurement variables
     tBCells_NEW          = 0.0; // Time measurement of handling boundaries
 
 }
+void init_localID(){
+    for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++) {
+        LocalID[l_rID] = getLocalID_LocRealID(l_rID);
+    }
+}
 
 void alloc_cells() {//////////////////////////////////////////////////////
     // Allocate structure for the cell properties (see ShellFunctions.h)
@@ -855,10 +933,6 @@ void alloc_cells() {//////////////////////////////////////////////////////
         printf("L_B_Cells mem failure, exiting \n");
         exit(EXIT_FAILURE);
     }
-    /*if (!L_W_Cells) {
-        printf("L_W_Cells mem failure, exiting \n");
-        exit(EXIT_FAILURE);
-    }*/
     //////////////////////////////////////////////////////
 
 }
@@ -885,6 +959,7 @@ void allocate_shared() {////////////////////////////
 }
 void allocate_lattice_vars() {// D2Q9 Variables of the lattice
     w  = Create1DArrayDouble(19); // weight values for the directions
+
     c  = Create1DArrayInt(19);    //
     cx  = Create1DArrayInt(19);    // x coordinate of the discrete lattice directions
     cy  = Create1DArrayInt(19);    // y coordinate of the discrete lattice directions
@@ -892,6 +967,9 @@ void allocate_lattice_vars() {// D2Q9 Variables of the lattice
     opp = Create1DArrayInt(19);    // opposite vector
     norm = Create2DArrayInt(3,6);
     j_wall_unknown = Create2DArrayInt(5,6);
+
+    LocalID = Create1DArrayInt(BLOCKSIZE_NEW);
+
 }
 void allocate_residuals() {// allocate residuals
     sumVel0   = Create1DArrayDouble(1);
@@ -900,6 +978,7 @@ void allocate_residuals() {// allocate residuals
     sumRho1   = Create1DArrayDouble(1);
     Residuals = Create1DArrayDouble(5);
 }
+
 
 void free_vars() {
     upc_barrier;
@@ -917,6 +996,7 @@ void free_vars() {
 
     free(Cells);
     free(L_B_Cells);
+
 
     free(w);
     free(cx);
@@ -1042,12 +1122,14 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
                 case 2: sprintf(AutosaveOutputFile, "Results/autosave_iter%05d.dat", iter); break;
                 default: break;}
             putCellsToWCells(); // Put information to WCells and write (Write Cells)
-            if (MYTHREAD==0) {
+            if (MYTHREAD==0) // AUTOSAVE
                 WriteResults(AutosaveOutputFile, ppp);
-                printf("Autsave n%i Iter n%i\n",AutosaveI-1,iter);
-            }
             end_measure_time(tWriting);
         }
+        char AutosaveTime [50];
+
+        sprintf(AutosaveTime, "Results/ParallelTimeMeasuerment_iter%05d.dat", iter);
+        print_times(AutosaveTime,AutosaveEvery);
     }
 }
 
@@ -1117,7 +1199,7 @@ void save_init_data(int postproc_prog) {// Write Initialized data
     WriteResults(OutputFile, ppp);
     printf("\nInitialized data was written to %s\n", OutputFile);
 }
-void export_data(int postproc_prog,int AutosaveEvery) {
+void export_data(int postproc_prog, int AutosaveEvery) {
     if(MYTHREAD == 0) // EXPORT DATA, TIME MEASUREMENT RESULTS
     {
         // Close residuals file
@@ -1128,7 +1210,7 @@ void export_data(int postproc_prog,int AutosaveEvery) {
 
         fprintf(log_file,"\nOverall calculations took %f seconds\n", tOverall);
         fprintf(log_file,"Main while loop took %f seconds\n",        tIteration);
-        fprintf(log_file,"Cells init with CUBES took %f seconds\n",  tCellsInitialization_NEW);
+        fprintf(log_file,"Cells init took %f seconds\n",             tCellsInitialization);
         fprintf(log_file,"Initialization took %f seconds\n",         tInitialization);
         fprintf(log_file,"Collision took %f seconds\n",              tCollision);
         fprintf(log_file,"UpdateF took %f seconds\n",                tUpdateF);
@@ -1137,43 +1219,17 @@ void export_data(int postproc_prog,int AutosaveEvery) {
         fprintf(log_file,"Update Macroscopic took %f seconds\n",     tUpdateMacro);
         fprintf(log_file,"Calculating Residuals took %f seconds\n",  tResiduals);
         fprintf(log_file,"Writing results took %f seconds\n",        tWriting);
-        fprintf(log_file,"Copying boundary cells with CUBES took %f seconds\n", tBCells_NEW);
+        fprintf(log_file,"Copying boundary cells took %f seconds\n", tBCells);
         fprintf(log_file,"Times with CUBES\n");
+        fprintf(log_file,"Cells init with CUBES took %f seconds\n",  tCellsInitialization_NEW);
+        fprintf(log_file,"Copying boundary cells with CUBES took %f seconds\n", tBCells_NEW);
 
 
         // end time measurement, close log file
         fprintf(log_file,"\n:::: Iterations done! ::::\n");
         fclose(log_file);
 
-        TimeMeasurementFile = fopen("Results/ParallelTimeMeasuerment.dat","w");
-        fprintf(TimeMeasurementFile,"tOverall %f\n",        tOverall);
-        fprintf(TimeMeasurementFile,"tIteration %f\n",      tIteration);
-        fprintf(TimeMeasurementFile,"tCellsInitialization_with_CUBES %f\n", tCellsInitialization_NEW);
-        fprintf(TimeMeasurementFile,"tInitialization %f\n", tInitialization);
-        fprintf(TimeMeasurementFile,"tCollision %f\n",      tCollision);
-        fprintf(TimeMeasurementFile,"tUpdateF %f\n",        tUpdateF);
-        fprintf(TimeMeasurementFile,"tStreaming %f\n",      tStreaming);
-        fprintf(TimeMeasurementFile,"tBoundaries %f\n",     tBoundaries);
-        fprintf(TimeMeasurementFile,"tUpdateMacro %f\n",    tUpdateMacro);
-        fprintf(TimeMeasurementFile,"tResiduals %f\n",      tResiduals);
-        fprintf(TimeMeasurementFile,"tWriting %f\n",        tWriting);
-        fprintf(TimeMeasurementFile,"tBCells_with_CUBES %f\n\n\n",         tBCells_NEW);
-
-
-        fprintf(TimeMeasurementFile,"Per Iteration");
-        fprintf(TimeMeasurementFile,"tIteration %f\n",      tIteration/iter);
-        fprintf(TimeMeasurementFile,"tCollision %f\n",      tCollision/iter);
-        fprintf(TimeMeasurementFile,"tUpdateF %f\n",        tUpdateF/iter);
-        fprintf(TimeMeasurementFile,"tStreaming %f\n",      tStreaming/iter);
-        fprintf(TimeMeasurementFile,"tBoundaries %f\n",     tBoundaries/iter);
-        fprintf(TimeMeasurementFile,"tUpdateMacro %f\n",    tUpdateMacro/iter);
-        fprintf(TimeMeasurementFile,"tResiduals %f\n",      tResiduals/iter);
-        fprintf(TimeMeasurementFile,"tWriting %f\n",        tWriting/AutosaveEvery);
-        fprintf(TimeMeasurementFile,"tBCells_with_CUBES %f\n\n\n",         tBCells_NEW/iter);
-
-
-        fprintf(TimeMeasurementFile,"THREADS %d\n",         THREADS);
-        fclose(TimeMeasurementFile);
+        print_times("Results/ParallelTimeMeasuerment.dat",AutosaveEvery);
 
         // Write final data
         switch(postproc_prog){
@@ -1200,6 +1256,49 @@ void export_data(int postproc_prog,int AutosaveEvery) {
 
 
 }
+void print_times(const char* fname, int AutosaveEvery) {
+
+
+
+    clock_t tEnd = clock();
+    float tOverall = (float)(tEnd - tStart) / CLOCKS_PER_SEC; // Calculate elapsed time
+
+    TimeMeasurementFile = fopen(fname,"w");
+
+    fprintf(TimeMeasurementFile,"Total times");
+    fprintf(TimeMeasurementFile,"tOverall %f\n",        tOverall);
+    fprintf(TimeMeasurementFile,"tIteration %f\n",      tIteration);
+    fprintf(TimeMeasurementFile,"tCellsInitialization_with_CUBES %f\n", tCellsInitialization_NEW);
+    fprintf(TimeMeasurementFile,"tInitialization %f\n", tInitialization);
+    fprintf(TimeMeasurementFile,"tCollision %f\n",      tCollision);
+    fprintf(TimeMeasurementFile,"tUpdateF %f\n",        tUpdateF);
+    fprintf(TimeMeasurementFile,"tStreaming %f\n",      tStreaming);
+    fprintf(TimeMeasurementFile,"tBoundaries %f\n",     tBoundaries);
+    fprintf(TimeMeasurementFile,"tUpdateMacro %f\n",    tUpdateMacro);
+    fprintf(TimeMeasurementFile,"tResiduals %f\n",      tResiduals);
+    fprintf(TimeMeasurementFile,"tWriting %f\n",        tWriting);
+    fprintf(TimeMeasurementFile,"tBCells_with_CUBES %f\n\n\n",         tBCells_NEW);
+
+
+    fprintf(TimeMeasurementFile,"Per Iteration");
+    fprintf(TimeMeasurementFile,"tIteration %f\n",      tIteration/iter);
+    fprintf(TimeMeasurementFile,"tCollision %f\n",      tCollision/iter);
+    fprintf(TimeMeasurementFile,"tUpdateF %f\n",        tUpdateF/iter);
+    fprintf(TimeMeasurementFile,"tStreaming %f\n",      tStreaming/iter);
+    fprintf(TimeMeasurementFile,"tBoundaries %f\n",     tBoundaries/iter);
+    fprintf(TimeMeasurementFile,"tUpdateMacro %f\n",    tUpdateMacro/iter);
+    fprintf(TimeMeasurementFile,"tResiduals %f\n",      tResiduals/iter);
+    fprintf(TimeMeasurementFile,"tWriting %f\n",        tWriting/AutosaveEvery);
+    fprintf(TimeMeasurementFile,"tBCells_with_CUBES %f\n\n\n",         tBCells_NEW/iter);
+
+
+    fprintf(TimeMeasurementFile,"THREADS %d\n",         THREADS);
+    fclose(TimeMeasurementFile);
+
+}
+
+
+
 
 void print_cells_info(CellProps* Cells) {
     upc_barrier;

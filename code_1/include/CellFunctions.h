@@ -17,10 +17,11 @@ int*    c;              // shift of lattice directions written in vector form
 int** norm;
 int** j_wall_unknown;
 
-int LocalID[CELL_TOT_SIZE];   //Storing the values to acces the internal points on each cube
+//int LocalID[CELL_TOT_SIZE];   //Storing the values to acces the internal points on each cube
 
 //void D3Q19Vars(double* w, int* cx, int* cy, int* cz, int* opp, int* c);
 void D3Q19Vars();
+int* LocalID;
 
 void MRTInitializer(double** tm, double** stmiv, double Omega);
 
