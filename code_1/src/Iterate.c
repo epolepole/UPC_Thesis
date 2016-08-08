@@ -226,8 +226,8 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
                      int AutosaveEvery, int postproc_prog, int CalculateDragLift, float ConvergenceCritVeloc,
                      float ConvergenceCritRho) {
 
-    //while ((Residuals[0] > ConvergenceCritVeloc || Residuals[1] > ConvergenceCritRho) && iter < (*Iterations))
-    while ((shared_total_Residuals[0] > ConvergenceCritVeloc || shared_total_Residuals[1] > ConvergenceCritRho) && iter < (*Iterations))
+    while ((Residuals[0] > ConvergenceCritVeloc || Residuals[1] > ConvergenceCritRho) && iter < (*Iterations))
+    //while ((shared_total_Residuals[0] > ConvergenceCritVeloc || shared_total_Residuals[1] > ConvergenceCritRho) && iter < (*Iterations))
     {
 
 
@@ -352,15 +352,15 @@ void FillLocalBCells() {
         Dir=getDir_F(f);
 
         a = (min+(max-min)*Dir);
-        
+
         for (c=1; c<LAT+1;c++) {
             for (b=1; b<LAT+1;b++){
                 i = eq(Ax,0)*a + eq(Ax,1)*c + eq(Ax,2)*b;
                 j = eq(Ax,1)*a + eq(Ax,2)*c + eq(Ax,0)*b;
                 k = eq(Ax,2)*a + eq(Ax,0)*c + eq(Ax,1)*b;
-               
+
                 L_B_Cells[c_BC] = Cells[getLocalID_LocalIndex(i, j, k)];
-                
+
                 c_BC++;
             }
         }
@@ -377,7 +377,7 @@ void FillLocalBCells() {
 
 
         for (a=1; a<LAT+1;a++){
- 
+
             i= eq(Ax,1)*c + eq(Ax,2)*b + eq(Ax,0)*a;
             j= eq(Ax,2)*c + eq(Ax,0)*b + eq(Ax,1)*a;
             k= eq(Ax,0)*c + eq(Ax,1)*b + eq(Ax,2)*a;
@@ -385,7 +385,7 @@ void FillLocalBCells() {
             c_BC++;
         }
     }
-    }
+}
 
 
 void setCubeType(){
@@ -676,7 +676,7 @@ void FillCellsWithLBCells() {
         Dir=getDir_F(f);
 
         a = (min+(max-min)*Dir);
-    
+
         for (c=1; c<LAT+1;c++) {
             for (b=1; b<LAT+1;b++){
 
@@ -684,7 +684,7 @@ void FillCellsWithLBCells() {
                 i = eq(Ax,0)*a + eq(Ax,1)*c + eq(Ax,2)*b;
                 j = eq(Ax,1)*a + eq(Ax,2)*c + eq(Ax,0)*b;
                 k = eq(Ax,2)*a + eq(Ax,0)*c + eq(Ax,1)*b;
-                  Cells[getLocalID_LocalIndex(i, j, k)] = L_B_Cells[c_BC];
+                Cells[getLocalID_LocalIndex(i, j, k)] = L_B_Cells[c_BC];
                 c_BC++;
             }
         }
@@ -700,7 +700,7 @@ void FillCellsWithLBCells() {
         b = (min + (max-min)*(Pos%2));
         c = (min + (max-min)*(Pos/2));
 
-   
+
         for (a=1; a<LAT+1;a++){
             i= i=eq(Ax,1)*c + eq(Ax,2)*b + eq(Ax,0)*a;
             j= j=eq(Ax,2)*c + eq(Ax,0)*b + eq(Ax,1)*a;
@@ -708,7 +708,7 @@ void FillCellsWithLBCells() {
 
 
             Cells[getLocalID_LocalIndex(i, j, k)] = L_B_Cells[c_BC];
-                        c_BC++;
+            c_BC++;
         }
     }
     PRINTING
@@ -744,7 +744,7 @@ void printTest(const char * text,int it) {
 }
 void putCellsToWCells(){
     UPUT( &WCells[MYTHREAD * CELL_TOT_SIZE], &Cells[0], CELL_TOT_SIZE * sizeof(CellProps));
-  }
+}
 void FillLocalWCells(){
     int c_WC = 0;
     for (int k = 1; k < LAT+1; k++) {
@@ -810,11 +810,11 @@ void UpdateStep(){
 void StreamingStep(){
     for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++){
         int lID = LocalID[l_rID];
-                for (int l = 0; l < 19; l++) {
+        for (int l = 0; l < 19; l++) {
 
             if (((Cells + lID)->StreamLattice[l]) == 1) {
                 (Cells + lID)->F[l] = (Cells + lID + c[l])->METAF[l];
-                    }
+            }
 
         }
     }
@@ -822,7 +822,7 @@ void StreamingStep(){
 
 void HandleBoundariesStep(int OutletProfile, int CurvedBoundaries){
 
-                // INLET
+    // INLET
     for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++){
         int lID = LocalID[l_rID];
         InletBC(Cells, lID);
@@ -867,11 +867,11 @@ void init_vars(int *postproc_prog) {
     ppp      = postproc_prog;       // for convenience ppp points to postproc_prog
 
 
-    shared_total_Residuals[0] = 100;
+    /*shared_total_Residuals[0] = 100;
     shared_total_Residuals[1] = 100;
     shared_total_Residuals[2] = 100;
     shared_total_Residuals[3] = 100;
-    shared_total_Residuals[4] = 100;
+    shared_total_Residuals[4] = 100;*/
 
     allocate_vars();
 
@@ -1114,22 +1114,32 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
     if(iter == (AutosaveEvery * AutosaveI))
     {
         AutosaveI++;
-        if(iter>AutosaveAfter)
-        {
+        if(iter>AutosaveAfter) {
             init_measure_time;
-            switch(postproc_prog) {
-                case 1: sprintf(AutosaveOutputFile, "Results/autosave_iter%05d.csv", iter); break;
-                case 2: sprintf(AutosaveOutputFile, "Results/autosave_iter%05d.dat", iter); break;
-                default: break;}
+            switch (postproc_prog) {
+                case 1:
+                    sprintf(AutosaveOutputFile, "Results/autosave_iter/autosave_iter%05d.csv", iter);
+                    break;
+                case 2:
+                    sprintf(AutosaveOutputFile, "Results/autosave_iter/autosave_iter%05d.dat", iter);
+                    break;
+                default:
+                    break;
+            }
             putCellsToWCells(); // Put information to WCells and write (Write Cells)
-            if (MYTHREAD==0) // AUTOSAVE
+            upc_barrier;
+            if (MYTHREAD == 0){ // AUTOSAVE
                 WriteResults(AutosaveOutputFile, ppp);
+                printf("Autsave n%i Iter n%i\n", AutosaveI - 1, iter);
+                char AutosaveTime[200];
+
+                sprintf(AutosaveTime, "Results/autosave_times/ParallelTimeMeasuerment_iter%05d.dat", iter);
+                print_times(AutosaveTime, AutosaveEvery);
+            }
+
             end_measure_time(tWriting);
         }
-        char AutosaveTime [50];
 
-        sprintf(AutosaveTime, "Results/ParallelTimeMeasuerment_iter%05d.dat", iter);
-        print_times(AutosaveTime,AutosaveEvery);
     }
 }
 

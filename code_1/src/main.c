@@ -18,6 +18,8 @@ int main(int argc, char* argv[])
   char OutputCellsDir[] = "Results/outCells";
   char BoundaryDir[] = "Results/boundary";
   char IterDir[] = "Results/iterations";
+  char AutoIterDir[] = "Results/autosave_iter";
+  char AutoTimeDir[] = "Results/autosave_times";
 
   if(MYTHREAD==0)
   {
@@ -29,7 +31,12 @@ int main(int argc, char* argv[])
     CreateDirectory(MainWorkDir);
     //CreateDirectory(OutputCellsDir);
     //CreateDirectory(BoundaryDir);
-    CreateDirectory(IterDir);
+      CreateDirectory(IterDir);
+/*#if __SAVE_ITER__ == 1
+#endif //__SAVE_ITER__*/
+
+    CreateDirectory(AutoIterDir);
+    CreateDirectory(AutoTimeDir);
   }
   ///////////////////// Declare Simulation Variables //////////////////////
   

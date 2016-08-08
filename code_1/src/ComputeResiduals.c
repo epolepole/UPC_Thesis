@@ -190,7 +190,7 @@ void ComputeResiduals(CellProps *Cells, double* Residuals, double* sumVel0, doub
 
     upc_barrier;
 
-    if(MYTHREAD==0) {
+    //if(MYTHREAD==0) {
         //printf("Th%d residualcalc\n",MYTHREAD);
         for (int i = 0; i < THREADS; i++)
         {
@@ -209,17 +209,17 @@ void ComputeResiduals(CellProps *Cells, double* Residuals, double* sumVel0, doub
         Residuals[2] = ResDrag;
         Residuals[3] = ResLift;
 
-    }
+    //}
 
     upc_barrier;
 
-    if(MYTHREAD == 0) {
+    /*if(MYTHREAD == 0) {
         shared_total_Residuals[0] = ResVel;
         shared_total_Residuals[1] = ResRho;
         shared_total_Residuals[2] = ResDrag;
         shared_total_Residuals[2] = ResDrag;
         shared_total_Residuals[3] = ResLift;
-    }
+    }*/
     /*if ((MYTHREAD == 0 && *iter%50 == 0) || ResRho != ResRho){
         printf("SumRho0 = %f\n",*sumRho0);
         printf("SumRho1 = %f\n",*sumRho1);
