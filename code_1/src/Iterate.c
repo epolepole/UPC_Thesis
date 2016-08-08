@@ -8,7 +8,7 @@
 
 ////////////////////////////////////////////////////
 ////////////////// OWN HEADERS /////////////////////
-////////////////////////////////////////////////////
+///////////////////////////////////s/////////////////
 
 #include "Iterate.h"            // Iteration takes place
 #include "FilesReading.h"       // For reading files
@@ -171,7 +171,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     upc_barrier;         // Synchronise
 
     end_tests();
-    export_data(postproc_prog);
+    export_data(postproc_prog,AutosaveEvery);
 
     upc_barrier;         // Synchronise
     main_thread
@@ -473,8 +473,8 @@ void allocate_shared() {////////////////////////////
     Delta          = (shared double*)upc_alloc(1*sizeof(double));
     NumNodes       = (shared int*)upc_alloc(1*sizeof(int));
     NumConn        = (shared int*)upc_alloc(1*sizeof(int));
-    //MaxInletCoordY = (shared [] double*)upc_alloc(1*sizeof(double));--------------------------> DO I NEED THIS?
-    //MinInletCoordY = (shared [] double*)upc_alloc(1*sizeof(double));--------------------------> DO I NEED THIS?
+    MaxInletCoordY = (shared double*)upc_alloc(1*sizeof(double));//--------------------------> DO I NEED THIS?
+    MinInletCoordY = (shared double*)upc_alloc(1*sizeof(double));//--------------------------> DO I NEED THIS?
     NumInletNodes  = (shared int*)upc_alloc(1*sizeof(int));
 }
 void allocate_lattice_vars() {// D2Q9 Variables of the lattice
@@ -620,15 +620,29 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
     if(iter == (AutosaveEvery * AutosaveI))
     {
         AutosaveI++;
-        if(iter>AutosaveAfter)
-        {
+        if(iter>AutosaveAfter) {
             init_measure_time;
             switch(postproc_prog) {
-                case 1: sprintf(AutosaveOutputFile, "Results/autosave_iter%05d.csv", iter); break;
-                case 2: sprintf(AutosaveOutputFile, "Results/autosave_iter%05d.dat", iter); break; }
+                case 1:
+                    sprintf(AutosaveOutputFile, "Results/autosave_iter/autosave_iter%05d.csv", iter);
+                    break;
+                case 2:
+                    sprintf(AutosaveOutputFile, "Results/autosave_iter/autosave_iter%05d.dat", iter);
+                    break;
+                default:
+                    break;
+            }
             putCellsToWCells(); // Put information to WCells and write (Write Cells)
-            if (MYTHREAD==0) // AUTOSAVE
+            upc_barrier;
+            if (MYTHREAD == 0){ // AUTOSAVE
                 WriteResults(AutosaveOutputFile, ppp);
+                printf("Autsave n%i Iter n%i\n", AutosaveI - 1, iter);
+                char AutosaveTime[200];
+
+                sprintf(AutosaveTime, "Results/autosave_times/ParallelTimeMeasuerment_iter%05d.dat", iter);
+                print_times(AutosaveTime, AutosaveEvery);
+            }
+
             end_measure_time(tWriting);
         }
     }
@@ -685,7 +699,7 @@ void save_init_data(int postproc_prog) {// Write Initialized data
     WriteResults(OutputFile, ppp);
     printf("\nInitialized data was written to %s\n", OutputFile);
 }
-void export_data(int postproc_prog) {
+void export_data(int postproc_prog, int AutosaveEvery) {
     if(MYTHREAD == 0) // EXPORT DATA, TIME MEASUREMENT RESULTS
     {
         // Close residuals file
@@ -711,20 +725,7 @@ void export_data(int postproc_prog) {
         fprintf(log_file,"\n:::: Iterations done! ::::\n");
         fclose(log_file);
 
-        TimeMeasurementFile = fopen("Results/ParallelTimeMeasuerment.dat","w");
-        fprintf(TimeMeasurementFile,"tOverall %f\n",        tOverall);
-        fprintf(TimeMeasurementFile,"tIteration %f\n",      tIteration);
-        fprintf(TimeMeasurementFile,"tInitialization %f\n", tInitialization);
-        fprintf(TimeMeasurementFile,"tCollision %f\n",      tCollision);
-        fprintf(TimeMeasurementFile,"tUpdateF %f\n",        tUpdateF);
-        fprintf(TimeMeasurementFile,"tStreaming %f\n",      tStreaming);
-        fprintf(TimeMeasurementFile,"tBoundaries %f\n",     tBoundaries);
-        fprintf(TimeMeasurementFile,"tUpdateMacro %f\n",    tUpdateMacro);
-        fprintf(TimeMeasurementFile,"tResiduals %f\n",      tResiduals);
-        fprintf(TimeMeasurementFile,"tWriting %f\n",        tWriting);
-        fprintf(TimeMeasurementFile,"tBCells %f\n",         tBCells);
-        fprintf(TimeMeasurementFile,"THREADS %d\n",         THREADS);
-        fclose(TimeMeasurementFile);
+        print_times("Results/ParallelTimeMeasuerment.dat",AutosaveEvery);
 
         // Write final data
         switch(postproc_prog){
@@ -748,6 +749,49 @@ void export_data(int postproc_prog) {
 
 
 }
+void print_times(const char* fname, int AutosaveEvery) {
+
+
+
+    clock_t tEnd = clock();
+    float tOverall = (float)(tEnd - tStart) / CLOCKS_PER_SEC; // Calculate elapsed time
+
+    TimeMeasurementFile = fopen(fname,"w");
+
+    fprintf(TimeMeasurementFile,"Total times");
+    fprintf(TimeMeasurementFile,"tOverall %f\n",        tOverall);
+    fprintf(TimeMeasurementFile,"tIteration %f\n",      tIteration);
+    fprintf(TimeMeasurementFile,"tCellsInitialization %f\n", tCellsInitialization);
+    fprintf(TimeMeasurementFile,"tInitialization %f\n", tInitialization);
+    fprintf(TimeMeasurementFile,"tCollision %f\n",      tCollision);
+    fprintf(TimeMeasurementFile,"tUpdateF %f\n",        tUpdateF);
+    fprintf(TimeMeasurementFile,"tStreaming %f\n",      tStreaming);
+    fprintf(TimeMeasurementFile,"tBoundaries %f\n",     tBoundaries);
+    fprintf(TimeMeasurementFile,"tUpdateMacro %f\n",    tUpdateMacro);
+    fprintf(TimeMeasurementFile,"tResiduals %f\n",      tResiduals);
+    fprintf(TimeMeasurementFile,"tWriting %f\n",        tWriting);
+    fprintf(TimeMeasurementFile,"tBCells %f\n\n\n",     tBCells);
+
+
+    fprintf(TimeMeasurementFile,"Per Iteration");
+    fprintf(TimeMeasurementFile,"tIteration %f\n",      tIteration/iter);
+    fprintf(TimeMeasurementFile,"tCollision %f\n",      tCollision/iter);
+    fprintf(TimeMeasurementFile,"tUpdateF %f\n",        tUpdateF/iter);
+    fprintf(TimeMeasurementFile,"tStreaming %f\n",      tStreaming/iter);
+    fprintf(TimeMeasurementFile,"tBoundaries %f\n",     tBoundaries/iter);
+    fprintf(TimeMeasurementFile,"tUpdateMacro %f\n",    tUpdateMacro/iter);
+    fprintf(TimeMeasurementFile,"tResiduals %f\n",      tResiduals/iter);
+    fprintf(TimeMeasurementFile,"tWriting %f\n",        tWriting/AutosaveEvery);
+    fprintf(TimeMeasurementFile,"tBCells %f\n\n\n",     tBCells/iter);
+
+
+    fprintf(TimeMeasurementFile,"THREADS %d\n",         THREADS);
+    fclose(TimeMeasurementFile);
+
+}
+
+
+
 
 void print_cells_info(CellProps* Cells) {
     upc_barrier;

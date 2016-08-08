@@ -9,60 +9,64 @@
 int main(int argc, char* argv[])
 {
 
-  /////////////////////////////////////////////////////////////////////////
-  //////////////////////////// INITIAL DATA ///////////////////////////////
-  /////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////
+    //////////////////////////// INITIAL DATA ///////////////////////////////
+    /////////////////////////////////////////////////////////////////////////
 
-  // Name of folder to which we write the files
-  char MainWorkDir[] = "Results";
-  char OutputCellsDir[] = "Results/outCells";
-  char BoundaryDir[] = "Results/boundary";
-  char IterDir[] = "Results/iterations";
+    // Name of folder to which we write the files
+    char MainWorkDir[] = "Results";
+    char OutputCellsDir[] = "Results/outCells";
+    char BoundaryDir[] = "Results/boundary";
+    char IterDir[] = "Results/iterations";
+    char AutoTimesDir[] = "Results/autosave_times";
+    char AutoIterDir[] = "Results/autosave_iter";
 
-  if(MYTHREAD==0)
-  {
-     printf("\n###############################################\n");
-       printf("#### This is a 3D lattice-Boltzmann solver ####\n");
-       printf("#### Written in UPC, running on %02d threads ####\n", THREADS);
-       printf("###############################################\n");
-    // Create the working directory, continue if it already exist!
-    CreateDirectory(MainWorkDir);
-    CreateDirectory(OutputCellsDir);
-    CreateDirectory(BoundaryDir);
-    CreateDirectory(IterDir);
-  }
-  ///////////////////// Declare Simulation Variables //////////////////////
-  
-  // inlet parameters  
-  float Uavg, Vavg, Wavg, rho_ini, Viscosity;
-  
-  // integer (logical) inlet parameters
-  int InletProfile, CollisionModel, CurvedBoundaries, OutletProfile, CalculateDragLift; 
-  
-  // numbers regarding the iterations
-  int Iterations, AutosaveEvery, AutosaveAfter, PostprocProg;       
-  float ConvergenceCritVeloc, ConvergenceCritRho;
-  
-  // Import Simulation Variables
-  char IniFileName[] = "SetUpData.ini";
-  ReadIniData(IniFileName,    &Uavg, &Vavg, &Wavg, &rho_ini, &Viscosity,
-              &InletProfile,  &CollisionModel, &CurvedBoundaries,
-              &OutletProfile, &Iterations, &AutosaveEvery,
-              &AutosaveAfter, &PostprocProg, &CalculateDragLift,
-              &ConvergenceCritVeloc,  &ConvergenceCritRho);
-    
-  // Mesh files
-  char NodeDataFile[]="Mesh/Nodes.dat";
-  char BCconnectorDataFile[]="Mesh/BCconnectors.dat";
-  
-  /////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////
+    if(MYTHREAD==0)
+    {
+        printf("\n###############################################\n");
+        printf("#### This is a 3D lattice-Boltzmann solver ####\n");
+        printf("#### Written in UPC, running on %02d threads ####\n", THREADS);
+        printf("###############################################\n");
+        // Create the working directory, continue if it already exist!
+        CreateDirectory(MainWorkDir);
+        //CreateDirectory(OutputCellsDir);
+        //CreateDirectory(BoundaryDir);
+        CreateDirectory(IterDir);
+        CreateDirectory(AutoTimesDir);
+        CreateDirectory(AutoIterDir);
+    }
+    ///////////////////// Declare Simulation Variables //////////////////////
 
-  //////////////////////
-  // START THE SOLVER //
-  //////////////////////
-  Iteration(NodeDataFile,          // data from mesher
+    // inlet parameters
+    float Uavg, Vavg, Wavg, rho_ini, Viscosity;
+
+    // integer (logical) inlet parameters
+    int InletProfile, CollisionModel, CurvedBoundaries, OutletProfile, CalculateDragLift;
+
+    // numbers regarding the iterations
+    int Iterations, AutosaveEvery, AutosaveAfter, PostprocProg;
+    float ConvergenceCritVeloc, ConvergenceCritRho;
+
+    // Import Simulation Variables
+    char IniFileName[] = "SetUpData.ini";
+    ReadIniData(IniFileName,    &Uavg, &Vavg, &Wavg, &rho_ini, &Viscosity,
+                &InletProfile,  &CollisionModel, &CurvedBoundaries,
+                &OutletProfile, &Iterations, &AutosaveEvery,
+                &AutosaveAfter, &PostprocProg, &CalculateDragLift,
+                &ConvergenceCritVeloc,  &ConvergenceCritRho);
+
+    // Mesh files
+    char NodeDataFile[]="Mesh/Nodes.dat";
+    char BCconnectorDataFile[]="Mesh/BCconnectors.dat";
+
+    /////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////
+
+    //////////////////////
+    // START THE SOLVER //
+    //////////////////////
+    Iteration(NodeDataFile,          // data from mesher
               BCconnectorDataFile,   // data from mesher
               Uavg,                  // mean x velocity
               Vavg,                  // mean y velocity
@@ -81,10 +85,10 @@ int main(int argc, char* argv[])
               ConvergenceCritVeloc,  // convergence criterion for velocity
               ConvergenceCritRho);   // convergence criterion for density
 
-  ///////////////////////
-  // END OF THE SOLVER //
-  ///////////////////////
+    ///////////////////////
+    // END OF THE SOLVER //
+    ///////////////////////
 
-  return 0;
+    return 0;
 }
 

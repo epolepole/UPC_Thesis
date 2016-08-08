@@ -14,7 +14,7 @@
 #if __SAVE_ITER__ == 0
 #define SAVE_ITERATION
 #else //__SAVE_ITER__
-#define SAVE_ITERATION save_iteration(postproc_prog,Iterations,AutosaveEvery)
+#define SAVE_ITERATION save_iteration(postproc_prog, Iteration, AutosaveEvery)
 #endif //__SAVE_ITER__
 
 
@@ -114,7 +114,8 @@ void save_iteration(int postproc_prog,int Iterations, int AutosaveEvery);
 
 void write_boundary_cells_to_results(int postproc_prog);
 void save_init_data(int postproc_prog);
-void export_data(int postproc_prog);
+void export_data(int postproc_prog, int AutosaveEvery);
+void print_times(const char* fname, int AutosaveEvery);
 
 void print_cells_info(CellProps* Cells);
 void print_boundary_type(CellProps* Cells);
