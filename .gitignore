@@ -6,4 +6,8 @@ cmake_install.cmake
 install_manifest.txt
 CTestTestfile.cmake
 build
-.idea 
+.idea
+SetUpData.ini
+Mesh_250
+Mesh_256
+ 
