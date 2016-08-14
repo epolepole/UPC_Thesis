@@ -1267,10 +1267,10 @@ void print_times(const char* fname, int AutosaveEvery) {
 
     TimeMeasurementFile = fopen(fname,"w");
 
-    fprintf(TimeMeasurementFile,"Total times");
+    fprintf(TimeMeasurementFile,"Total_times");
     fprintf(TimeMeasurementFile,"tOverall %f\n",        tOverall);
     fprintf(TimeMeasurementFile,"tIteration %f\n",      tIteration);
-    fprintf(TimeMeasurementFile,"tCellsInitialization_with_CUBES %f\n", tCellsInitialization_NEW);
+    fprintf(TimeMeasurementFile,"tCellsInitialization %f\n", tCellsInitialization);
     fprintf(TimeMeasurementFile,"tInitialization %f\n", tInitialization);
     fprintf(TimeMeasurementFile,"tCollision %f\n",      tCollision);
     fprintf(TimeMeasurementFile,"tUpdateF %f\n",        tUpdateF);
@@ -1278,11 +1278,11 @@ void print_times(const char* fname, int AutosaveEvery) {
     fprintf(TimeMeasurementFile,"tBoundaries %f\n",     tBoundaries);
     fprintf(TimeMeasurementFile,"tUpdateMacro %f\n",    tUpdateMacro);
     fprintf(TimeMeasurementFile,"tResiduals %f\n",      tResiduals);
-    fprintf(TimeMeasurementFile,"tWriting %f\n",        tWriting);
-    fprintf(TimeMeasurementFile,"tBCells_with_CUBES %f\n\n\n",         tBCells_NEW);
+    fprintf(TimeMeasurementFile,"tBCells %f\n",     tBCells);
+    fprintf(TimeMeasurementFile,"tWriting %f\n\n\n",        tWriting);
 
 
-    fprintf(TimeMeasurementFile,"Per Iteration");
+    fprintf(TimeMeasurementFile,"Per_Iteration");
     fprintf(TimeMeasurementFile,"tIteration %f\n",      tIteration/iter);
     fprintf(TimeMeasurementFile,"tCollision %f\n",      tCollision/iter);
     fprintf(TimeMeasurementFile,"tUpdateF %f\n",        tUpdateF/iter);
@@ -1290,11 +1290,9 @@ void print_times(const char* fname, int AutosaveEvery) {
     fprintf(TimeMeasurementFile,"tBoundaries %f\n",     tBoundaries/iter);
     fprintf(TimeMeasurementFile,"tUpdateMacro %f\n",    tUpdateMacro/iter);
     fprintf(TimeMeasurementFile,"tResiduals %f\n",      tResiduals/iter);
+    fprintf(TimeMeasurementFile,"tBCells %f\n\n",     tBCells/iter);
     fprintf(TimeMeasurementFile,"tWriting %f\n",        tWriting/AutosaveEvery);
-    fprintf(TimeMeasurementFile,"tBCells_with_CUBES %f\n\n\n",         tBCells_NEW/iter);
 
-
-    fprintf(TimeMeasurementFile,"THREADS %d\n",         THREADS);
     fclose(TimeMeasurementFile);
 
 }
