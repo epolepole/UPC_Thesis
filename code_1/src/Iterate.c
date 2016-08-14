@@ -134,7 +134,6 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     upc_barrier;
     */
 
-    tInitialization = tInitialization + (float)(clock()-tStart) / CLOCKS_PER_SEC;
     //end_measure_time(tInitialization);
 
     upc_barrier;         // Synchronise
@@ -163,6 +162,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     //write_cells_to_results(postproc_prog);
 
 
+    tInitialization = tInitialization + (float)(clock()-tStart) / CLOCKS_PER_SEC;
     //free_mesh_data_matrices();  //BCNode
 
     upc_barrier;         // Synchronise
@@ -239,16 +239,12 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         init_measure_time;
         CollisionStep(CollisionModel); ////////////////////// !!!!!!!!!!!!!!!!! CX CY!
         end_measure_time(tCollision);
-        PRINTING
-            printf("T%i: Collsision\n",MYTHREAD);
 
 
         ////////////// UPDATE DISTR ///////////////
         init_measure_time;
         UpdateStep();
         end_measure_time(tUpdateF);
-        PRINTING
-            printf("T%i: UpdateF\n",MYTHREAD);
         upc_barrier;
         SAVE_ITERATION;
 
@@ -257,8 +253,6 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         init_measure_time;
         putCellsToShared();
         end_measure_time(tBCells_NEW);
-        PRINTING
-            printf("T%i: putCellsToShared_NEW\n",MYTHREAD);
         upc_barrier;
 
 
@@ -266,38 +260,28 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
         init_measure_time;
         getSharedToCells();
         end_measure_time(tBCells_NEW);
-        PRINTING
-            printf("T%i: getSharedToCells_NEW\n",MYTHREAD);
 
 ////////////// STREAMING ///////////////
         init_measure_time;
         StreamingStep();
         end_measure_time(tStreaming);
-        PRINTING
-            printf("T%i: StreamingStep\n",MYTHREAD);
         SAVE_ITERATION;
 
 ////////////// BOUNDARIES ///////////////
         init_measure_time;
         HandleBoundariesStep(OutletProfile, CurvedBoundaries);
         end_measure_time(tBoundaries);
-        PRINTING
-            printf("T%i: HandleBoundariesStep\n",MYTHREAD);
         SAVE_ITERATION;
 
 // UPDATE VELOCITY AND DENSITY
         init_measure_time;
         UpdateMacroscopicStep(CalculateDragLift);
         end_measure_time(tUpdateMacro);
-        PRINTING
-            printf("T%i: UpdateMacroscopicStep\n",MYTHREAD);
 
 ////////////// Residuals ///////////////
         init_measure_time;
         ComputeResiduals(Cells, Residuals, sumVel0, sumVel1, sumRho0, sumRho1, CalculateDragLift, &iter, Iterations);
         end_measure_time(tResiduals);
-        PRINTING
-            printf("T%i: ComputeResiduals\n",MYTHREAD);
 
         if(MYTHREAD==0)
             fprintf(resid_file,"%d %5.4e %5.4e %5.4e %f %f\n", iter, (iter+1.0)*(*Delta), Residuals[0], Residuals[1], Residuals[2], Residuals[3]);
@@ -310,7 +294,9 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
     }
     upc_barrier;
     //printf("Reached with T%i, iteration %d\n",MYTHREAD,iter);
+    init_measure_time;
     putCellsToWCells();
+    end_measure_time(tWriting);
 
     upc_barrier;
 
@@ -347,6 +333,7 @@ void FillLocalBCells() {
 
     //printTest("0", 0);
     //Faces
+
     for (f = 0; f<6; f++){
         Ax=getAx_F(f);
         Dir=getDir_F(f);
@@ -689,6 +676,11 @@ void FillCellsWithLBCells() {
             }
         }
     }
+
+    
+
+
+
     PRINTING
         printf("T%i: Copied Faces\n",MYTHREAD);
 

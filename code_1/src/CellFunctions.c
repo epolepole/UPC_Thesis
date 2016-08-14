@@ -1210,9 +1210,9 @@ int getC(int X, int Y, int Z) {
     return X + Y*2 + Z*4;
 }
 
-int getCubeID(int x, int y, int z) {
+int getCubeID(int x, int y, int z) {  //Done
     return x + y*NTDX + z*NTDX*NTDY;
-}
+}//Done
 
 void getCubeCoords_TotIndex(int *tX, int *X) {
     X[0] = tX[0]/LAT;
@@ -1229,12 +1229,12 @@ void getCubeCoords_CubeID(int ID, int *X) {
     X[2] = ID/(NTDX*NTDY);
     X[1] = (ID - X[2] * NTDX*NTDY) / NTDX;
     X[0] = ID - X[1]*NTDX - X[2]*NTDX*NTDY;
-}
+}//Done
 void getLocalRealIndex_LocRealID(int ID, int *X) {
     X[2] = ID/(LAT*LAT);
     X[1] = (ID - X[2]*LAT*LAT)/LAT;
     X[0] = ID - X[1]*LAT - X[2]*LAT*LAT;
-}
+}//Done
 void getLocalIndex_LocRealIndex(int *lrX,int *lX) {
     lX[0] = lrX[0] + 1;
     lX[1] = lrX[1] + 1;
@@ -1250,11 +1250,11 @@ int getLocalID_LocRealID(int l_rID) {
     l_rID%LAT +
     ((l_rID/LAT)%LAT)*(LAT+2) +
     ((l_rID/(LAT*LAT))%LAT)*(LAT+2)*(LAT+2);
-}
+}//Done
 
 int getLocalID_LocalIndex(int i, int j, int k) {
     return i + j*(LAT+2) + k*(LAT+2)*(LAT+2);
-}
+}//Done
 
 int getThread(int index) {
     return index/BLOCKSIZE;
