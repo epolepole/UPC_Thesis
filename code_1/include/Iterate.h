@@ -59,9 +59,9 @@ int  AutosaveI;                         // autosave i variable, will be incremen
 int* ppp;                               // pointer of the postproc_prog variable
 int iter_counter;
 
-/*CellProps Cells[B_CELLS_SIZE + BLOCKSIZE_NEW];                       // Pointer to Cells
+/*CellProps Cells[B_CELLS_SIZE + BLOCKSIZE];                       // Pointer to Cells
 CellProps L_B_Cells[B_CELLS_SIZE];
-CellProps L_W_Cells[BLOCKSIZE_NEW];*/
+CellProps L_W_Cells[BLOCKSIZE];*/
 
 CellProps *Cells;                       // Pointer to Cells
 CellProps *L_B_Cells;
@@ -69,7 +69,7 @@ CellProps *L_B_Cells;
 
 //CellProps Cells[CELL_TOT_SIZE];                       // Pointer to Cells
 //CellProps L_B_Cells[B_CELLS_SIZE];
-//CellProps L_W_Cells[BLOCKSIZE_NEW];
+//CellProps L_W_Cells[BLOCKSIZE];
 
 // Time measurement variables
 float tInitialization;          // Time measurement of Initialization
@@ -84,8 +84,6 @@ float tResiduals;               // Time measurement of calculating residuals
 float tWriting;                 // Time measurement of writing data
 float tBCells;                  // Time measurement of handling boundaries
 
-float tCellsInitialization_NEW;          // Time measurement of Initialization
-float tBCells_NEW;                  // Time measurement of handling boundaries
 clock_t tInstant1, tInstant2;   // Time measurement points: universal
 clock_t tIterStart, tIterEnd;   // Time measurement points: main loop
 

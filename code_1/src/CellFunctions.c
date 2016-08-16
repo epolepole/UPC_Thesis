@@ -116,7 +116,7 @@ void MRTInitializer(double** tm, double** stmiv, double Omega)
 ==================================================*/
 
 
-void CellIni_NEW(CellProps *Cells,
+void CellIni(CellProps *Cells,
                  float  **Nod,
                  float  **Con,
                  float  Uavg,
@@ -168,7 +168,7 @@ void CellIni_NEW(CellProps *Cells,
     /*for (int k = 1; k < LAT+1; k++) {
         for (int j = 1; j< LAT+1; j++) {
             for (int i = 1; i< LAT+1; i++) {*/
-    for (l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++){
+    for (l_rID = 0; l_rID< BLOCKSIZE; l_rID++){
         //getLocalRealIndex_LocRealID(l_rID,&lrX[0]);
         //getLocalIndex_LocRealIndex(&lrX[0],&lX[0]);
         //lID = getLocalID_LocalIndex(lX[0],lX[1],lX[2]);

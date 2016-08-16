@@ -37,10 +37,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
         printf("NN = %i\n", NN);
         printf("NM = %i\n", NM);
         printf("NL = %i\n", NL);
-        //printf("LAYER = %i\n", LAYER);
-        //printf("BLOCKSIZE = %i\n", BLOCKSIZE);
-        printf("BLOCKSIZE_NEW = %i\n", BLOCKSIZE_NEW);
-        //printf("LAYERS_PER_THREAD = %i\n", LAYERS_PER_THREAD);
+        printf("BLOCKSIZE = %i\n", BLOCKSIZE);
     }
 
     main_thread
@@ -95,23 +92,10 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
 
     upc_barrier;         // Synchronise
 
-    init_measure_time;
-    /*CellIni( Cells,
-             Nodes,            // Nodes
-             BCconn,           // BCconn
-             Uavg,             // INPUT PARAMETER
-             Vavg,             // INPUT PARAMETER
-             Wavg,             // INPUT PARAMETER
-             InletProfile,     // INPUT PARAMETER
-             CollisionModel,   // INPUT PARAMETER
-             opp,              // Opposite direction
-             rho_ini);         // Initial density*/
-    end_measure_time(tCellsInitialization);
-
     upc_barrier;
 
     init_measure_time;
-    CellIni_NEW( Cells,
+    CellIni( Cells,
                  Nodes,            // Nodes
                  BCconn,           // BCconn
                  Uavg,             // INPUT PARAMETER
@@ -121,7 +105,7 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
                  CollisionModel,   // INPUT PARAMETER
                  opp,              // Opposite direction
                  rho_ini);         // Initial density
-    end_measure_time(tCellsInitialization_NEW);
+    end_measure_time(tCellsInitialization);
 
     main_thread
         printf("Cell intialization completed\n");
@@ -153,8 +137,6 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     upc_barrier;
     //printTest("After put/Before get",0);
     getSharedToCells();
-    upc_barrier;
-    //printTest("After get",0);
     upc_barrier;
     // COPY CELLS TO WCELLS (writing cells) TO WRITE DATA
     putCellsToWCells();
@@ -213,12 +195,8 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
     export_data(postproc_prog, AutosaveEvery);
 
     upc_barrier;         // Synchronise
-    main_thread
-        printf("Before freeing vars\n");
     free_vars();
     upc_barrier;         // Synchronise
-    //main_thread
-    printf("After freeing vars\n");
 
 }
 
@@ -252,14 +230,14 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
 //////////////// PUT THREAD-BOUNDARY CELLS TO SHARED WITH CUBES ////////////////
         init_measure_time;
         putCellsToShared();
-        end_measure_time(tBCells_NEW);
+        end_measure_time(tBCells);
         upc_barrier;
 
 
 //////////////// COPY SHARED BCELLS TO CELLS WITH CUBES////////////////
         init_measure_time;
         getSharedToCells();
-        end_measure_time(tBCells_NEW);
+        end_measure_time(tBCells);
 
 ////////////// STREAMING ///////////////
         init_measure_time;
@@ -472,7 +450,7 @@ void setCubeType(){
 
     upc_barrier;
 
-    printf("T=%2i ->  ",MYTHREAD);
+    /*printf("T=%2i ->  ",MYTHREAD);
     if(cur_corner != -1)
         printf("Corner %2i",cur_corner);
     else if(cur_edge != -1)
@@ -482,7 +460,7 @@ void setCubeType(){
     else
         printf("Interior");
 
-    printf("\n");
+    printf("\n");*/
 
     //PRINTING
     //printf("T%i: Finished cube type\n",MYTHREAD);
@@ -756,7 +734,7 @@ void CollisionStep(int CollisionModel){
     {
         // BGKW
         case 1:
-            for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++){
+            for (int l_rID = 0; l_rID< BLOCKSIZE; l_rID++){
 
                 BGKW(LocalID[l_rID], Omega);
                 //}
@@ -792,7 +770,7 @@ void CollisionStep(int CollisionModel){
 }
 
 void UpdateStep(){
-    for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++){
+    for (int l_rID = 0; l_rID< BLOCKSIZE; l_rID++){
         UpdateF(Cells, LocalID[l_rID]);
         //}
         //}
@@ -800,7 +778,7 @@ void UpdateStep(){
 }
 
 void StreamingStep(){
-    for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++){
+    for (int l_rID = 0; l_rID< BLOCKSIZE; l_rID++){
         int lID = LocalID[l_rID];
         for (int l = 0; l < 19; l++) {
 
@@ -815,7 +793,7 @@ void StreamingStep(){
 void HandleBoundariesStep(int OutletProfile, int CurvedBoundaries){
 
     // INLET
-    for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++){
+    for (int l_rID = 0; l_rID< BLOCKSIZE; l_rID++){
         int lID = LocalID[l_rID];
         InletBC(Cells, lID);
         WallBC(Cells, lID, opp);
@@ -840,7 +818,7 @@ void HandleBoundariesStep(int OutletProfile, int CurvedBoundaries){
     }
 }
 void UpdateMacroscopicStep(int CalculateDragLift){
-    for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++){
+    for (int l_rID = 0; l_rID< BLOCKSIZE; l_rID++){
         UpdateMacroscopic(Cells, LocalID[l_rID], CalculateDragLift);
     }
 }
@@ -899,12 +877,10 @@ void time_meas_vars_init() {// Time measurement variables
     tResiduals       = 0.0; // Time measurement of calculating residuals
     tWriting         = 0.0; // Time measurement of writing data
     tBCells          = 0.0; // Time measurement of handling boundaries
-    tCellsInitialization_NEW  = 0.0; // Time measurement of Initialization
-    tBCells_NEW          = 0.0; // Time measurement of handling boundaries
 
 }
 void init_localID(){
-    for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++) {
+    for (int l_rID = 0; l_rID< BLOCKSIZE; l_rID++) {
         LocalID[l_rID] = getLocalID_LocRealID(l_rID);
     }
 }
@@ -960,7 +936,7 @@ void allocate_lattice_vars() {// D2Q9 Variables of the lattice
     norm = Create2DArrayInt(3,6);
     j_wall_unknown = Create2DArrayInt(5,6);
 
-    LocalID = Create1DArrayInt(BLOCKSIZE_NEW);
+    LocalID = Create1DArrayInt(BLOCKSIZE);
 
 }
 void allocate_residuals() {// allocate residuals
@@ -1092,7 +1068,7 @@ void print_init_info_to_log(float Uavg, float Vavg, float Wavg, float rho_ini, f
 
         fprintf(log_file,"\n:::: Parallel properties :::: \n");
         fprintf(log_file,">>> # of threads        = %d\n", THREADS);
-        fprintf(log_file,">>> BlockSize           = %d\n", BLOCKSIZE_NEW);
+        fprintf(log_file,">>> BlockSize           = %d\n", BLOCKSIZE);
 
 // In case of no autosave
         sprintf(AutosaveOutputFile, "NOWHERE!");
@@ -1122,11 +1098,10 @@ void auto_save(int AutosaveAfter, int AutosaveEvery, int postproc_prog) {
             upc_barrier;
             if (MYTHREAD == 0){ // AUTOSAVE
                 WriteResults(AutosaveOutputFile, ppp);
-                printf("Autsave n%i Iter n%i\n", AutosaveI - 1, iter);
                 char AutosaveTime[200];
-
                 sprintf(AutosaveTime, "Results/autosave_times/ParallelTimeMeasuerment_iter%05d.dat", iter);
                 print_times(AutosaveTime, AutosaveEvery);
+                printf("Autosaved n%i Iter n%i\n", AutosaveI - 1, iter);
             }
 
             end_measure_time(tWriting);
@@ -1222,9 +1197,6 @@ void export_data(int postproc_prog, int AutosaveEvery) {
         fprintf(log_file,"Calculating Residuals took %f seconds\n",  tResiduals);
         fprintf(log_file,"Writing results took %f seconds\n",        tWriting);
         fprintf(log_file,"Copying boundary cells took %f seconds\n", tBCells);
-        fprintf(log_file,"Times with CUBES\n");
-        fprintf(log_file,"Cells init with CUBES took %f seconds\n",  tCellsInitialization_NEW);
-        fprintf(log_file,"Copying boundary cells with CUBES took %f seconds\n", tBCells_NEW);
 
 
         // end time measurement, close log file
@@ -1267,7 +1239,6 @@ void print_times(const char* fname, int AutosaveEvery) {
 
     TimeMeasurementFile = fopen(fname,"w");
 
-    fprintf(TimeMeasurementFile,"Total_times");
     fprintf(TimeMeasurementFile,"tOverall %f\n",        tOverall);
     fprintf(TimeMeasurementFile,"tIteration %f\n",      tIteration);
     fprintf(TimeMeasurementFile,"tCellsInitialization %f\n", tCellsInitialization);
@@ -1278,11 +1249,11 @@ void print_times(const char* fname, int AutosaveEvery) {
     fprintf(TimeMeasurementFile,"tBoundaries %f\n",     tBoundaries);
     fprintf(TimeMeasurementFile,"tUpdateMacro %f\n",    tUpdateMacro);
     fprintf(TimeMeasurementFile,"tResiduals %f\n",      tResiduals);
-    fprintf(TimeMeasurementFile,"tBCells %f\n",     tBCells);
-    fprintf(TimeMeasurementFile,"tWriting %f\n\n\n",        tWriting);
+    fprintf(TimeMeasurementFile,"tBCells %f\n",         tBCells);
+    fprintf(TimeMeasurementFile,"tWriting %f\n\n",    tWriting);
 
 
-    fprintf(TimeMeasurementFile,"Per_Iteration");
+    fprintf(TimeMeasurementFile,"n_iterations %i\n",    iter);
     fprintf(TimeMeasurementFile,"tIteration %f\n",      tIteration/iter);
     fprintf(TimeMeasurementFile,"tCollision %f\n",      tCollision/iter);
     fprintf(TimeMeasurementFile,"tUpdateF %f\n",        tUpdateF/iter);
@@ -1290,7 +1261,8 @@ void print_times(const char* fname, int AutosaveEvery) {
     fprintf(TimeMeasurementFile,"tBoundaries %f\n",     tBoundaries/iter);
     fprintf(TimeMeasurementFile,"tUpdateMacro %f\n",    tUpdateMacro/iter);
     fprintf(TimeMeasurementFile,"tResiduals %f\n",      tResiduals/iter);
-    fprintf(TimeMeasurementFile,"tBCells %f\n\n",     tBCells/iter);
+    fprintf(TimeMeasurementFile,"tBCells %f\n\n",       tBCells/iter);
+
     fprintf(TimeMeasurementFile,"tWriting %f\n",        tWriting/AutosaveEvery);
 
     fclose(TimeMeasurementFile);

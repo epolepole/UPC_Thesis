@@ -152,7 +152,7 @@ void ComputeResiduals(CellProps *Cells, double* Residuals, double* sumVel0, doub
     *sumRho1 = 0;
     // sum up velocity and density
 
-    for (int l_rID = 0; l_rID< BLOCKSIZE_NEW; l_rID++){
+    for (int l_rID = 0; l_rID< BLOCKSIZE; l_rID++){
 
         int lID = LocalID[l_rID];
                 //int lID = getLocalID_LocRealID(l_rID);

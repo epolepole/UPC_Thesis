@@ -23,7 +23,6 @@
 #define LAYER NN*NM
 #define NODES NN*NM*NL
 #define LAYERS_PER_THREAD ((int)(NL/THREADS))
-//#define BLOCKSIZE LAYER*LAYERS_PER_THREAD
 
 //Number of threads per dimension
 #define NTD (int) pow(THREADS,1/3.)
@@ -36,7 +35,7 @@
 #define NTDZ (int)(NL/LAT)
 
 
-#define BLOCKSIZE_NEW (int)(LAT*LAT*LAT)
+#define BLOCKSIZE (int)(LAT*LAT*LAT)
 #define CELL_TOT_SIZE (int)((LAT+2)*(LAT+2)*(LAT+2))
         //                 Faces       Edges    Corners
 #define B_CELLS_SIZE (int)(6*LAT*LAT + 12*LAT)

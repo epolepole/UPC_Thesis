@@ -26,7 +26,7 @@ int* LocalID;
 void MRTInitializer(double** tm, double** stmiv, double Omega);
 
 
-void CellIni_NEW(CellProps *Cells,
+void CellIni(CellProps *Cells,
              float  **Nod,
              float  **Con,
              float  Uavg,
