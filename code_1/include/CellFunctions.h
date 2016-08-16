@@ -26,18 +26,6 @@ int* LocalID;
 void MRTInitializer(double** tm, double** stmiv, double Omega);
 
 
-void CellIni(CellProps *Cells,
-             float  **Nod,
-             float  **Con,
-             float  Uavg,
-             float  Vavg,
-             float  Wavg,
-             int    InletProfile,
-             int    CollisionModel,
-             int*   opp,
-             float  rho_ini);
-
-
 void CellIni_NEW(CellProps *Cells,
              float  **Nod,
              float  **Con,
@@ -86,6 +74,6 @@ int getLocalID_LocalIndex(int i, int j, int k);
 int getLocalID_LocRealID(int l_rID);
 
 int getIndex(const int x, const int y, const int z);
-int getThread(int index);
+
 
 #endif

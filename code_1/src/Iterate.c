@@ -1092,7 +1092,7 @@ void print_init_info_to_log(float Uavg, float Vavg, float Wavg, float rho_ini, f
 
         fprintf(log_file,"\n:::: Parallel properties :::: \n");
         fprintf(log_file,">>> # of threads        = %d\n", THREADS);
-        fprintf(log_file,">>> BlockSize           = %d\n", BLOCKSIZE);
+        fprintf(log_file,">>> BlockSize           = %d\n", BLOCKSIZE_NEW);
 
 // In case of no autosave
         sprintf(AutosaveOutputFile, "NOWHERE!");
@@ -1301,7 +1301,7 @@ void print_times(const char* fname, int AutosaveEvery) {
 
 
 void print_cells_info(CellProps* Cells) {
-    upc_barrier;
+    /*upc_barrier;
     FILE* out_cells_file;
     char out_cells_filename [50];
     sprintf(out_cells_filename,"Results/outCells/T_%i.dat",MYTHREAD);
@@ -1319,11 +1319,11 @@ void print_cells_info(CellProps* Cells) {
         upc_barrier;
     }
     fclose(out_cells_file);
-    upc_barrier;
+    upc_barrier;*/
     //printf("Cells info printed\n");
 }
 void print_boundary_type(CellProps* Cells) {
-    main_thread
+    /*main_thread
         printf("printing boundaries T%i\n",MYTHREAD);
 
 
@@ -1385,7 +1385,7 @@ void print_boundary_type(CellProps* Cells) {
     b_filename[1] = b2_filename;
     b_filename[2] = b3_filename;
     b_filename[3] = b4_filename;
-    /*if (MYTHREAD == 0) {
+    if (MYTHREAD == 0) {
         printf(b_filename[0]);
         printf("\n");
         printf(b1_filename);
@@ -1403,7 +1403,7 @@ void print_boundary_type(CellProps* Cells) {
         printf(b4_filename);
         printf("\n");}*/
 
-    if (MYTHREAD == 0){
+    /*if (MYTHREAD == 0){
         for(int BT = 0; BT<4; BT++) {
             FILE* b_file = fopen(b_filename[BT],"w");
             fclose(b_file);
@@ -1432,7 +1432,7 @@ void print_boundary_type(CellProps* Cells) {
     free(N_B[0]);
     free(N_B[1]);
     free(N_B[2]);
-    free(N_B[3]);
+    free(N_B[3]);*/
 
 }
 void print_cell_line(FILE* file, const CellProps* Cell) {
@@ -1454,10 +1454,7 @@ void print_cell_line(FILE* file, const CellProps* Cell) {
 
 
 //Other functions
-CellProps* cell_from_id(CellProps* Cells, int ID){
-    int n = ID + LAYER - MYTHREAD*BLOCKSIZE;
-    return (Cells+n);
-}
+
 void calc_collision_freq(float Viscosity) {// Calculate collision frequency
     Omega  = 1.0/(3.*Viscosity+0.5);
     OmegaA = 8*(2-Omega)/(8-Omega);

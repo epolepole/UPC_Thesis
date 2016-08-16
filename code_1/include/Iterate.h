@@ -193,7 +193,6 @@ void CalculateDragLiftForcesStep(int CalculateDragLift);
 
 
 //Other functions
-CellProps* cell_from_id(CellProps* Cells, int ID);
 void calc_collision_freq(float Viscosity);
 
 

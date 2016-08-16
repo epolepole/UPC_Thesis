@@ -23,7 +23,7 @@
 #define LAYER NN*NM
 #define NODES NN*NM*NL
 #define LAYERS_PER_THREAD ((int)(NL/THREADS))
-#define BLOCKSIZE LAYER*LAYERS_PER_THREAD
+//#define BLOCKSIZE LAYER*LAYERS_PER_THREAD
 
 //Number of threads per dimension
 #define NTD (int) pow(THREADS,1/3.)
