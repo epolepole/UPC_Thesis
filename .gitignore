@@ -9,4 +9,6 @@ build
 .idea
 SetUpData.ini
 Mesh_256
+Mesh_125
 Mesh_250
+Mesh*
