@@ -96,15 +96,15 @@ void Iteration(char* NodeDataFile, char* BCconnectorDataFile,
 
     init_measure_time;
     CellIni( Cells,
-                 Nodes,            // Nodes
-                 BCconn,           // BCconn
-                 Uavg,             // INPUT PARAMETER
-                 Vavg,             // INPUT PARAMETER
-                 Wavg,             // INPUT PARAMETER
-                 InletProfile,     // INPUT PARAMETER
-                 CollisionModel,   // INPUT PARAMETER
-                 opp,              // Opposite direction
-                 rho_ini);         // Initial density
+             Nodes,            // Nodes
+             BCconn,           // BCconn
+             Uavg,             // INPUT PARAMETER
+             Vavg,             // INPUT PARAMETER
+             Wavg,             // INPUT PARAMETER
+             InletProfile,     // INPUT PARAMETER
+             CollisionModel,   // INPUT PARAMETER
+             opp,              // Opposite direction
+             rho_ini);         // Initial density
     end_measure_time(tCellsInitialization);
 
     main_thread
@@ -205,7 +205,7 @@ void main_while_loop(int CollisionModel, int CurvedBoundaries, int OutletProfile
                      float ConvergenceCritRho) {
 
     while ((Residuals[0] > ConvergenceCritVeloc || Residuals[1] > ConvergenceCritRho) && iter < (*Iterations))
-    //while ((shared_total_Residuals[0] > ConvergenceCritVeloc || shared_total_Residuals[1] > ConvergenceCritRho) && iter < (*Iterations))
+        //while ((shared_total_Residuals[0] > ConvergenceCritVeloc || shared_total_Residuals[1] > ConvergenceCritRho) && iter < (*Iterations))
     {
 
 
@@ -472,7 +472,7 @@ void setThingsToGet(){
         int Y = getY_C(cur_corner);
         int Z = getZ_C(cur_corner);
 
-        corners_to_get[7-cur_corner] = 1;
+        /*corners_to_get[7-cur_corner] = 1;
 
         edges_to_get[getE(0,3-Y-2*Z)] = 1;
         edges_to_get[getE(1,3-Z-2*X)] = 1;
@@ -480,7 +480,7 @@ void setThingsToGet(){
 
         faces_to_get[getF(0,1-X)] = 1;
         faces_to_get[getF(1,1-Y)] = 1;
-        faces_to_get[getF(2,1-Z)] = 1;
+        faces_to_get[getF(2,1-Z)] = 1;*/
     }//Checked
 
     else if(cur_edge!=-1) {
@@ -637,25 +637,30 @@ void FillCellsWithLBCells() {
     int a, b, c;
 
     for (f = 0; f<6; f++){
-        Ax=getAx_F(f);
-        Dir=getDir_F(f);
+        if (faces_to_get[f] == 1){
+            Ax=getAx_F(f);
+            Dir=getDir_F(f);
 
-        a = (min+(max-min)*Dir);
+            a = (min+(max-min)*Dir);
 
-        for (c=1; c<LAT+1;c++) {
-            for (b=1; b<LAT+1;b++){
+            for (c=1; c<LAT+1;c++) {
+                for (b=1; b<LAT+1;b++){
 
-                //Faces
-                i = eq(Ax,0)*a + eq(Ax,1)*c + eq(Ax,2)*b;
-                j = eq(Ax,1)*a + eq(Ax,2)*c + eq(Ax,0)*b;
-                k = eq(Ax,2)*a + eq(Ax,0)*c + eq(Ax,1)*b;
-                Cells[getLocalID_LocalIndex(i, j, k)] = L_B_Cells[c_BC];
-                c_BC++;
+                    //Faces
+                    i = eq(Ax,0)*a + eq(Ax,1)*c + eq(Ax,2)*b;
+                    j = eq(Ax,1)*a + eq(Ax,2)*c + eq(Ax,0)*b;
+                    k = eq(Ax,2)*a + eq(Ax,0)*c + eq(Ax,1)*b;
+                    Cells[getLocalID_LocalIndex(i, j, k)] = L_B_Cells[c_BC];
+                    c_BC++;
+                }
             }
+        }
+        else {
+            c_BC=c_BC + LAT*LAT;
         }
     }
 
-    
+
 
 
 
@@ -664,21 +669,26 @@ void FillCellsWithLBCells() {
 
     //Edges
     for (e = 0; e<12; e++){
-        Ax=getAx_E(e);
-        Pos=getPos_E(e);
+        if(edges_to_get[e] == 1) {
+            Ax = getAx_E(e);
+            Pos = getPos_E(e);
 
-        b = (min + (max-min)*(Pos%2));
-        c = (min + (max-min)*(Pos/2));
-
-
-        for (a=1; a<LAT+1;a++){
-            i= i=eq(Ax,1)*c + eq(Ax,2)*b + eq(Ax,0)*a;
-            j= j=eq(Ax,2)*c + eq(Ax,0)*b + eq(Ax,1)*a;
-            k= k=eq(Ax,0)*c + eq(Ax,1)*b + eq(Ax,2)*a;
+            b = (min + (max - min) * (Pos % 2));
+            c = (min + (max - min) * (Pos / 2));
 
 
-            Cells[getLocalID_LocalIndex(i, j, k)] = L_B_Cells[c_BC];
-            c_BC++;
+            for (a = 1; a < LAT + 1; a++) {
+                i = i = eq(Ax, 1) * c + eq(Ax, 2) * b + eq(Ax, 0) * a;
+                j = j = eq(Ax, 2) * c + eq(Ax, 0) * b + eq(Ax, 1) * a;
+                k = k = eq(Ax, 0) * c + eq(Ax, 1) * b + eq(Ax, 2) * a;
+
+
+                Cells[getLocalID_LocalIndex(i, j, k)] = L_B_Cells[c_BC];
+                c_BC++;
+            }
+        }
+        else {
+            c_BC=c_BC + LAT;
         }
     }
     PRINTING
