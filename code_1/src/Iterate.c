@@ -655,10 +655,6 @@ void FillCellsWithLBCells() {
         }
     }
 
-    
-
-
-
     PRINTING
         printf("T%i: Copied Faces\n",MYTHREAD);
 
